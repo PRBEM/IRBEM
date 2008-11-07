@@ -229,3 +229,4 @@ xHEEQ = onera_desp_lib_rotate(xHAE,'hae2heeq',matlabd);
 HEEQ2HAE
 xHAE = onera_desp_lib_rotate(xHEEQ,'heeq2hae',matlabd);
 
+This document is largely superseded by the project help pages
