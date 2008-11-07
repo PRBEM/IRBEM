@@ -1,0 +1,22 @@
+`make install' is used to install (copy) the files necessary for using
+ONERA_DESP_LIB into `matlab' and top level ONERA_DESP_LIB directories.
+ The only optional `make' variable is as follows...
+
+   INSTALLDIR=<path>
+     where <path> is the directory path of where the `matlab',directory 
+     provided in the distribution exist.  If this is not
+     specified, a default path of `.' is used (which specifies the current
+     directory level).
+
+For example, to install the ONERA_DESP_LIB distribution at the current 
+directory level enter the following...
+
+   make install
+
+If you wanted to install the distribution at a different location, for
+instance `/usr/local/onera_desp_lib', enter the following...
+
+   make INSTALLDIR=/usr/local/onera_desp_lib install
+
+Note that `install' is at the end of the command line after the `make'
+variable.

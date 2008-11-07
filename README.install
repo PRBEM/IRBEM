@@ -1,0 +1,78 @@
+                   ONERA_DESP_LIB
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!   You must have a Fortran compiler in order to build the ONERA_DESP_LIB distribution.    !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Requests for assistance or documentation should be sent to:
+
+  Internet -- sebastien.bourdarie@onera.fr
+
+If you get the distribution, please send to sebastien.bourdarie@onera.fr a 
+message so we can put you on our mailing list.  
+That way you will be notified of new releases. 
+
+
+Installation Instructions
+-------------------------
+
+ONERA_DESP_LIB has a makefile setup to automatically build the library.
+The following steps should be taken to build and install ONERA_DESP_LIB.
+
+        1. Set your current directory (cd) to the top level ONERA_DESP_LIB
+	 directory.
+
+        2. Compile/link the distribution.  First enter...
+
+              make all.help
+
+           For example, to build the distribution on a SunOS system using
+           the gnu Fortran compiler enter...
+
+              make OS=sunos ENV=gnu64 all
+
+           The `OS' and `ENV' variables are described in the `make all.help'
+           part of this step.
+
+        3. Install the libraries.
+	   First enter...
+
+              make install.help
+
+           to determine the required/optional `make' variables to be used.
+           Then enter...
+
+              make `make variables...' install
+
+           The appropriate files will be copied to the `matlab'
+           and top level ONERA_DESP_LIB directories (from the `source/...'
+           directory).
+
+           For example, to install the distribution in `/usr/local/onera_desp_lib'
+           enter...
+
+              make INSTALLDIR=/usr/local/onera_desp_lib install
+
+           The `INSTALLDIR' variable is described in the `make install.help'
+           part of this step.
+
+        4. Test that the distribution was built correctly by entering...
+	   First enter...
+
+              make test.help
+
+           to determine the required/optional `make' variables to be used.
+           Then enter...
+
+
+              make `make variables...' test
+
+           The name of each test executed and results will be displayed.
+
+        5. Delete the library(s), object files, and executables in the
+           `source/...' directory by entering...
+
+              make clean
+
+

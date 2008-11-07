@@ -1,0 +1,30 @@
+Introduction
+------------
+
+`make test' is used to test that the distribution was built correctly.
+
+Make Variables
+--------------
+
+  The supported `make' variables consist of the following...
+
+     LANG          REQUIRED.  The language to be tested.
+
+  A detailed description of each variable follows...
+
+     LANG=<lang>
+       This variable is REQUIRED
+
+          LANG=IDL allows to test the ONERA_DESP_LIB (shared one) from 
+	       IDL using the call_external command.
+
+Examples
+--------
+
+  For example, to test the ONERA_DESP_LIB distribution with IDL
+  use the command...
+
+     make LANG=IDL test
+
+  Note that `test' is at the end of each command line after any `make'
+  variables.

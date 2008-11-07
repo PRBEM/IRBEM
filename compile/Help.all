@@ -1,0 +1,111 @@
+Introduction
+------------
+
+`make all' is used to compile/link the ONERA_DESP_LIB distribution.  Several `make'
+variables are used to configure the distribution for your particular operating
+system and environment.  They are specified on the command line as part of the
+`make' command.  The "Examples" section below illustrates how to specify `make'
+variables.  If your operating system and/or environment is not supported,
+please contact sebastien.bourdarie@onera.fr  .
+We will either add the support or tell you how to patch the `make' file in the
+top-level directory of the current distribution.  If your operating system and
+environment is supported but you still have problems, simply contact 
+sebastien.bourdarie@onera.fr with a description of the problem 
+(eg. operating system, environment, log of error messages, etc.).
+
+Make Variables
+--------------
+
+  The supported `make' variables consist of the following...
+
+     OS            REQUIRED.  The operating system being used.
+     ENV           REQUIRED.  The environment/architecture being used (eg. Fortran compiler).
+
+  A detailed description of each variable follows...
+
+     OS=<os>
+     ENV=<env>
+       These variables are REQUIRED and specify the operating system you are
+       using and the environment in which to build the ONERA_DESP_LIB distribution.  These
+       variables are always specified as a pair.  In the following list each
+       supported operating system is shown along with the possible environments
+       for that operation system...
+
+          OS=sunos   For SunOS on a Sun (SOLARIS 2.x == SunOS 5.x) or a PC.  The
+                       possible environments are...
+
+                       ENV=sparc32  Compile using the System 
+                                  V flavored SPARC Fortran compiler (/opt/SUNWspro/bin/f95), 
+				  Produce ELF 32-bit MSB dynamic lib (also available on 64-bit
+				  SunOS).
+
+
+
+                       ENV=sparc64  Compile using the System 
+                                  V flavored SPARC C compiler (/opt/SUNWspro/bin/f95), 
+				  Produce ELF 64-bit MSB dynamic lib.
+
+
+                       ENV=gnu32    Compile using Gnu Fortran (g77).
+				  Produce ELF 32-bit MSB dynamic lib (also available on 64-bit
+				  SunOS).
+
+                       ENV=gnu64    Compile using Gnu Fortran (g77)
+                                  Produce ELF 64-bit MSB dynamic lib.
+
+          OS=mach      For Mach on a NeXT or a MacOS X Server.  The possible
+                       environments are...
+ 
+                       ENV=gnu32   Compile using the Gnu-supplied Gnu C (gcc).
+
+          OS=linux32   For Linux 32-bit on an IBM PC, a Mac Power PC or a Dual Alpha.  
+                       The possible environments are...
+
+                       ENV=intel32  Compile using Intel Fortran (ifort).
+				  Produce ELF 32-bit MSB dynamic lib.
+
+                       ENV=gnu32    Compile using Gnu Fortran (g77).  This seems to
+                                  be the fortran compiler most commonly found on
+                                  Linux systems. 
+				  Produce ELF 32-bit MSB dynamic lib.
+
+                       ENV=pgi32    Compile using Portland Fortran compilers (PGI).
+				  Produce ELF 32-bit MSB dynamic lib.
+
+          OS=linux64   For Linux 64-bit on an IBM PC, a Mac Power PC or a Dual Alpha.  
+                       The possible environments are...
+
+                       ENV=intel32  Compile using Intel Fortran (ifort).
+				  Produce ELF 32-bit MSB dynamic lib.
+
+                       ENV=gnu32    Compile using Gnu Fortran (g77).  This seems to
+                                  be the fortran compiler most commonly found on
+                                  Linux systems. 
+				  Produce ELF 32-bit MSB dynamic lib.
+
+                       ENV=gnu64    Compile using Gnu Fortran (g77).  This seems to
+                                  be the fortran compiler most commonly found on
+                                  Linux systems. 
+				  Produce ELF 64-bit MSB dynamic lib.
+
+                       ENV=pgi64    Compile using Portland Fortran compilers (PGI).
+				  Produce ELF 64-bit MSB dynamic lib.
+
+          OS=win32     For Cygwin on a PC. The possible environments are...
+
+                       ENV=cygwin32 Compile using Gnu Fortran (g77).  This is the Fortran 
+                                  compiler for Cygwin systems. 
+				  Produce ELF 32-bit MSB dynamic lib.
+
+
+Examples
+--------
+
+  For example, to build the ONERA_DESP_LIB distribution on a Sun running SunOS 4.1 using
+  the System V gnu compiler environment and to produce a ELF 64-bit MSB dynamic lib
+  use the command...
+
+     make OS=sunos ENV=gnu64 all
+
+  Note that `all' is at the end of each command line after any `make'
+  variables.
