@@ -149,3 +149,83 @@ options  = onera_desp_lib_options(inoptions)
 sysaxes = onera_desp_lib_sysaxes(sysaxes)
 [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd)
 
+
+COORDINATE ROTATIONS
+GEO2GSM
+xGSM = onera_desp_lib_rotate(xGEO,'geo2gsm',matlabd);
+[xGSM,psi] = onera_desp_lib_rotate(xGEO,'geo2gsm',matlabd);
+
+GSM2GEO
+xGEO = onera_desp_lib_rotate(xGSM,'gsm2geo',matlabd);
+[xGEO,psi] = onera_desp_lib_rotate(xGSM,'gsm2geo',matlabd);
+
+GEO2GSE
+xGSE = onera_desp_lib_rotate(xGEO,'geo2gse',matlabd);
+
+GSE2GEO
+xGEO = onera_desp_lib_rotate(xGSE,'gse2geo',matlabd);
+
+GDZ2GEO
+******NOTE ORDER OF GDZ COORDINATES********
+xGEO = onera_desp_lib_rotate([alti(:), lati(:), longi(:)],'gdz2geo');
+xx = xGEO(:,1); yy = xGEO(:,2); zz = xGEO(:,3);
+
+GEO2GDZ
+******NOTE ORDER OF GDZ COORDINATES********
+xGDZ = onera_desp_lib_rotate([xx(:) yy(:) zz(:)],'geo2gdz');
+alti = xGDZ(:,1); lati = xGDZ(:,2); longi = xGDZ(:,3); 
+
+GEO2GEI
+xGEI = onera_desp_lib_rotate(xGEO,'geo2gei',matlabd);
+
+GEI2GEO
+xGEO = onera_desp_lib_rotate(xGEI,'gei2geo',matlabd);
+
+GEO2SM
+xSM = onera_desp_lib_rotate(xGEO,'geo2sm',matlabd);
+
+SM2GEO
+xGEO = onera_desp_lib_rotate(xSM,'sm2geo',matlabd);
+
+GSM2SM
+xSM = onera_desp_lib_rotate(xGSM,'gsm2sm',matlabd);
+
+SM2GSM
+xGSM = onera_desp_lib_rotate(xSM,'sm2gsm',matlabd);
+
+GEO2MAG
+xMAG = onera_desp_lib_rotate(xGEO,'geo2mag',matlabd);
+
+MAG2GEO
+xGEO = onera_desp_lib_rotate(xMAG,'mag2geo',matlabd);
+
+SPH2CAR
+xCAR = onera_desp_lib_rotate([r(:), lati(:), longi(:)],'sph2car');
+
+CAR2SPH
+xSPH = onera_desp_lib_rotate(xCAR,'car2sph');
+r = xSPH(:,1); lati = xSPH(:,2); longi = xSPH(:,3);
+
+RLL2GDZ
+******NOTE ORDER OF GDZ COORDINATES********
+xGDZ = onera_desp_lib_rotate([r(:), lati(:), longi(:)],'rll2gdz');
+alti = xGDZ(:,1); lati = xGDZ(:,2); longi = xGDZ(:,3); 
+
+GSE2HEE
+xHEE = onera_desp_lib_rotate(xGSE,'gse2hee',matlabd);
+
+HEE2GSE
+xGSE = onera_desp_lib_rotate(xHEE,'hee2gse',matlabd);
+
+HEE2HAE
+xHAE = onera_desp_lib_rotate(xHEE,'hee2hae',matlabd);
+
+HAE2HEE
+xHEE = onera_desp_lib_rotate(xHAE,'hae2hee',matlabd);
+
+HAE2HEEQ
+xHEEQ = onera_desp_lib_rotate(xHAE,'hae2heeq',matlabd);
+
+HEEQ2HAE
+xHAE = onera_desp_lib_rotate(xHEEQ,'heeq2hae',matlabd);
+

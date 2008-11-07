@@ -19,7 +19,7 @@ function [Xfoot,Bfoot,BfootMag] = onera_desp_lib_find_foot_point(kext,options,sy
 %
 %***************************************************************************************************
 %
-% function [Xfoot,Bfoot,BfootMag] = onera_desp_lib_find_mirror_point(kext,options,sysaxes,matlabd,x1,x2,x3,stop_alt,hemi_flag,maginput)
+% function [Xfoot,Bfoot,BfootMag] = onera_desp_lib_find_foot_point(kext,options,sysaxes,matlabd,x1,x2,x3,stop_alt,hemi_flag,maginput)
 % finds the foot point for a field line
 % where the foot point is defined as the point at stop_alt km in gdz
 % hemi_flag has the following meaning:
@@ -118,7 +118,9 @@ for i = 1:ntime,
 end
 
 % the flag value is actually -1d31
+% BfootMag<=0 also indicates error
 Xfoot(Xfoot<-1e30) = nan;
 Bfoot(Bfoot<-1e30) = nan;
-BfootMag(BfootMag<-1e30) = nan;
-
+Xfoot(BfootMag<=0,:) = nan; % discard debug info
+Bfoot(BfootMag<=0,:) = nan; % discard debug info
+BfootMag(BfootMag<=0) = nan;
