@@ -188,6 +188,11 @@ void fly_in_ige1_(long int *launch_year, long int *duration,
 		  long int *nene, double *energy,
 		  double *Lower_flux, double *Mean_flux, double *Upper_flux);
 
+void fly_in_meo_gnss1_(long int *launch_year, long int *duration,
+		  long int *whichm, long int *whatf,
+		  long int *nene, double *energy,
+		  double *Lower_flux, double *Mean_flux, double *Upper_flux);
+
 void nrlmsise00_(long int *ntime,long int *whichAp,
 		long int *DOY,double *UT,double *ALT,double *LAT,double *LON,
 		double *F107A,double *F107,double *AP,double *Dens,double *Temp);

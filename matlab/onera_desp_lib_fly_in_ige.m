@@ -39,6 +39,10 @@ function [Lower_flux,Mean_flux,Upper_flux] = onera_desp_lib_fly_in_ige(launch_ye
 %   duration - This has to be considered as an upper envelop for expected 
 %   flux at GEO for any solar cycle
 
+% note: this is also a wrapper for fly_in_meo_gnss for whichm>100
+% in which case whichm is converted to whichm-100 and fly_in_meo_gnss1_ is
+% called instead of fly_in_ige1_
+
 onera_desp_lib_load;
 
 if isnumeric(whichm),
@@ -58,6 +62,15 @@ else
     end
 end
 
+iwhichm0 = iwhichm; % store this, as we're about to change it for gnss case
+
+if iwhichm >= 100,
+    iwhichm = iwhichm-100;
+    libfuncname = 'fly_in_meo_gnss1_';
+else
+    libfuncname = 'fly_in_ige1_';
+end
+
 NE = size(energy,1); % number of energies
 NEmax = 50; % maximum number of energies
 
@@ -68,7 +81,7 @@ if NE>NEmax,
     Upper_flux = nan(NE,1);
     for ie = 1:NEmax:NE,
         iie = ie:min(ie+NEmax-1,NE);
-        [lf,mf,uf] = onera_desp_lib_fly_in_ige(launch_year,duration,iwhichm,energy(iie,:));
+        [lf,mf,uf] = onera_desp_lib_fly_in_ige(launch_year,duration,iwhichm0,energy(iie,:));
         Lower_flux(iie) = lf;
         Mean_flux(iie) = mf;
         Upper_flux(iie) = uf;
@@ -106,7 +119,7 @@ else
     LFluxPtr = libpointer('doublePtr',zeros(NEmax,1));
     MFluxPtr = libpointer('doublePtr',zeros(NEmax,1));
     UFluxPtr = libpointer('doublePtr',zeros(NEmax,1));
-    calllib('onera_desp_lib','fly_in_ige1_',launch_year,duration,iwhichm,whatf,NE,energy',LFluxPtr,MFluxPtr,UFluxPtr);
+    calllib('onera_desp_lib',libfuncname,launch_year,duration,iwhichm,whatf,NE,energy',LFluxPtr,MFluxPtr,UFluxPtr);
     Lower_flux = get(LFluxPtr,'value');
     Mean_flux = get(MFluxPtr,'value');
     Upper_flux = get(UFluxPtr,'value');
