@@ -886,7 +886,8 @@ C	[EOS TRANS. AGU APRIL 21, 1992, P. 182]. INTERPOLATION IS USED
 C	FOR YEARS BETWEEN DGRF MODELS, AND EXTRAPOLATION FOR YEARS
 C	BETWEEN 1990 AND 2000.
 C       Coefficients for 1995 were added by D. Boscher
-c
+C       Modified by Paul O'Brien: ierr set, but uses nearest date limit
+c       Date limits are 1965 to 2015
 c
 c		Mauricio Peredo
 c		Hughes STX at NASA/GSFC
@@ -1108,7 +1109,7 @@ C
 	if ( (year.lt.1965.D0).or.(year.gt.2015.D0) ) then
 	   ierr=1
 	   write(*,999) year
-	   goto 300
+c	   goto 300 ! continue, just throw an error
 	endif
 c
       IF (year.LT.1970.D0) GOTO 50	!INTERPOLATE BETWEEN 1965 - 1970
@@ -1123,6 +1124,9 @@ C
 C	EXTRAPOLATE BETWEEN 2005 - 2015
 C
       DT=year-2005.D0
+      if (DT.gt.10.D0) then
+        DT = 10.D0 ! effectively 2015
+      endif
       DO 40 N=1,66
          G(N)=G05(N)
          H(N)=H05(N)
@@ -1135,7 +1139,12 @@ C
 C
 C	INTERPOLATE BETWEEEN 1965 - 1970
 C
-50    F2=(year-1965.D0)/5.D0
+50    
+      if (year.gt.1965.D0) then
+        F2=(year-1965.D0)/5.D0
+      else
+        F2=0.D0 ! effectively 1965
+      endif
       F1=1.D0-F2
       DO 55 N=1,66
          G(N)=G65(N)*F1+G70(N)*F2
