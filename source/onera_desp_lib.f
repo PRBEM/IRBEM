@@ -16,9 +16,9 @@
 !    You should have received a copy of the GNU Lesser General Public License
 !    along with ONERA_DESP_LIB.  If not, see <http://www.gnu.org/licenses/>.
 !
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrappers and procedures for ONERA_DESP_LIB
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION make_lstar(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -47,18 +47,18 @@ c
         SUBROUTINE make_lstar1(ntime,kext,options,sysaxes,iyearsat,
      &  idoy,UT,xIN1,xIN2,xIN3,maginput,Lm,Lstar,BLOCAL,BMIN,XJ,MLT)
 c
-	IMPLICIT NONE
-	INCLUDE 'variables.inc'
+      IMPLICIT NONE
+      INCLUDE 'variables.inc'
 C
 c declare inputs
-        INTEGER*4    ntime_max,kext,k_ext,k_l,options(5)
-	PARAMETER (ntime_max=100000)
-        INTEGER*4    ntime,sysaxes
-	INTEGER*4    iyearsat(ntime_max)
-	integer*4    idoy(ntime_max)
-	real*8     UT(ntime_max)
-	real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
-	real*8     maginput(25,ntime_max)
+      INTEGER*4    ntime_max,kext,k_ext,k_l,options(5)
+      PARAMETER (ntime_max=100000)
+      INTEGER*4    ntime,sysaxes
+      INTEGER*4    iyearsat(ntime_max)
+      integer*4    idoy(ntime_max)
+      real*8     UT(ntime_max)
+      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+      real*8     maginput(25,ntime_max)
 c                      1: Kp
 c                      2: Dst
 c                      3: dens
@@ -85,7 +85,7 @@ c Declare internal variables
 	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables	
+c Declare output variables
         REAL*8     BLOCAL(ntime_max),BMIN(ntime_max),XJ(ntime_max)
 	REAL*8     MLT(ntime_max)
         REAL*8     Lm(ntime_max),Lstar(ntime_max)
@@ -155,7 +155,7 @@ c
 c	   write(6,*)real(isat)*100./real(ntime), '% done'
 c
            if (kint .le. 1) then
-              if (options(2) .eq. 0) then	
+              if (options(2) .eq. 0) then
 	        if (iyearsat(isat) .ne. iyear) then
 	           iyear=iyearsat(isat)
 	           dec_year=iyear+0.5d0
@@ -237,19 +237,19 @@ c
 	       longi=xIN3(isat)
 	       CALL RLL_GDZ(xMAG(1),lati,longi,alti)
 	   endif
-c	   
+c
 c make inputs according to magn. field model chosen
 c
            if (kext .eq. 1) then
 c Input for MEAD
 	       if (maginput(1,isat).le.3.d0) Activ=1
-	       if (maginput(1,isat).gt.3.d0 .and. 
+	       if (maginput(1,isat).gt.3.d0 .and.
      &         maginput(1,isat).lt.20.d0) Activ=2
-	       if (maginput(1,isat).ge.20.d0 .and. 
+	       if (maginput(1,isat).ge.20.d0 .and.
      &         maginput(1,isat).lt.30.d0) Activ=3
 	       if (maginput(1,isat).ge.30.d0) Activ=4
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          Lm(isat)=baddata
 		  Lstar(isat)=baddata
@@ -262,20 +262,20 @@ c
            if (kext .eq. 2) then
 c Input for TSYG87s
 	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and. 
+	       if (maginput(1,isat).ge.7.d0 .and.
      &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and. 
+	       if (maginput(1,isat).ge.17.d0 .and.
      &         maginput(1,isat).lt.20.d0) Activ=3
-	       if (maginput(1,isat).ge.20.d0 .and. 
+	       if (maginput(1,isat).ge.20.d0 .and.
      &         maginput(1,isat).lt.27.d0) Activ=4
-	       if (maginput(1,isat).ge.27.d0 .and. 
+	       if (maginput(1,isat).ge.27.d0 .and.
      &         maginput(1,isat).lt.37.d0) Activ=5
-	       if (maginput(1,isat).ge.37.d0 .and. 
+	       if (maginput(1,isat).ge.37.d0 .and.
      &         maginput(1,isat).lt.47.d0) Activ=6
 	       if (maginput(1,isat).ge.47.d0) Activ=7
 	       if (maginput(1,isat).ge.53.d0) Activ=8
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          Lm(isat)=baddata
 		  Lstar(isat)=baddata
@@ -288,17 +288,17 @@ c
            if (kext .eq. 3) then
 c Input for TSYG87l
 	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and. 
+	       if (maginput(1,isat).ge.7.d0 .and.
      &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and. 
+	       if (maginput(1,isat).ge.17.d0 .and.
      &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and. 
+	       if (maginput(1,isat).ge.27.d0 .and.
      &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and. 
+	       if (maginput(1,isat).ge.37.d0 .and.
      &         maginput(1,isat).lt.47.d0) Activ=5
 	       if (maginput(1,isat).ge.47.d0) Activ=6
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          Lm(isat)=baddata
 		  Lstar(isat)=baddata
@@ -311,19 +311,19 @@ c
            if (kext .eq. 4) then
 c Input for Tsy89
 	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and. 
+	       if (maginput(1,isat).ge.7.d0 .and.
      &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and. 
+	       if (maginput(1,isat).ge.17.d0 .and.
      &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and. 
+	       if (maginput(1,isat).ge.27.d0 .and.
      &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and. 
+	       if (maginput(1,isat).ge.37.d0 .and.
      &         maginput(1,isat).lt.47.d0) Activ=5
-	       if (maginput(1,isat).ge.47.d0 .and. 
+	       if (maginput(1,isat).ge.47.d0 .and.
      &         maginput(1,isat).lt.57.d0) Activ=6
 	       if (maginput(1,isat).ge.57.d0) Activ=7
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          Lm(isat)=baddata
 		  Lstar(isat)=baddata
@@ -529,9 +529,9 @@ c
            IF (MLT(isat).LT.0.d0) MLT(isat) = MLT(isat) + 24.d0
 	ENDDO
 	END
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION make_lstar_shell_splitting(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -602,7 +602,7 @@ c Declare internal variables
 	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables	
+c Declare output variables
         REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime_max)
 	REAL*8     XJ(ntime_max,Nalp),MLT(ntime_max)
         REAL*8     Lm(ntime_max,Nalp),Lstar(ntime_max,Nalp)
@@ -668,9 +668,9 @@ c
 	if (kint .eq. 3) CALL GSFC1266
         DO isat = 1,ntime
 c	   write(6,*)real(isat)*100./real(ntime), '% done'
-c	
+c
            if (kint .le. 1) then
-              if (options(2) .eq. 0) then	
+              if (options(2) .eq. 0) then
 	        if (iyearsat(isat) .ne. iyear) then
 	           iyear=iyearsat(isat)
 	           dec_year=iyear+0.5d0
@@ -752,19 +752,19 @@ c
 	       longi=xIN3(isat)
 	       CALL RLL_GDZ(xMAG(1),lati,longi,alti)
 	   endif
-c	   
+c
 c make inputs according to magn. field model chosen
 c
            if (kext .eq. 1) then
 c Input for MEAD
 	       if (maginput(1,isat).le.3.d0) Activ=1
-	       if (maginput(1,isat).gt.3.d0 .and. 
+	       if (maginput(1,isat).gt.3.d0 .and.
      &         maginput(1,isat).lt.20.d0) Activ=2
-	       if (maginput(1,isat).ge.20.d0 .and. 
+	       if (maginput(1,isat).ge.20.d0 .and.
      &         maginput(1,isat).lt.30.d0) Activ=3
 	       if (maginput(1,isat).ge.30.d0) Activ=4
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          DO IPA=1,Nipa
 		     Lm(isat,IPA)=baddata
@@ -779,20 +779,20 @@ c
            if (kext .eq. 2) then
 c Input for TSYG87s
 	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and. 
+	       if (maginput(1,isat).ge.7.d0 .and.
      &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and. 
+	       if (maginput(1,isat).ge.17.d0 .and.
      &         maginput(1,isat).lt.20.d0) Activ=3
-	       if (maginput(1,isat).ge.20.d0 .and. 
+	       if (maginput(1,isat).ge.20.d0 .and.
      &         maginput(1,isat).lt.27.d0) Activ=4
-	       if (maginput(1,isat).ge.27.d0 .and. 
+	       if (maginput(1,isat).ge.27.d0 .and.
      &         maginput(1,isat).lt.37.d0) Activ=5
-	       if (maginput(1,isat).ge.37.d0 .and. 
+	       if (maginput(1,isat).ge.37.d0 .and.
      &         maginput(1,isat).lt.47.d0) Activ=6
 	       if (maginput(1,isat).ge.47.d0) Activ=7
 	       if (maginput(1,isat).ge.53.d0) Activ=8
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          DO IPA=1,Nipa
 		     Lm(isat,IPA)=baddata
@@ -807,17 +807,17 @@ c
            if (kext .eq. 3) then
 c Input for TSYG87l
 	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and. 
+	       if (maginput(1,isat).ge.7.d0 .and.
      &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and. 
+	       if (maginput(1,isat).ge.17.d0 .and.
      &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and. 
+	       if (maginput(1,isat).ge.27.d0 .and.
      &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and. 
+	       if (maginput(1,isat).ge.37.d0 .and.
      &         maginput(1,isat).lt.47.d0) Activ=5
 	       if (maginput(1,isat).ge.47.d0) Activ=6
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          DO IPA=1,Nipa
 		     Lm(isat,IPA)=baddata
@@ -832,19 +832,19 @@ c
            if (kext .eq. 4) then
 c Input for Tsy89
 	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and. 
+	       if (maginput(1,isat).ge.7.d0 .and.
      &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and. 
+	       if (maginput(1,isat).ge.17.d0 .and.
      &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and. 
+	       if (maginput(1,isat).ge.27.d0 .and.
      &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and. 
+	       if (maginput(1,isat).ge.37.d0 .and.
      &         maginput(1,isat).lt.47.d0) Activ=5
-	       if (maginput(1,isat).ge.47.d0 .and. 
+	       if (maginput(1,isat).ge.47.d0 .and.
      &         maginput(1,isat).lt.57.d0) Activ=6
 	       if (maginput(1,isat).ge.57.d0) Activ=7
 c
-	       if (maginput(1,isat).lt.0.d0 .or. 
+	       if (maginput(1,isat).lt.0.d0 .or.
      &         maginput(1,isat).gt.90.d0) then
 	          DO IPA=1,Nipa
 		     Lm(isat,IPA)=baddata
@@ -1066,7 +1066,7 @@ c Compute Bmin assuming 90° PA at S/C
      &         ,BLOCAL(isat,IPA),BMIN(isat))
 	   k_l=options(1)
            DO IPA=1,Nipa
-             if (alpha(IPA).ne.90.0d0) then 
+             if (alpha(IPA).ne.90.0d0) then
                 CALL find_bm(
      &           lati,longi,alti,alpha(IPA),BL,BMIR,xGEO)
 	        CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati_IPA,
@@ -1104,7 +1104,7 @@ c Compute Bmin assuming 90° PA at S/C
 	ENDDO
 	END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION Lstar_Phi(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -1148,12 +1148,13 @@ c Declare internal variables
         REAL*8     ERA,AQUAD,BQUAD
         REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
 c
-c Declare output variables	
-        REAL*8     Phi(ntime_max),Lstar(ntime_max)
+c Declare output variables
+        REAL*8     Phi(ntime_max),Lstar(ntime_max),pi
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
         COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
 C
+      pi=2.D0*atan(1.D0)
         iyear=1800
 	kint=options(5)
 	IF (kint .lt. 0) THEN
@@ -1182,7 +1183,7 @@ c
 c	   write(6,*)real(isat)*100./real(ntime), '% done'
 c
            if (kint .le. 1) then
-              if (options(2) .eq. 0) then	
+              if (options(2) .eq. 0) then
 	        if (iyearsat(isat) .ne. iyear) then
 	           iyear=iyearsat(isat)
 	           dec_year=iyear+0.5d0
@@ -1204,13 +1205,13 @@ c
 	   endif
 	   if (whichinv .EQ. 1) then !Lstar to Phi
 	      if (Lstar(isat) .NE. baddata) then
-	         Phi(isat)=Bo/Lstar(isat)
+	         Phi(isat)=2.d0*pi*Bo/Lstar(isat)
 	      else
 	         Phi(isat)=baddata
 	      endif
 	   else
 	      if (phi(isat) .NE. baddata) then
-	         Lstar(isat)=Bo/Phi(isat)
+	         Lstar(isat)=2.d0*pi*Bo/Phi(isat)
 	      else
 	         Lstar(isat)=baddata
 	      endif
@@ -1218,7 +1219,7 @@ c
 	enddo
 	end
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION drift_shell(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -1274,7 +1275,7 @@ c Declare internal variables
 	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables	
+c Declare output variables
         INTEGER*4  ind(48)
         REAL*8     BLOCAL(1000,48),BMIN,XJ
         REAL*8     Lm,Lstar
@@ -1336,7 +1337,7 @@ c
 	if (kint .eq. 2) CALL JensenANDCain1960
 	if (kint .eq. 3) CALL GSFC1266
         if (kint .le. 1) then
-           if (options(2) .eq. 0) then	
+           if (options(2) .eq. 0) then
 	      if (iyearsat .ne. iyear) then
 	         iyear=iyearsat
 	         dec_year=iyear+0.5d0
@@ -1424,13 +1425,13 @@ c
         if (kext .eq. 1) then
 c Input for MEAD
 	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and. 
+	    if (maginput(1).gt.3.d0 .and.
      &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.30.d0) Activ=3
 	    if (maginput(1).ge.30.d0) Activ=4
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       Lstar=baddata
@@ -1442,20 +1443,20 @@ c
         if (kext .eq. 2) then
 c Input for TSYG87s
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=6
 	    if (maginput(1).ge.47.d0) Activ=7
 	    if (maginput(1).ge.53.d0) Activ=8
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       Lstar=baddata
@@ -1467,17 +1468,17 @@ c
         if (kext .eq. 3) then
 c Input for TSYG87l
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
 	    if (maginput(1).ge.47.d0) Activ=6
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       Lstar=baddata
@@ -1489,19 +1490,19 @@ c
         if (kext .eq. 4) then
 c Input for Tsy89
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and. 
+	    if (maginput(1).ge.47.d0 .and.
      &      maginput(1).lt.57.d0) Activ=6
 	    if (maginput(1).ge.57.d0) Activ=7
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       Lstar=baddata
@@ -1671,13 +1672,13 @@ c Input for Alexeev 2000
 	    BzIMF_nt=maginput(7)
 	    Al=maginput(17)
 	endif
-c	   	   
+c
         CALL trace_drift_shell(lati,longi,alti
      &     ,Lm,Lstar,XJ,BLOCAL,BMIN,
      &     posit,ind)
 	END
 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION trace_field_line(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -1690,7 +1691,7 @@ c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine make_Lstar: 17 arguments
-      call trace_field_line1(%VAL(argv(1)), %VAL(argv(2)), 
+      call trace_field_line1(%VAL(argv(1)), %VAL(argv(2)),
      +%VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -1734,7 +1735,7 @@ c Declare internal variables
 	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables	
+c Declare output variables
         INTEGER*4  ind
         REAL*8     BLOCAL(1000),BMIN,XJ
         REAL*8     Lm
@@ -1801,7 +1802,7 @@ c
 	if (kint .eq. 2) CALL JensenANDCain1960
 	if (kint .eq. 3) CALL GSFC1266
         if (kint .le. 1) then
-           if (options(2) .eq. 0) then	
+           if (options(2) .eq. 0) then
 	      if (iyearsat .ne. iyear) then
 	         iyear=iyearsat
 	         dec_year=iyear+0.5d0
@@ -1889,13 +1890,13 @@ c
         if (kext .eq. 1) then
 c Input for MEAD
 	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and. 
+	    if (maginput(1).gt.3.d0 .and.
      &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.30.d0) Activ=3
 	    if (maginput(1).ge.30.d0) Activ=4
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       XJ=baddata
@@ -1907,20 +1908,20 @@ c
         if (kext .eq. 2) then
 c Input for TSYG87s
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=6
 	    if (maginput(1).ge.47.d0) Activ=7
 	    if (maginput(1).ge.53.d0) Activ=8
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       XJ=baddata
@@ -1932,17 +1933,17 @@ c
         if (kext .eq. 3) then
 c Input for TSYG87l
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
 	    if (maginput(1).ge.47.d0) Activ=6
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       XJ=baddata
@@ -1954,19 +1955,19 @@ c
         if (kext .eq. 4) then
 c Input for Tsy89
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and. 
+	    if (maginput(1).ge.47.d0 .and.
      &      maginput(1).lt.57.d0) Activ=6
 	    if (maginput(1).ge.57.d0) Activ=7
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Lm=baddata
 	       XJ=baddata
@@ -2136,12 +2137,12 @@ c Input for Alexeev 2000
 	    BzIMF_nt=maginput(7)
 	    Al=maginput(17)
 	endif
-c	   	   
+c
         CALL field_line_tracing(lati,longi,alti
      &     ,Lm,XJ,BLOCAL,BMIN,posit,ind)
 	END
 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION find_mirror_point(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -2154,7 +2155,7 @@ c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine make_Lstar: 19 arguments
-      call find_mirror_point1(%VAL(argv(1)), %VAL(argv(2)), 
+      call find_mirror_point1(%VAL(argv(1)), %VAL(argv(2)),
      + %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -2199,7 +2200,7 @@ c Declare internal variables
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 	real*8     BxGEO(3)
 c
-c Declare output variables	
+c Declare output variables
         REAL*8     BLOCAL,xGEO(3),BMIR
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
@@ -2256,7 +2257,7 @@ c
 	if (kint .eq. 2) CALL JensenANDCain1960
 	if (kint .eq. 3) CALL GSFC1266
         if (kint .le. 1) then
-           if (options(2) .eq. 0) then	
+           if (options(2) .eq. 0) then
 	      if (iyearsat .ne. iyear) then
 	         iyear=iyearsat
 	         dec_year=iyear+0.5d0
@@ -2283,6 +2284,7 @@ c
 	    alti=xIN1
 	    lati=xIN2
 	    longi=xIN3
+	    call gdz_geo(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
 	endif
 	if (sysaxes .EQ. 1) then
 	    xGEO(1)=xIN1
@@ -2337,20 +2339,21 @@ c
 	    lati=xIN2
 	    longi=xIN3
 	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
+	    call gdz_geo(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
 	endif
-c	   	   
+c
 c make inputs according to magn. field model chosen
 c
         if (kext .eq. 1) then
 c Input for MEAD
 	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and. 
+	    if (maginput(1).gt.3.d0 .and.
      &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.30.d0) Activ=3
 	    if (maginput(1).ge.30.d0) Activ=4
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       xGEO(1)=baddata
 	       xGEO(2)=baddata
@@ -2363,20 +2366,20 @@ c
         if (kext .eq. 2) then
 c Input for TSYG87s
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=6
 	    if (maginput(1).ge.47.d0) Activ=7
 	    if (maginput(1).ge.53.d0) Activ=8
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       xGEO(1)=baddata
 	       xGEO(2)=baddata
@@ -2389,17 +2392,17 @@ c
         if (kext .eq. 3) then
 c Input for TSYG87l
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
 	    if (maginput(1).ge.47.d0) Activ=6
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       xGEO(1)=baddata
 	       xGEO(2)=baddata
@@ -2412,19 +2415,19 @@ c
         if (kext .eq. 4) then
 c Input for Tsy89
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and. 
+	    if (maginput(1).ge.47.d0 .and.
      &      maginput(1).lt.57.d0) Activ=6
 	    if (maginput(1).ge.57.d0) Activ=7
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       xGEO(1)=baddata
 	       xGEO(2)=baddata
@@ -2579,7 +2582,7 @@ c Input for Tsy01 storm
 	    G2_tsy01=maginput(9)
 	    G3_tsy01=maginput(10)
 	endif
-c	   
+c
         if (kext .eq. 11) then
 c Input for Tsy04 storm
 	    dst_nt=maginput(2)
@@ -2609,8 +2612,8 @@ c Input for Alexeev 2000
 	    Al=maginput(17)
 	endif
 c
-        if (alpha.eq.90.0d0) then 
-          Iint=2   
+        if (alpha.eq.90.0d0) then
+          Iint=2
           CALL CHAMP(Iint,xGEO,BxGEO,Blocal,Ifail)
 	  IF (Ifail.LT.0) THEN
 	    Blocal=baddata
@@ -2622,7 +2625,7 @@ c
 	    BMIR=Blocal
 	  ENDIF
 	  RETURN
-	endif	   
+	endif
 c
         CALL find_bm(lati,longi,alti,alpha
      &     ,BLOCAL,BMIR,xGEO)
@@ -2630,7 +2633,7 @@ c
 
 
 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION find_MAGequator(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -2642,7 +2645,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c  
+c
       call find_MAGequator1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -2685,7 +2688,7 @@ c Declare internal variables
 	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables	
+c Declare output variables
         REAL*8     BMIN
 	REAL*8     posit(3)
 C
@@ -2744,7 +2747,7 @@ c
 	if (kint .eq. 2) CALL JensenANDCain1960
 	if (kint .eq. 3) CALL GSFC1266
         if (kint .le. 1) then
-           if (options(2) .eq. 0) then	
+           if (options(2) .eq. 0) then
 	      if (iyearsat .ne. iyear) then
 	         iyear=iyearsat
 	         dec_year=iyear+0.5d0
@@ -2826,19 +2829,19 @@ c
 	    longi=xIN3
 	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
 	endif
-c	   
+c
 c make inputs according to magn. field model chosen
 c
         if (kext .eq. 1) then
 c Input for MEAD
 	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and. 
+	    if (maginput(1).gt.3.d0 .and.
      &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.30.d0) Activ=3
 	    if (maginput(1).ge.30.d0) Activ=4
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       posit(1)=baddata
 	       posit(2)=baddata
@@ -2850,20 +2853,20 @@ c
         if (kext .eq. 2) then
 c Input for TSYG87s
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=6
 	    if (maginput(1).ge.47.d0) Activ=7
 	    if (maginput(1).ge.53.d0) Activ=8
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       posit(1)=baddata
 	       posit(2)=baddata
@@ -2875,17 +2878,17 @@ c
         if (kext .eq. 3) then
 c Input for TSYG87l
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
 	    if (maginput(1).ge.47.d0) Activ=6
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       posit(1)=baddata
 	       posit(2)=baddata
@@ -2897,19 +2900,19 @@ c
         if (kext .eq. 4) then
 c Input for Tsy89
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and. 
+	    if (maginput(1).ge.47.d0 .and.
      &      maginput(1).lt.57.d0) Activ=6
 	    if (maginput(1).ge.57.d0) Activ=7
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       posit(1)=baddata
 	       posit(2)=baddata
@@ -3080,11 +3083,11 @@ c Input for Alexeev 2000
 	    Al=maginput(17)
 	endif
 c
-c	   	   
+c
         CALL loc_equator(
      &     lati,longi,alti,BMIN,posit)
 	END
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION GET_FIELD(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3096,7 +3099,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c  
+c
       call GET_FIELD1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -3139,7 +3142,7 @@ c Declare internal variables
 	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables	
+c Declare output variables
         REAL*8     BxGEO(3),Bl
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
@@ -3197,7 +3200,7 @@ c
 	if (kint .eq. 2) CALL JensenANDCain1960
 	if (kint .eq. 3) CALL GSFC1266
         if (kint .le. 1) then
-           if (options(2) .eq. 0) then	
+           if (options(2) .eq. 0) then
 	      if (iyearsat .ne. iyear) then
 	         iyear=iyearsat
 	         dec_year=iyear+0.5d0
@@ -3274,19 +3277,19 @@ c
 	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
 	    CALL GDZ_GEO(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
 	endif
-c	   
+c
 c make inputs according to magn. field model chosen
 c
         if (kext .eq. 1) then
 c Input for MEAD
 	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and. 
+	    if (maginput(1).gt.3.d0 .and.
      &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.30.d0) Activ=3
 	    if (maginput(1).ge.30.d0) Activ=4
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Bl=baddata
 	       BxGEO(1)=baddata
@@ -3298,20 +3301,20 @@ c
         if (kext .eq. 2) then
 c Input for TSYG87s
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and. 
+	    if (maginput(1).ge.20.d0 .and.
      &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=6
 	    if (maginput(1).ge.47.d0) Activ=7
 	    if (maginput(1).ge.53.d0) Activ=8
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Bl=baddata
 	       BxGEO(1)=baddata
@@ -3323,17 +3326,17 @@ c
         if (kext .eq. 3) then
 c Input for TSYG87l
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
 	    if (maginput(1).ge.47.d0) Activ=6
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Bl=baddata
 	       BxGEO(1)=baddata
@@ -3345,19 +3348,19 @@ c
         if (kext .eq. 4) then
 c Input for Tsy89
 	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and. 
+	    if (maginput(1).ge.7.d0 .and.
      &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and. 
+	    if (maginput(1).ge.17.d0 .and.
      &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and. 
+	    if (maginput(1).ge.27.d0 .and.
      &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and. 
+	    if (maginput(1).ge.37.d0 .and.
      &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and. 
+	    if (maginput(1).ge.47.d0 .and.
      &      maginput(1).lt.57.d0) Activ=6
 	    if (maginput(1).ge.57.d0) Activ=7
 c
-	    if (maginput(1).lt.0.d0 .or. 
+	    if (maginput(1).lt.0.d0 .or.
      &      maginput(1).gt.90.d0) then
 	       Bl=baddata
 	       BxGEO(1)=baddata
@@ -3527,7 +3530,7 @@ c Input for Alexeev 2000
 	    BzIMF_nt=maginput(7)
 	    Al=maginput(17)
 	endif
-c	   	
+c
         CALL CHAMP(xGEO,BxGEO,Bl,Ifail)
 	IF (Ifail.LT.0) THEN
 	   BxGEO(1)=baddata
@@ -3536,7 +3539,7 @@ c
 	   Bl=baddata
 	ENDIF
 	END
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION GET_MLT(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3548,7 +3551,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c  
+c
       call GET_MLT1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)))
 
@@ -3576,7 +3579,7 @@ c Declare internal variables
 	REAL*8     xMAG(3),xSUN(3),rM,MLAT,Mlon1
 	REAL*8     xTMP(3)
 c
-c Declare output variables	
+c Declare output variables
         REAL*8     MLT
 C
         DATA  xSUN /1.d0,0.d0,0.d0/
@@ -3595,7 +3598,7 @@ C
         IF (MLT.LT.0.d0) MLT = MLT + 24.d0
 
         END
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION GET_HEMI(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3607,7 +3610,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c  
+c
       call GET_HEMI1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)))
@@ -3617,14 +3620,14 @@ c
       RETURN
       END
 c
-c Wrapper and proceduce to access many coordinate transformation form the 
+c Wrapper and proceduce to access many coordinate transformation form the
 c ONERA library
 c
 c =======================================================================
 c GEO2GSM
 c
 c Routine to transform Cartesian GEO to cartesian GSM coordinates
-c 
+c
 c  INPUTS: iyr = integer year
 c          idoy = integer day of year
 c          secs = UT in seconds
@@ -3643,7 +3646,7 @@ c =======================================================================
 c GSM2GEO
 c
 c Routine to transform Cartesian GSM to cartesian GEO coordinates
-c 
+c
 c  INPUTS: iyr = integer year
 c          idoy = integer day of year
 c          secs = UT in seconds
@@ -3663,7 +3666,7 @@ c =======================================================================
 c GDZ2GEO
 c
 c Routine to transform GEODEZIC coordinates to cartesian GEO coordinates
-c 
+c
 c  INPUTS: lati = latitude (degres)
 c          longi = longitude (degres)
 c          alti = altitude (km)
@@ -3682,8 +3685,8 @@ c
 c =======================================================================
 c GEO2GDZ
 c
-c Routine to transform cartesian GEO coordinates to GEODEZIC coordinates 
-c 
+c Routine to transform cartesian GEO coordinates to GEODEZIC coordinates
+c
 c INPUTS: xx = xGEO (Re)
 c          yy = yGEO (Re)
 c          zz = zGEO (Re)
@@ -3701,9 +3704,9 @@ c           /f_value)                             ;function returns a float.
 c
 c =======================================================================
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION coord_trans(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3725,9 +3728,9 @@ c  subroutine coord_trans1: 7 arguments
       END
 c
 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION coord_trans_vec(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3750,9 +3753,9 @@ c  subroutine coord_trans_vec1: 8 arguments
       END
 c
 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gsm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3779,15 +3782,15 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSM(3)
-	
+
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GSM(xGEO,xGSM)
         end
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gsm2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3814,17 +3817,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSM(3)
-	
-	
+
+
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSM_GEO(xGSM,xGEO)
         end
 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gse(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3851,16 +3854,16 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSE(3)
-	
+
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GSE(xGEO,xGSE)
         end
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gse2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3887,8 +3890,8 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSE(3)
-	
-	
+
+
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
@@ -3897,9 +3900,9 @@ c
 
 
 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gdz2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3920,9 +3923,9 @@ c  subroutine gdz2geo: 6 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gdz(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3943,9 +3946,9 @@ c  subroutine geo_gdz: 6 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gei(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3972,17 +3975,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGEI(3)
-	
+
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GEI(xGEO,xGEI)
         end
-	
-C----------------------------------------------------------------------------- 
+
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gei2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4009,17 +4012,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGEI(3)
-	
+
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEI_GEO(xGEI,xGEO)
         end
-	
-C----------------------------------------------------------------------------- 
+
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2sm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4046,17 +4049,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xSM(3)
-	
+
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_SM(xGEO,xSM)
         end
-	
-C----------------------------------------------------------------------------- 
+
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION sm2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4083,17 +4086,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xSM(3)
-	
+
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL SM_GEO(xSM,xGEO)
         end
-	
-C----------------------------------------------------------------------------- 
+
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gsm2sm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4120,17 +4123,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGSM(3),xSM(3)
-	
+
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSM_SM(xGSM,xSM)
         end
-	
-C----------------------------------------------------------------------------- 
+
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION sm2gsm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4157,16 +4160,16 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGSM(3),xSM(3)
-	
+
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL SM_GSM(xSM,xGSM)
         end
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2mag(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4192,15 +4195,15 @@ c
 	INTEGER*4 iyr
 	REAL*8    dyear
 	REAL*8    xGEO(3),xMAG(3)
-	
+
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL GEO_MAG(xGEO,xMAG)
         end
-	
-C----------------------------------------------------------------------------- 
+
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION mag2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4226,14 +4229,14 @@ c
 	INTEGER*4 iyr
 	REAL*8    dyear
 	REAL*8    xGEO(3),xMAG(3)
-	
+
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL MAG_GEO(xMAG,xGEO)
         end
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION sph2car(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4246,7 +4249,7 @@ c  Call subroutine geo2gsm1, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine geo2gsm: 6 arguments
-      call SPH_CAR(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)), 
+      call SPH_CAR(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      &  %VAL(argv(4)))
 
       sph2car = 9.9
@@ -4254,9 +4257,9 @@ c  subroutine geo2gsm: 6 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION car2sph(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4269,17 +4272,17 @@ c  Call subroutine geo2gsm1, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine geo2gsm: 6 arguments
-      call CAR_SPH(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)), 
+      call CAR_SPH(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      & %VAL(argv(4)))
 
       car2sph = 9.9
 
       RETURN
       END
-c	
-C----------------------------------------------------------------------------- 
+c
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION rll2gdz(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4292,16 +4295,16 @@ c  Call subroutine geo2gsm1, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine geo2gsm: 6 arguments
-      call RLL_GDZ(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)), 
+      call RLL_GDZ(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      & %VAL(argv(4)))
 
       rll2gdz = 9.9
 
       RETURN
       END
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gse2hee(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4322,9 +4325,9 @@ c  subroutine gse2hee1: 5 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hee2gse(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4345,9 +4348,9 @@ c  subroutine hee2gse1: 5 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hae2hee(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4368,9 +4371,9 @@ c  subroutine hae2hee1: 5 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hee2hae(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4391,9 +4394,9 @@ c  subroutine hee2hae1: 5 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hae2heeq(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4414,9 +4417,9 @@ c  subroutine hae2heeq1: 5 arguments
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 C Wrapper and procedure for ONERA library
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION heeq2hae(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4444,8 +4447,8 @@ c
 ! CREATION: S. Bourdarie - September 2005
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call fly_in_nasa_aeap1 (IN AE8_AP8.f) from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call fly_in_nasa_aeap1 (IN AE8_AP8.f) from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4459,7 +4462,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
 !
-      call fly_in_nasa_aeap1(%VAL(argv(1)), %VAL(argv(2)), 
+      call fly_in_nasa_aeap1(%VAL(argv(1)), %VAL(argv(2)),
      * %VAL(argv(3)),%VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),
      * %VAL(argv(7)),  %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)),
      * %VAL(argv(11)),  %VAL(argv(12)),  %VAL(argv(13)))
@@ -4475,8 +4478,8 @@ c
 ! CREATION: S. Bourdarie - March 2008
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call get_AE8_AP8_flux (IN AE8_AP8.f) from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call get_AE8_AP8_flux (IN AE8_AP8.f) from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4490,7 +4493,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
 !
-      call get_AE8_AP8_flux(%VAL(argv(1)), %VAL(argv(2)), 
+      call get_AE8_AP8_flux(%VAL(argv(1)), %VAL(argv(2)),
      * %VAL(argv(3)),%VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),
      * %VAL(argv(7)), %VAL(argv(8)))
 
@@ -4506,8 +4509,8 @@ c
 ! CREATION: S. Bourdarie - May 2006
 ! MODIFICATION: S. Bourdarie - March 2007 (add multi channel calculcations) - V4.1
 !
-! DESCRIPTION: Wrapper to call fly_in_afrl_crres1 (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call fly_in_afrl_crres1 (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4526,7 +4529,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call fly_in_afrl_crres1(%VAL(argv(1)), %VAL(argv(2)), 
+      call fly_in_afrl_crres1(%VAL(argv(1)), %VAL(argv(2)),
      * %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -4543,8 +4546,8 @@ c
 !
 ! CREATION: S. Bourdarie - March 2008
 !
-! DESCRIPTION: Wrapper to call get_crres_flux (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call get_crres_flux (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4563,7 +4566,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call get_crres_flux(%VAL(argv(1)), %VAL(argv(2)), 
+      call get_crres_flux(%VAL(argv(1)), %VAL(argv(2)),
      * %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)))
@@ -4580,8 +4583,8 @@ c
 ! CREATION: S. Bourdarie - December 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call fly_in_ige1 from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call fly_in_ige1 from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4614,8 +4617,8 @@ c
 ! CREATION: S. Bourdarie - March 2008
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call fly_in_meo_gnss1 from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call fly_in_meo_gnss1 from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4648,8 +4651,8 @@ c
 ! CREATION: S. Bourdarie - January 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call SPG4_TLE1 from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call SPG4_TLE1 from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4668,7 +4671,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call SGP4_TLE1(%VAL(argv(1)), %VAL(argv(2)), 
+      call SGP4_TLE1(%VAL(argv(1)), %VAL(argv(2)),
      * %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)))
@@ -4684,8 +4687,8 @@ c
 ! CREATION: S. Bourdarie - January 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call SPG4_ORB1 from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call SPG4_ORB1 from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4719,8 +4722,8 @@ c
 ! CREATION: S. Bourdarie - January 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call rv2coe (in sgp4ext.f) from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call rv2coe (in sgp4ext.f) from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4752,8 +4755,8 @@ c
 ! CREATION: S. Bourdarie - March 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call DATE_AND_TIME2DECY from IDL, converts the IDL parameters to 
-!              standard FORTRAN passed by reference arguments. 
+! DESCRIPTION: Wrapper to call DATE_AND_TIME2DECY from IDL, converts the IDL parameters to
+!              standard FORTRAN passed by reference arguments.
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -4769,7 +4772,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call DATE_AND_TIME2DECY(%VAL(argv(1)), %VAL(argv(2)), 
+      call DATE_AND_TIME2DECY(%VAL(argv(1)), %VAL(argv(2)),
      * %VAL(argv(3)),
      * %VAL(argv(4)),%VAL(argv(5)), %VAL(argv(6)), %VAL(argv(7)))
 
@@ -4778,9 +4781,9 @@ c
       RETURN
       END
 c
-C----------------------------------------------------------------------------- 
-C IDL Wrappers 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
+C IDL Wrappers
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION msis86_idl(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4809,7 +4812,7 @@ c
       REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
       REAL*8 F107A(100000),F107(100000),AP(7,100000)
       REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
-c       
+c
       COMMON/CSWI/ISW
       DO I=1,25
          SV(I)=1.D0
@@ -4841,10 +4844,10 @@ c
 	 ENDDO
       ENDDO
       END
-      
-C----------------------------------------------------------------------------- 
-C IDL Wrappers 
-C----------------------------------------------------------------------------- 
+
+C-----------------------------------------------------------------------------
+C IDL Wrappers
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION msise90_idl(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4873,7 +4876,7 @@ c
       REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
       REAL*8 F107A(100000),F107(100000),AP(7,100000)
       REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
-c       
+c
       COMMON/CSWI/ISW
       DO I=1,25
          SV(I)=1.D0
@@ -4896,9 +4899,9 @@ c
 	 ENDDO
       ENDDO
       END
-C----------------------------------------------------------------------------- 
-C IDL Wrappers 
-C----------------------------------------------------------------------------- 
+C-----------------------------------------------------------------------------
+C IDL Wrappers
+C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION nrlmsise00_idl(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4927,7 +4930,7 @@ c
       REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
       REAL*8 F107A(100000),F107(100000),AP(7,100000)
       REAL*8 Dens(9,100000),Temp(2,100000),APin(7),D(8),T(2)
-c       
+c
       COMMON/CSWI/ISW
       DO I=1,25
          SV(I)=1.D0
@@ -4950,5 +4953,5 @@ c
 	 ENDDO
       ENDDO
       END
-      
-      
+
+
