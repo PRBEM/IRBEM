@@ -1,20 +1,20 @@
 !***************************************************************************************************
 ! Copyright 2000 D. Boscher, 2004 S. Bourdarie
 !
-! This file is part of ONERA_DESP_LIB.
+! This file is part of IRBEM-LIB.
 !
-!    ONERA_DESP_LIB is free software: you can redistribute it and/or modify
+!    IRBEM-LIB is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU Lesser General Public License as published by
 !    the Free Software Foundation, either version 3 of the License, or
 !    (at your option) any later version.
 !
-!    ONERA_DESP_LIB is distributed in the hope that it will be useful,
+!    IRBEM-LIB is distributed in the hope that it will be useful,
 !    but WITHOUT ANY WARRANTY; without even the implied warranty of
 !    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 !    GNU Lesser General Public License for more details.
 !
 !    You should have received a copy of the GNU Lesser General Public License
-!    along with ONERA_DESP_LIB.  If not, see <http://www.gnu.org/licenses/>.
+!    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 !
        SUBROUTINE CHAMP(xGEO,BxGEO,Bl,Ifail)
 C
@@ -384,11 +384,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       GEO_GSM(xGEO,xGSM)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xGEO(3)
 	REAL*8    xGSM(3)
 	REAL*8    xGEI,yGEI,zGEI
@@ -413,11 +413,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       GSM_GEO(xGSM,xGEO)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xGSM(3)
 	REAL*8    xGEO(3)
 	REAL*8    xGEI,yGEI,zGEI
@@ -442,11 +442,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       GEO_GEI(xGEO,xGEI)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xGEO(3)
 	REAL*8    xGEI(3)
         REAL*8    xS,yS,zS,cgst,sgst
@@ -462,11 +462,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       GEI_GEO(xGEI,xGEO)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xGEI(3)
 	REAL*8    xGEO(3)
         REAL*8    xS,yS,zS,cgst,sgst
@@ -482,11 +482,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       GEO_SM(xGEO,xSM)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xGEO(3)
 	REAL*8    xSM(3)
 	REAL*8    xGEI,yGEI,zGEI
@@ -511,11 +511,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       SM_GEO(xSM,xGEO)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xSM(3)
 	REAL*8    xGEO(3)
 	REAL*8    xGEI,yGEI,zGEI
@@ -540,11 +540,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       SM_GSM(xSM,xGSM)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xSM(3)
 	REAL*8    xGSM(3)
 	REAL*8    xGEI,yGEI,zGEI
@@ -569,11 +569,11 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE 
+	SUBROUTINE
      &       GSM_SM(xGSM,xSM)
 C
 	IMPLICIT NONE
-C        	
+C
 	REAL*8    xGSM(3)
 	REAL*8    xSM(3)
 	REAL*8    xGEI,yGEI,zGEI
@@ -701,7 +701,7 @@ C
 C
         det = xS*y2*bb+zS*y1*aa-xS*y3*aa-yS*y1*bb
 C
-	xGEI =  (y2*bb-y3*aa)*xGSE(1) - (ys*bb-zS*aa)*xGSE(2) 
+	xGEI =  (y2*bb-y3*aa)*xGSE(1) - (ys*bb-zS*aa)*xGSE(2)
      &        + (yS*y3-zS*y2)*xGSE(3)
 	yGEI = - y1*bb*xGSE(1) + xS*bb*xGSE(2) - (xS*y3-zS*y1)*xGSE(3)
         zGEI =   y1*aa*xGSE(1) - xS*aa*xGSE(2) + (xS*y2-yS*y1)*xGSE(3)
@@ -811,7 +811,7 @@ C
       ct     = cos(colati)
       sp     = sin(longi*pi/180.D0)
       cp     = cos(longi*pi/180.D0)
-      sph(1) = x(3) *  ct + x(1) * st*cp + x(2) * st*sp   
+      sph(1) = x(3) *  ct + x(1) * st*cp + x(2) * st*sp
       sph(2) = -st * x(3) + x(1) * ct*cp + x(2) * ct*sp
       sph(3) =                - sp * x(1)  + x(2) *  cp
 C
@@ -857,7 +857,7 @@ C
 	iaux = INT(aux/360.D0)
 	g = (aux-360.D0*iaux)/rad
 C
-        Slong = vl + (1.91946D0-0.004789D0*t)*SIN(g) 
+        Slong = vl + (1.91946D0-0.004789D0*t)*SIN(g)
      &         + 0.020094D0*SIN(2.D0*g)
 	obliq = (23.45229D0 - 0.0130125D0*t) / rad
         slp   = (Slong - 0.005686D0) / rad
@@ -880,7 +880,7 @@ C
 	subroutine get_igrf_coeffs(year,g,h,ierr)
 c
 C	SET UP TO ACCEPT DATES BETWEEN 1965 AND 2005; COEFFICIENTS
-C	THROUGH 1985 ARE FROM DGRF MODELS COEFFICIENTS FOR 1990 
+C	THROUGH 1985 ARE FROM DGRF MODELS COEFFICIENTS FOR 1990
 C       FROM IGRF
 C	[EOS TRANS. AGU APRIL 21, 1992, P. 182]. INTERPOLATION IS USED
 C	FOR YEARS BETWEEN DGRF MODELS, AND EXTRAPOLATION FOR YEARS
@@ -1139,7 +1139,7 @@ C
 C
 C	INTERPOLATE BETWEEEN 1965 - 1970
 C
-50    
+50
       if (year.gt.1965.D0) then
         F2=(year-1965.D0)/5.D0
       else
@@ -1301,22 +1301,22 @@ C
       ENDDO
 C
       GH1(1) =  0.0D0
-      I=2          
-      F0= -1.D0                
-      DO 9 N=1,10           
+      I=2
+      F0= -1.D0
+      DO 9 N=1,10
 	X = N
-      	F0 = F0 * X * X / (4.D0 * X - 2.D0)               
+      	F0 = F0 * X * X / (4.D0 * X - 2.D0)
         F0 = F0 * (2.D0 * X - 1.D0) / X
-	F = F0 * 0.5D0 * SQRT(2.D0)                                   
+	F = F0 * 0.5D0 * SQRT(2.D0)
 	GH1(I) = GH(I-1) * F0
-	I = I+1                                         
-      DO 9 M=1,N                                    
-      	F = F * (X + M) / (X - M + 1.D0)                 
-        F = F * SQRT((X - M + 1.D0) / (X + M))      	
+	I = I+1
+      DO 9 M=1,N
+      	F = F * (X + M) / (X - M + 1.D0)
+        F = F * SQRT((X - M + 1.D0) / (X + M))
 	GH1(I) = GH(I-1) * F
 	GH1(I+1) = GH(I) * F
         I=I+2
-9     CONTINUE                                          
+9     CONTINUE
 C
       RETURN
       END
@@ -1343,14 +1343,14 @@ C
         CALL INITIZE
 C
         rr=rr*ERA
-        CT = DSIN(lati*rad)                                   
+        CT = DSIN(lati*rad)
         ST = DCOS(lati*rad)
         D  = DSQRT(AQUAD-(AQUAD-BQUAD)*CT*CT)
         CP = COS(longi*rad)
         SP = SIN(longi*rad)
         bb = (BQUAD*CT*CT+AQUAD*ST*ST)/D
 	cc = (BQUAD*BQUAD*CT*CT+AQUAD*AQUAD*ST*ST)/D/D-rr*rr
-	alti = -bb+DSQRT(bb*bb-cc) 
+	alti = -bb+DSQRT(bb*bb-cc)
 C
 	RETURN
 	END
@@ -1378,7 +1378,7 @@ C
 C
         CALL INITIZE
 C
-        CT = SIN(lati*rad)                                   
+        CT = SIN(lati*rad)
         ST = COS(lati*rad)
         D  = SQRT(AQUAD-(AQUAD-BQUAD)*CT*CT)
         CP = COS(longi*rad)
@@ -1446,14 +1446,14 @@ C----------------------------------------------------------------
 C Initializes the parameters in COMMON/GENER/
 C
 C	UMR     = ATAN(1.0)*4./180.   <DEGREE>*UMR=<RADIANT>
-C	ERA	EARTH RADIUS FOR NORMALIZATION OF CARTESIAN 
-C			COORDINATES (6371.2 KM) 
+C	ERA	EARTH RADIUS FOR NORMALIZATION OF CARTESIAN
+C			COORDINATES (6371.2 KM)
 C	EREQU	MAJOR HALF AXIS FOR EARTH ELLIPSOID (6378.160 KM)
 C	ERPOL	MINOR HALF AXIS FOR EARTH ELLIPSOID (6356.775 KM)
 C	AQUAD	SQUARE OF MAJOR HALF AXIS FOR EARTH ELLIPSOID
 C	BQUAD   SQUARE OF MINOR HALF AXIS FOR EARTH ELLIPSOID
 C
-C ERA, EREQU and ERPOL as recommended by the INTERNATIONAL 
+C ERA, EREQU and ERPOL as recommended by the INTERNATIONAL
 C ASTRONOMICAL UNION .
 C-----------------------------------------------------------------
         IMPLICIT NONE
