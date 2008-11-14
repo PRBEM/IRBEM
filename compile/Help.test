@@ -15,13 +15,13 @@ Make Variables
      LANG=<lang>
        This variable is REQUIRED
 
-          LANG=IDL allows to test the ONERA_DESP_LIB (shared one) from 
+          LANG=IDL allows to test the IRBEM-LIB (shared one) from 
 	       IDL using the call_external command.
 
 Examples
 --------
 
-  For example, to test the ONERA_DESP_LIB distribution with IDL
+  For example, to test the IRBEM-LIB distribution with IDL
   use the command...
 
      make LANG=IDL test

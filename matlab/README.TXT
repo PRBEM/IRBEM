@@ -1,33 +1,33 @@
 %***************************************************************************************************
 % Copyright 2006, T.P. O'Brien
 %
-% This file is part of ONERA_DESP_LIB.
+% This file is part of IRBEM-LIB.
 %
-%    ONERA_DESP_LIB is free software: you can redistribute it and/or modify
+%    IRBEM-LIB is free software: you can redistribute it and/or modify
 %    it under the terms of the GNU Lesser General Public License as published by
 %    the Free Software Foundation, either version 3 of the License, or
 %    (at your option) any later version.
 %
-%    ONERA_DESP_LIB is distributed in the hope that it will be useful,
+%    IRBEM-LIB is distributed in the hope that it will be useful,
 %    but WITHOUT ANY WARRANTY; without even the implied warranty of
 %    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 %    GNU Lesser General Public License for more details.
 %
 %    You should have received a copy of the GNU Lesser General Public License
-%    along with ONERA_DESP_LIB.  If not, see <http://www.gnu.org/licenses/>.
+%    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 %
 INTRODUCTION
 
-We provide a set of Matlab wrappers for the ONERA/DESP FORTRAN library
+We provide a set of Matlab wrappers for the IRBEM FORTRAN library
 through the use of a shared library file (.dll on windows, .so on
 Unix). Matlab refers to this type of interface as a "mex file". In
 addition to the shared library file, Matlab requires a C-style header
 file that includes the C-style calling syntax for each FORTRAN
-function. This .h file is provided with the ONERA/DESP Matlab library.
+function. This .h file is provided with the IRBEM Matlab library.
 
 INSTALLATION
 
-The ONERA/DESP compile scripts will create the shared library file for
+The IRBEM compile scripts will create the shared library file for
 use with IDL or Matlab. A copy of the shared library is created in the
 "matlab" subdirectory, and is given a name "onera_desp_lib.dll" or
 "onera_desp_lib.so" depending on the platform. Thus, in order to
@@ -42,7 +42,7 @@ possible to add these two folders to the path using the Matlab
 the path permanent, so that "addpath" will have to be issued once in
 each new Matlab session. The "savepath" function can make the path
 change permanent, as can the GUI path manager interface. Thus, one
-could use the following commands, if the ONERA library is located in
+could use the following commands, if the IRBEM library is located in
 "c:\onera_desp":
 
 addpath c:\onera_desp\matlab c:\onera_desp\data

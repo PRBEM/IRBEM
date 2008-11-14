@@ -1,7 +1,7 @@
 Introduction
 ------------
 
-`make all' is used to compile/link the ONERA_DESP_LIB distribution.  Several `make'
+`make all' is used to compile/link the IRBEM-LIB distribution.  Several `make'
 variables are used to configure the distribution for your particular operating
 system and environment.  They are specified on the command line as part of the
 `make' command.  The "Examples" section below illustrates how to specify `make'
@@ -26,7 +26,7 @@ Make Variables
      OS=<os>
      ENV=<env>
        These variables are REQUIRED and specify the operating system you are
-       using and the environment in which to build the ONERA_DESP_LIB distribution.  These
+       using and the environment in which to build the IRBEM-LIB distribution.  These
        variables are always specified as a pair.  In the following list each
        supported operating system is shown along with the possible environments
        for that operation system...
@@ -101,7 +101,7 @@ Make Variables
 Examples
 --------
 
-  For example, to build the ONERA_DESP_LIB distribution on a Sun running SunOS 4.1 using
+  For example, to build the IRBEM-LIB distribution on a Sun running SunOS 4.1 using
   the System V gnu compiler environment and to produce a ELF 64-bit MSB dynamic lib
   use the command...
 

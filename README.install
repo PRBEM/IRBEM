@@ -1,8 +1,8 @@
-                   ONERA_DESP_LIB
+                   IRBEM-LIB
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!   You must have a Fortran compiler in order to build the ONERA_DESP_LIB distribution.    !!
+!!   You must have a Fortran compiler in order to build the IRBEM-LIB distribution.    !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 Requests for assistance or documentation should be sent to:
@@ -17,10 +17,10 @@ That way you will be notified of new releases.
 Installation Instructions
 -------------------------
 
-ONERA_DESP_LIB has a makefile setup to automatically build the library.
-The following steps should be taken to build and install ONERA_DESP_LIB.
+IRBEM-LIB has a makefile setup to automatically build the library.
+The following steps should be taken to build and install IRBEM-LIB.
 
-        1. Set your current directory (cd) to the top level ONERA_DESP_LIB
+        1. Set your current directory (cd) to the top level IRBEM-LIB
 	 directory.
 
         2. Compile/link the distribution.  First enter...
@@ -46,13 +46,13 @@ The following steps should be taken to build and install ONERA_DESP_LIB.
               make `make variables...' install
 
            The appropriate files will be copied to the `matlab'
-           and top level ONERA_DESP_LIB directories (from the `source/...'
+           and top level IRBEM-LIB directories (from the `source/...'
            directory).
 
-           For example, to install the distribution in `/usr/local/onera_desp_lib'
+           For example, to install the distribution in `/usr/local/irbem_lib'
            enter...
 
-              make INSTALLDIR=/usr/local/onera_desp_lib install
+              make INSTALLDIR=/usr/local/irbem_lib install
 
            The `INSTALLDIR' variable is described in the `make install.help'
            part of this step.
