@@ -1139,8 +1139,7 @@ C
 C
 C	INTERPOLATE BETWEEEN 1965 - 1970
 C
-50
-      if (year.gt.1965.D0) then
+50    if (year.gt.1965.D0) then
         F2=(year-1965.D0)/5.D0
       else
         F2=0.D0 ! effectively 1965
