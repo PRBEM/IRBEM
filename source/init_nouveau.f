@@ -844,7 +844,7 @@ C
 	IF (iyr.LT.1901 .OR. iyr.GT.2099) RETURN
 C
 	fday = secs/86400.D0
-	dj   = 365.D0*(iyr-1900.D0) + (iyr-1901.D0)/4.D0
+	dj   = 365.D0*(iyr-1900.D0) + INT((iyr-1901)/4)
      &       + iday + fday - 0.5D0
         t    = dj/36525.D0
 	aux = 279.696678D0 + 0.9856473354D0*dj
@@ -1225,7 +1225,7 @@ C
 c
 C
 999	format(//1x,
-     *	 '*** WARNING -- Input year = ',F7.2,/
+     *   '*** WARNING -- Input year = ',F7.2,/
      *   ' is out of valid range 1965-2015. Using nearest ***'//)
 c
 	return
