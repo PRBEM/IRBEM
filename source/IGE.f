@@ -329,7 +329,7 @@ c-------------------------------------------------------------------------------
       IMPLICIT NONE
 
       INTEGER*4 I
-      INTEGER*4 Nmin
+      INTEGER*4 Nmin, mod_year, nsolcyc
       INTEGER*4 year,year_cycle
       PARAMETER (Nmin = 10)
       REAL*8 tab_min(Nmin)
@@ -349,19 +349,19 @@ c-------------------------------------------------------------------------------
 
       last_min=tab_min(Nmin)
       min_sol=last_min
-      IF (year .GE. int(last_min)) THEN
-         IF (year .GE. int(min_sol+10.966d0)) THEN
-            min_sol = min_sol+10.966d0
-         ELSE 
-            GOTO 100
-         ENDIF
-100      CONTINUE
-         year_cycle=year-int(min_sol)
-         IF (year_cycle .GT. 4) THEN
-            min_sol=min_sol+10.966d0
-            year_cycle=-(int(min_sol)-year)
-         ENDIF
+      
+      mod_year = year
+
+C     if we're beyond the last solar minimum
+C     then find the "equivalent" year in the last
+C     solar cycle. We assume the solar cycle is 11
+C     years long (rough estimate) and we propagate from
+C     the last known solar minimum date.
+      IF ( year .GE. int(last_min)) THEN
+         year_cycle  = MOD( mod_year - INT(last_min), 11)
+         if (year_cycle .GT. 4) year_cycle = year_cycle - 11
       ELSE
+C        process a year found in the table above.
          DO i=1,Nmin 
             IF (year .GE. int(tab_min(i))
      &        .AND. year .LE. int(tab_min(i+1)))  GOTO 101
@@ -371,7 +371,8 @@ c-------------------------------------------------------------------------------
          IF (year_cycle .GT. 4) THEN
             year_cycle=-(int(tab_min(i+1))-year)
          ENDIF
-      ENDIF 
+C        we have now found the solar cycle for the given year.
+      ENDIF
 
       END
 
