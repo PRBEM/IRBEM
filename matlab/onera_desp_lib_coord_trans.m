@@ -23,7 +23,7 @@ function Y = onera_desp_lib_coord_trans(X,rotation,matlabd)
 % Y is nx3 and psi (for geo2gsm/gsm2geo) is nx1
 % rotation x2y
 % sph, car, geo, gsm, gse, gdz, gei (eci), sm, mag, rll, gse, hee, hae, heeq
-% (car=geo and sph=rll, but used for generic sph2car and car2sph)
+% (car=geo, but used for generic sph2car and car2sph)
 % sph/rll coordinates are ordered: r, lat, lon
 % gdz coordinates are ordered: alt, lat, lon (as in sysaxes=0)
 % also can specify numerical coordinate IDs like in sysaxes rotation = [num1 num2]
@@ -65,7 +65,6 @@ if isnumeric(rotation(1)),
 else
     rotation = lower(rotation);
     rotation = strrep(rotation,'car','geo'); % simplify
-    rotation = strrep(rotation,'sph','rll'); % simplify
     rotation = strrep(rotation,'eci','gei'); % simplify
     rotation(rotation=='_') = '2';
     f = find(rotation=='2');
