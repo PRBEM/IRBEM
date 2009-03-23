@@ -38,8 +38,8 @@ C           their individual variations are not presently separable with
 C           the drag data used to define this model component.
 C
 C        SUBROUTINES FOR SPECIAL OUTPUTS:
-C        
-C        HIGH ALTITUDE DRAG: EFFECTIVE TOTAL MASS DENSITY 
+C
+C        HIGH ALTITUDE DRAG: EFFECTIVE TOTAL MASS DENSITY
 C        (SUBROUTINE GTD7D, OUTPUT D(6))
 C           For atmospheric drag calculations at altitudes above 500 km,
 C           call SUBROUTINE GTD7D to compute the "effective total mass
@@ -51,7 +51,7 @@ C          See subroutine GHP7 to specify outputs at a pressure level
 C          rather than at an altitude.
 C
 C        OUTPUT IN M-3 and KG/M3:   CALL METERS7(.TRUE.)
-C 
+C
 C     INPUT VARIABLES:
 C        IYD - YEAR AND DAY AS YYDDD (day of year from 1 to 365 (or 366))
 C              (Year ignored in current model)
@@ -77,9 +77,9 @@ C        MASS - MASS NUMBER (ONLY DENSITY FOR SELECTED GAS IS
 C                 CALCULATED.  MASS 0 IS TEMPERATURE.  MASS 48 FOR ALL.
 C                 MASS 17 IS Anomalous O ONLY.)
 C
-C     NOTES ON INPUT VARIABLES: 
+C     NOTES ON INPUT VARIABLES:
 C        UT, Local Time, and Longitude are used independently in the
-C        model and are not of equal importance for every situation.  
+C        model and are not of equal importance for every situation.
 C        For the most physically realistic calculation these three
 C        variables should be consistent (STL=SEC/3600+GLONG/15).
 C        The Equation of Time departures from the above formula
@@ -101,7 +101,7 @@ C        D(1) - HE NUMBER DENSITY(CM-3)
 C        D(2) - O NUMBER DENSITY(CM-3)
 C        D(3) - N2 NUMBER DENSITY(CM-3)
 C        D(4) - O2 NUMBER DENSITY(CM-3)
-C        D(5) - AR NUMBER DENSITY(CM-3)                       
+C        D(5) - AR NUMBER DENSITY(CM-3)
 C        D(6) - TOTAL MASS DENSITY(GM/CM3)
 C        D(7) - H NUMBER DENSITY(CM-3)
 C        D(8) - N NUMBER DENSITY(CM-3)
@@ -110,7 +110,7 @@ C        T(1) - EXOSPHERIC TEMPERATURE
 C        T(2) - TEMPERATURE AT ALT
 C
 C     NOTES ON OUTPUT VARIABLES:
-C        TO GET OUTPUT IN M-3 and KG/M3:   CALL METERS7(.TRUE.) 
+C        TO GET OUTPUT IN M-3 and KG/M3:   CALL METERS7(.TRUE.)
 C
 C        O, H, and N are set to zero below 72.5 km
 C
@@ -118,7 +118,7 @@ C        T(1), Exospheric temperature, is set to global average for
 C        altitudes below 120 km. The 120 km gradient is left at global
 C        average value for altitudes below 72 km.
 C
-C        D(6), TOTAL MASS DENSITY, is NOT the same for subroutines GTD7 
+C        D(6), TOTAL MASS DENSITY, is NOT the same for subroutines GTD7
 C        and GTD7D
 C
 C          SUBROUTINE GTD7 -- D(6) is the sum of the mass densities of the
@@ -129,11 +129,11 @@ C
 C          SUBROUTINE GTD7D -- D(6) is the "effective total mass density
 C          for drag" and is the sum of the mass densities of all species
 C          in this model, INCLUDING anomalous oxygen.
-C        
+C
 C     SWITCHES: The following is for test and special purposes:
-C          
+C
 C        TO TURN ON AND OFF PARTICULAR VARIATIONS CALL TSELEC7(SW),
-C        WHERE SW IS A 25 ELEMENT ARRAY CONTAINING 0. FOR OFF, 1. 
+C        WHERE SW IS A 25 ELEMENT ARRAY CONTAINING 0. FOR OFF, 1.
 C        FOR ON, OR 2. FOR MAIN EFFECTS OFF BUT CROSS TERMS ON
 C        FOR THE FOLLOWING VARIATIONS
 C               1 - F10.7 EFFECT ON MEAN  2 - TIME INDEPENDENT
@@ -303,14 +303,14 @@ C       TOTAL MASS DENSITY
 C
         IF(MASS.EQ.48) THEN
          D(6) = 1.66D-24*(4.D0*D(1)+16.D0*D(2)+28.D0*D(3)+32.D0*D(4)+
-     &       40.D0*D(5)+D(7)+14.D0*D(8))  
+     &       40.D0*D(5)+D(7)+14.D0*D(8))
          IF(IMR.EQ.1) D(6)=D(6)/1000.D0
          ENDIF
          T(2)=TZ
    10 CONTINUE
       GOTO 90
    50 CONTINUE
-      DD=DENSM7(ALT,1.D0,0.D0,TZ,MN3,ZN3,TN3,TGN3,MN2,ZN2,TN2,TGN2)                
+      DD=DENSM7(ALT,1.D0,0.D0,TZ,MN3,ZN3,TN3,TGN3,MN2,ZN2,TN2,TGN2)
       T(2)=TZ
    90 CONTINUE
       ALAST=ALT
@@ -326,7 +326,7 @@ C     -----------
 C        This subroutine provides Effective Total Mass Density for
 C        output D(6) which includes contributions from "anomalous
 C        oxygen" which can affect satellite drag above 500 km.  This
-C        subroutine is part of the distribution package for the 
+C        subroutine is part of the distribution package for the
 C        Neutral Atmosphere Empirical Model from the surface to lower
 C        exosphere.  See subroutine GTD7 for more extensive comments.
 C
@@ -355,9 +355,9 @@ C        MASS - MASS NUMBER (ONLY DENSITY FOR SELECTED GAS IS
 C                 CALCULATED.  MASS 0 IS TEMPERATURE.  MASS 48 FOR ALL.
 C                 MASS 17 IS Anomalous O ONLY.)
 C
-C     NOTES ON INPUT VARIABLES: 
+C     NOTES ON INPUT VARIABLES:
 C        UT, Local Time, and Longitude are used independently in the
-C        model and are not of equal importance for every situation.  
+C        model and are not of equal importance for every situation.
 C        For the most physically realistic calculation these three
 C        variables should be consistent (STL=SEC/3600+GLONG/15).
 C        The Equation of Time departures from the above formula
@@ -373,7 +373,7 @@ C        D(1) - HE NUMBER DENSITY(CM-3)
 C        D(2) - O NUMBER DENSITY(CM-3)
 C        D(3) - N2 NUMBER DENSITY(CM-3)
 C        D(4) - O2 NUMBER DENSITY(CM-3)
-C        D(5) - AR NUMBER DENSITY(CM-3)                       
+C        D(5) - AR NUMBER DENSITY(CM-3)
 C        D(6) - TOTAL MASS DENSITY(GM/CM3) [includes anomalous oxygen]
 C        D(7) - H NUMBER DENSITY(CM-3)
 C        D(8) - N NUMBER DENSITY(CM-3)
@@ -390,7 +390,7 @@ C       TOTAL MASS DENSITY
 C
         IF(MASS.EQ.48) THEN
          D(6) = 1.66D-24*(4.D0*D(1)+16.D0*D(2)+28.D0*D(3)+32.D0*D(4)+
-     &       40.D0*D(5)+D(7)+14.D0*D(8)+16.D0*D(9))  
+     &       40.D0*D(5)+D(7)+14.D0*D(8)+16.D0*D(9))
          IF(IMR.EQ.1) D(6)=D(6)/1000.D0
          ENDIF
       RETURN
@@ -421,7 +421,7 @@ C             (7) AVERAGE OF EIGHT 3 HR AP INDICIES FROM 36 TO 59 HRS PRIOR
 C                    TO CURRENT TIME
 C        PRESS - PRESSURE LEVEL(MB)
 C     OUTPUT:
-C        ALT - ALTITUDE(KM) 
+C        ALT - ALTITUDE(KM)
 C        D(1) - HE NUMBER DENSITY(CM-3)
 C        D(2) - O NUMBER DENSITY(CM-3)
 C        D(3) - N2 NUMBER DENSITY(CM-3)
@@ -566,7 +566,7 @@ C     Thermospheric portion of NRLMSISE-00
 C     See GTD7 for more extensive comments
 C
 C        OUTPUT IN M-3 and KG/M3:   CALL METERS7(.TRUE.)
-C 
+C
 C     INPUT VARIABLES:
 C        IYD - YEAR AND DAY AS YYDDD (day of year from 1 to 365 (or 366))
 C              (Year ignored in current model)
@@ -592,9 +592,9 @@ C        MASS - MASS NUMBER (ONLY DENSITY FOR SELECTED GAS IS
 C                 CALCULATED.  MASS 0 IS TEMPERATURE.  MASS 48 FOR ALL.
 C                 MASS 17 IS Anomalous O ONLY.)
 C
-C     NOTES ON INPUT VARIABLES: 
+C     NOTES ON INPUT VARIABLES:
 C        UT, Local Time, and Longitude are used independently in the
-C        model and are not of equal importance for every situation.  
+C        model and are not of equal importance for every situation.
 C        For the most physically realistic calculation these three
 C        variables should be consistent (STL=SEC/3600+GLONG/15).
 C        The Equation of Time departures from the above formula
@@ -616,7 +616,7 @@ C        D(1) - HE NUMBER DENSITY(CM-3)
 C        D(2) - O NUMBER DENSITY(CM-3)
 C        D(3) - N2 NUMBER DENSITY(CM-3)
 C        D(4) - O2 NUMBER DENSITY(CM-3)
-C        D(5) - AR NUMBER DENSITY(CM-3)                       
+C        D(5) - AR NUMBER DENSITY(CM-3)
 C        D(6) - TOTAL MASS DENSITY(GM/CM3) [Anomalous O NOT included]
 C        D(7) - H NUMBER DENSITY(CM-3)
 C        D(8) - N NUMBER DENSITY(CM-3)
@@ -719,7 +719,7 @@ C
 C
       IF(MASS.EQ.0) GO TO 50
 C       N2 variation factor at Zlb
-      G28=SW(21)*GLOBE7(YRD,SEC,GLAT,GLONG,STL,F107A,F107, 
+      G28=SW(21)*GLOBE7(YRD,SEC,GLAT,GLONG,STL,F107A,F107,
      & AP,PD(1,3))
       DAY=DMOD(YRD,1000.D0)
 C        VARIATION OF TURBOPAUSE HEIGHT
@@ -747,7 +747,7 @@ C      Diffusive density at Alt
       DD=D(3)
 C      Turbopause
       ZH28=PDM(3,3)*ZHF
-      ZHM28=PDM(4,3)*PDL(6,2) 
+      ZHM28=PDM(4,3)*PDL(6,2)
       XMD=28.D0-XMM
 C      Mixed density at Zlb
       B28=DENSU7(ZH28,DB28,TINF,TLB,XMD,ALPHA(3)-1.D0,TZ,PTM(6),S,MN1,
@@ -1048,7 +1048,7 @@ C      Calculate scale height (km)
 C-----------------------------------------------------------------------
       FUNCTION GLOBE7(YRD,SEC,LAT,LONG,TLOC,F107A,F107,AP,P)
       IMPLICIT NONE
-C       CALCULATE G(L) FUNCTION 
+C       CALCULATE G(L) FUNCTION
 C       Upper Thermosphere Parameters
       INTEGER*4 IYR,ISW,NSW,J,I
 c
@@ -1067,7 +1067,7 @@ c
       COMMON/CSW/SW,SWC
       COMMON/CSWI/ISW
       COMMON/LPOLY/PLG,CTLOC,STLOC,C2TLOC,S2TLOC,C3TLOC,S3TLOC,
-     $ DAY,DF,DFA,APD,APDF,APT,XLONG
+     $ DAY,DF,DFA,APD,APDF,APT,XLONG,CLONG,SLONG
       COMMON/LPOLYI/IYR
       SAVE
       DATA DGTR/1.74533D-2/,DR/1.72142D-2/,XL/1000.D0/,TLL/1000.D0/
@@ -1123,7 +1123,7 @@ C     PLG(9,2) = (15.D0*C*PLG(8,2)-8.D0*PLG(7,2))/7.D0
       PLG(7,3)=(11.D0*C*PLG(6,3)-7.D0*PLG(5,3))/4.D0
       PLG(8,3)=(13.D0*C*PLG(7,3)-8.D0*PLG(6,3))/5.D0
       PLG(4,4) = 15.D0*S2*S
-      PLG(5,4) = 105.D0*S2*S*C 
+      PLG(5,4) = 105.D0*S2*S*C
       PLG(6,4)=(9.D0*C*PLG(5,4)-7.D0*PLG(4,4))/2.D0
       PLG(7,4)=(11.D0*C*PLG(6,4)-8.D0*PLG(5,4))/3.D0
       XL=LAT
@@ -1182,7 +1182,7 @@ C        DIURNAL
   200 CONTINUE
 C        SEMIDIURNAL
       IF(SW(8).EQ.0.D0) GOTO 210
-      T81 = (P(24)*PLG(4,3)+P(36)*PLG(6,3))*CD14*SWC(5) 
+      T81 = (P(24)*PLG(4,3)+P(36)*PLG(6,3))*CD14*SWC(5)
       T82 = (P(34)*PLG(4,3)+P(37)*PLG(6,3))*CD14*SWC(5)
       T(8) = F2*
      1 ((P(6)*PLG(3,3) + P(42)*PLG(5,3) + T81)*C2TLOC
@@ -1287,9 +1287,9 @@ C-----------------------------------------------------------------------
 C        SET SWITCHES
 C        Output in  COMMON/CSW/SW(25),ISW,SWC(25)
 C        SW FOR MAIN TERMS, SWC FOR CROSS TERMS
-C  
+C
 C        TO TURN ON AND OFF PARTICULAR VARIATIONS CALL TSELEC7(SV),
-C        WHERE SV IS A 25 ELEMENT ARRAY CONTAINING 0. FOR OFF, 1. 
+C        WHERE SV IS A 25 ELEMENT ARRAY CONTAINING 0. FOR OFF, 1.
 C        FOR ON, OR 2. FOR MAIN EFFECTS OFF BUT CROSS TERMS ON
 C
 C        To get current values of SW: CALL TRETRV7(SW)
@@ -1329,7 +1329,7 @@ C      VERSION OF GLOBE FOR LOWER ATMOSPHERE 10/26/99
       REAL*8 CD32,CD18,CD14,CD39,T71,T72,T81,T82,TT,GLOB7S
 c
       COMMON/LPOLY/PLG,CTLOC,STLOC,C2TLOC,S2TLOC,C3TLOC,S3TLOC,
-     $ DAY,DF,DFA,APD,APDF,APT,LONG
+     $ DAY,DF,DFA,APD,APDF,APT,LONG,CLONG,SLONG
       COMMON/LPOLYI/IYR
       COMMON/CSW/SW,SWC
       COMMON/CSWI/ISW
@@ -1347,7 +1347,7 @@ C       CONFIRM PARAMETER SET
         T(J)=0.D0
    10 CONTINUE
       IF(DAY.NE.DAYL.OR.P32.NE.P(32)) CD32=COS(DR*(DAY-P(32)))
-      IF(DAY.NE.DAYL.OR.P18.NE.P(18)) CD18=COS(2.D0*DR*(DAY-P(18)))       
+      IF(DAY.NE.DAYL.OR.P18.NE.P(18)) CD18=COS(2.D0*DR*(DAY-P(18)))
       IF(DAY.NE.DAYL.OR.P14.NE.P(14)) CD14=COS(DR*(DAY-P(14)))
       IF(DAY.NE.DAYL.OR.P39.NE.P(39)) CD39=COS(2.D0*DR*(DAY-P(39)))
       DAYL=DAY
@@ -1373,7 +1373,7 @@ C        DIURNAL
       IF(SW(7).EQ.0.D0) GOTO 200
       T71 = P(12)*PLG(3,2)*CD14*SWC(5)
       T72 = P(13)*PLG(3,2)*CD14*SWC(5)
-      T(7) = 
+      T(7) =
      1 ((P(4)*PLG(2,2) + P(5)*PLG(4,2)
      2 + T71)*CTLOC
      4 + (P(7)*PLG(2,2) + P(8)*PLG(4,2)
@@ -1381,9 +1381,9 @@ C        DIURNAL
   200 CONTINUE
 C        SEMIDIURNAL
       IF(SW(8).EQ.0.D0) GOTO 210
-      T81 = (P(24)*PLG(4,3)+P(36)*PLG(6,3))*CD14*SWC(5) 
+      T81 = (P(24)*PLG(4,3)+P(36)*PLG(6,3))*CD14*SWC(5)
       T82 = (P(34)*PLG(4,3)+P(37)*PLG(6,3))*CD14*SWC(5)
-      T(8) = 
+      T(8) =
      1 ((P(6)*PLG(3,3) + P(42)*PLG(5,3) + T81)*C2TLOC
      3 +(P(9)*PLG(3,3) + P(43)*PLG(5,3) + T82)*S2TLOC)
   210 CONTINUE
@@ -1455,7 +1455,7 @@ C
 C       CALCULATE TEMPERATURE BELOW ZA
 C      Temperature gradient at ZA from Bates profile
       DTA=(TINF-TA)*S2*((RE+ZLB)/(RE+ZA))**2
-      TGN1(1)=DTA 
+      TGN1(1)=DTA
       TN1(1)=TA
       Z=DMAX1(ALT,ZN1(MN1))
       MN=MN1
@@ -1554,7 +1554,7 @@ C       Temperature at altitude
       TZ=1.D0/Y
       IF(XM.EQ.0.D0) GO TO 20
 C
-C      CALCULATE STRATOSPHERE/MESOSPHERE DENSITY 
+C      CALCULATE STRATOSPHERE/MESOSPHERE DENSITY
       GLB=GSURF/(1.D0+Z1/RE)**2
       GAMM=XM*GLB*ZGDIF/RGAS
 C       Integrate temperature profile
@@ -1590,8 +1590,8 @@ C       temperature at altitude
       TZ=1.D0/Y
       IF(XM.EQ.0.D0) GO TO 30
 C
-C      CALCULATE TROPOSPHERIC/STRATOSPHERE DENSITY 
-C     
+C      CALCULATE TROPOSPHERIC/STRATOSPHERE DENSITY
+C
       GLB=GSURF/(1.D0+Z1/RE)**2
       GAMM=XM*GLB*ZGDIF/RGAS
 C        Integrate temperature profile
@@ -1804,7 +1804,7 @@ c
 C-----------------------------------------------------------------------
       BLOCK DATA GTD7BK
       IMPLICIT NONE
-C          MSISE-00 01-FEB-02   
+C          MSISE-00 01-FEB-02
       INTEGER*4 IMR
 c
       REAL*8 PT1(50),PT2(50),PT3(50),PA1(50),PA2(50),PA3(50)
@@ -2180,7 +2180,7 @@ C        HOT O DENSITY
      *  0.00000D+00, 0.00000D+00, 0.00000D+00, 0.00000D+00, 0.00000D+00,
      *  0.00000D+00, 0.00000D+00, 0.00000D+00, 0.00000D+00, 0.00000D+00,
      *  0.00000D+00, 0.00000D+00, 0.00000D+00, 0.00000D+00, 0.00000D+00/
-C          S PARAM  
+C          S PARAM
       DATA PJ1/
      *  9.56827D-01, 6.20637D-02, 3.18433D-02, 0.00000D+00, 0.00000D+00,
      *  3.94900D-02, 0.00000D+00, 0.00000D+00,-9.24882D-03,-7.94023D-03,
