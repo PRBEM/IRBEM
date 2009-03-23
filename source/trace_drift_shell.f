@@ -16,7 +16,7 @@
 !    You should have received a copy of the GNU Lesser General Public License
 !    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 !
-C 
+C
 C
        SUBROUTINE trace_drift_shell(
      &         lati,longi,alti,Lm,Lstar,leI0,Bposit,Bmin,posit,Nposit)
@@ -53,7 +53,7 @@ C
        REAL*8     posit(3,20*Nreb,Nder),Bposit(20*Nreb,Nder)
 C
        COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
-       COMMON /calotte/tet
+       COMMON /calotte2/tet
        COMMON /flag_L/Ilflag
        COMMON /magmod/k_ext,k_l,kint
 C
@@ -69,7 +69,7 @@ C
        leI0 = 0.D0
 C
        CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
-C           
+C
        CALL GEO_SM(xx0,xx)
        rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))
        tt = ACOS(xx(3)/rr)
@@ -87,7 +87,7 @@ C
 C
        dsreb = Lb/Nreb
 C
-C calcul du sens du depart 
+C calcul du sens du depart
 C
        CALL sksyst(-dsreb,xx0,x1,Bl,Ifail)
        IF (Ifail.LT.0) THEN
@@ -163,13 +163,13 @@ C
         Ilflag = 0
 	RETURN
        ENDIF
-C           
+C
        leI = leI+0.5D0*SQRT(1.D0-B1/B0)*(B0-Bl)/(Bl-B1)
        leI = leI*ABS(dsreb)
-       leI0 = leI       
-C   
+       leI0 = leI
+C
 C calcul de L Mc Ilwain (Mc Ilwain-Hilton)
-C       
+C
        XY = leI*leI*leI*B0/Bo
        YY = 1.D0 + 1.35047D0*XY**(1.D0/3.D0)
      &      + 0.465376D0*XY**(2.D0/3.D0)
@@ -354,7 +354,7 @@ C
         IF (Iflag_I .EQ.0) THEN
 	 IF (J.GE.Nrebmax) THEN
 	  tetl = tetl-dtet
-         ELSE	  
+         ELSE
 	  tetl = tetl+dtet
 	 ENDIF
 	 leI1 = leI
@@ -383,7 +383,7 @@ C
         x1(1) = SIN(tet(I))*COS(phi(I))
         x1(2) = SIN(tet(I))*SIN(phi(I))
         x1(3) = COS(tet(I))
-c	
+c
 c trace la ligne de champ complete
 c
         DO II = 1,3
