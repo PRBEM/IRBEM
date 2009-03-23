@@ -71,7 +71,7 @@ c         strong geomagnetic storms, J. Geophys. Res., v. 110 (A3), A03208, doi:
 
 c----------------------------------------------------------------------
 c
-      REAL PARMOD(10),PS,X,Y,Z,BX,BY,BZ,tilt
+      REAL*8 PARMOD(10),PS,X,Y,Z,BX,BY,BZ,tilt
       REAL*8 A(69),PDYN,DST_AST,BXIMF,BYIMF,BZIMF,W1,W2,W3,W4,W5,W6,
      *  PSS,XX,YY,ZZ,BXCF,BYCF,BZCF,BXT1,BYT1,BZT1,BXT2,BYT2,BZT2,
      *  BXSRC,BYSRC,BZSRC,BXPRC,BYPRC,BZPRC, BXR11,BYR11,BZR11,
@@ -104,7 +104,7 @@ c
       DATA IOPGEN,IOPTT,IOPB,IOPR/0,0,0,0/
 C
        ps=tilt*4.D0*ATAN(1.D0)/180.d0
-c       
+c
       PDYN=PARMOD(1)
       DST_AST=PARMOD(2)*0.8D0-13.D0*SQRT(PDYN)
       BYIMF=PARMOD(3)
