@@ -53,7 +53,7 @@ C             (7) AVERAGE OF EIGHT 3 HR AP INDICIES FROM 36 TO 59 HRS PRIOR
 C                    TO CURRENT TIME
 C        MASS - MASS NUMBER (ONLY DENSITY FOR SELECTED GAS IS
 C                 CALCULATED.  MASS 0 IS TEMPERATURE.  MASS 48 FOR ALL.
-C     OUTPUT: 
+C     OUTPUT:
 C        D(1) - HE NUMBER DENSITY(CM-3)
 C        D(2) - O NUMBER DENSITY(CM-3)
 C        D(3) - N2 NUMBER DENSITY(CM-3)
@@ -65,12 +65,12 @@ C        D(8) - N NUMBER DENSITY(CM-3)
 C        T(1) - EXOSPHERIC TEMPERATURE
 C        T(2) - TEMPERATURE AT ALT
 C
-C      TO GET OUTPUT IN M-3 and KG/M3:   CALL METERS(.TRUE.) 
+C      TO GET OUTPUT IN M-3 and KG/M3:   CALL METERS(.TRUE.)
 C
 C          ADDITIONAL COMMENTS
 C           (1) LOWER BOUND QUANTITIES IN COMMON/GTS3C/
 C           (2) TO TURN ON AND OFF PARTICULAR VARIATIONS CALL TSELEC(SW)
-C               WHERE SW IS A 25 ELEMENT ARRAY CONTAINING 0. FOR OFF, 1. 
+C               WHERE SW IS A 25 ELEMENT ARRAY CONTAINING 0. FOR OFF, 1.
 C               FOR ON, OR 2. FOR MAIN EFFECTS OFF BUT CROSS TERMS ON
 C               FOR THE FOLLOWING VARIATIONS
 C               1 - F10.7 EFFECT ON MEAN  2 - TIME INDEPENDENT
@@ -89,16 +89,16 @@ C
 C              To get current values of SW: CALL TRETRV(SW)
 C
 C !!!!!!!!!!!!!!!!!!!!!!!!!!! CHANGES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-C 
-C  - NAME,ISD,IST,ISDATE, and ISTIME were changed to character variables 
+C
+C  - NAME,ISD,IST,ISDATE, and ISTIME were changed to character variables
 C    in GTS5 and PRMSG5
-C		
-C  - The variable dimension of P and AP in GLOBE5 and GLOBE5L was 
-C    indicted by *, rather than 1; if this does not work on your system 
+C
+C  - The variable dimension of P and AP in GLOBE5 and GLOBE5L was
+C    indicted by *, rather than 1; if this does not work on your system
 C    you may want to use P(150) and AP(7).
-C		
-C  - The large data statement in PRMSG5 is now read in from file 
-C    MSIS86.DAT; some compilers do not allow named commons to be 
+C
+C  - The large data statement in PRMSG5 is now read in from file
+C    MSIS86.DAT; some compilers do not allow named commons to be
 C    initialized in a data statement.
 C
 C  - The first call to GLOBE5 should come before the common array SW(25)
@@ -124,12 +124,13 @@ C **********************************************************************
       REAL*8 G1,ZH01,B01,DM01,ZHM01,HC01,ZC01,HCC01,ZCC01,RC01
       REAL*8 G14,ZH14,B14,DM14,ZHM14,HC14,ZC14,HCC14,ZCC14,RC14
       REAL*8 DENSS,GLOBE5,CCOR,GLOB5L,TZ,DDUM
+      REAL*8 TR12  ! not used but added for consistency with newer MSIS models
 c
-      CHARACTER NAME(2)*4,ISDATE(3)*3,ISTIME(2)*4
+      CHARACTER NAME(2)*4,ISDATE(3)*4,ISTIME(2)*4
 c
       COMMON/UINR/IIEE
       COMMON/GTS3C/TLB,S,DB04,DB16,DB28,DB32,DB40,DB48,DB01,ZA,T0,Z0
-     $ ,G0,RL,DD,DB14
+     $ ,G0,RL,DD,DB14,TR12
       COMMON/LOWER5/PTM,PDM
       COMMON/PARM5/PT,PD,PS,PDL
       COMMON/CSW/SW,SWC
@@ -161,7 +162,7 @@ C       Eq. A10
       Z0=PTM(7)*(1.D0+SW(20)*GLOB5L(PD(51,3)))*PD(51,3)
 C       Eq. A6
       G0=PTM(4)*PS(1)
-     $ *(1.D0+SW(19)*GLOBE5(YRD,SEC,GLAT,GLONG,STL,F107A,F107, 
+     $ *(1.D0+SW(19)*GLOBE5(YRD,SEC,GLAT,GLONG,STL,F107A,F107,
      $ AP,PS))
 C       Eq. A5
       S=G0/(TINF-TLB)
@@ -423,7 +424,7 @@ c
       REAL*8 QPB(50),DV(60)
       REAL*8 Z,ZG2,TT,TA,ZG0,DTA,T12,ZG1,DD,CC,BB,X,X2,TAF
       REAL*8 GLB,GAMMA,DENSA,GAMM
-c     
+c
       COMMON/PARMB/GSURF,RE
       COMMON/FIT/TAF
       COMMON/LSQV/MP,II,JG,LT,QPB,IERR,IFUN,N,J,DV
@@ -511,12 +512,13 @@ C
       REAL*8 CD14,C2D14,CD18,CD32,CD39,F1,F2,T71,T72,T81,T82
       REAL*8 P44,P45,TINF
       REAL*8 A,EX,G0,SUMEX,SG0,GLOBE5,GB,ROUT,EXP1,EXP2
+      REAL*8 XLONG,CLONG,SLONG ! not used but added for consistency with newer MSIS models
 c
       COMMON/TTEST/TINF,GB,ROUT,T
       COMMON/CSW/SW,SWC
       COMMON/CSWI/ISW
       COMMON/LPOLY/PLG,CTLOC,STLOC,C2TLOC,S2TLOC,C3TLOC,S3TLOC,
-     &             DAY,DF,DFA,APD,APDF,APT
+     &             DAY,DF,DFA,APD,APDF,APT,XLONG,CLONG,SLONG
       COMMON/LPOLYI/IYR
       DATA DGTR/1.74533D-2/,DR/1.72142D-2/, XL/1000.D0/,TLL/1000.D0/
      &  DAYL/-1.D0/,P14/-1000.D0/,P18/-1000.D0/,P32/-1000.D0/
@@ -566,7 +568,7 @@ C CALCULATE LEGENDRE POLYNOMIALS
       PLG(7,3)=(11.D0*C*PLG(6,3)-7.D0*PLG(5,3))/4.D0
       PLG(8,3)=(13.D0*C*PLG(7,3)-8.D0*PLG(6,3))/5.D0
       PLG(4,4) = 15.D0*S2*S
-      PLG(5,4) = 105.D0*S2*S*C 
+      PLG(5,4) = 105.D0*S2*S*C
       PLG(6,4)=(9.D0*C*PLG(5,4)-7.D0*PLG(4,4))/2.D0
       PLG(7,4)=(11.D0*C*PLG(6,4)-8.D0*PLG(5,4))/3.D0
       XL=LAT
@@ -622,7 +624,7 @@ C        DIURNAL
      4 + (P(7)*PLG(2,2) + P(8)*PLG(4,2) +P(29)*PLG(6,2)
      5 + T72)*STLOC)
 C        SEMIDIURNAL
-      T81 = (P(24)*PLG(4,3))*CD14*SWC(5) 
+      T81 = (P(24)*PLG(4,3))*CD14*SWC(5)
       T82 = (P(34)*PLG(4,3))*CD14*SWC(5)
       T(8) = F2*
      1 ((P(6)*PLG(3,3) + P(42)*PLG(5,3) + T81)*C2TLOC
@@ -748,9 +750,11 @@ c
       REAL*8 PLG(9,4),CTLOC,STLOC,C2TLOC,S2TLOC,C3TLOC,S3TLOC
       REAL*8 DF,DFA,APD,APDF,APT(4),SW(25),SWC(25)
       REAL*8 TT,GLOB5L
+      REAL*8 XLONG,CLONG,SLONG ! not used but added for consistency with newer MSIS models
+
 c
       COMMON/LPOLY/PLG,CTLOC,STLOC,C2TLOC,S2TLOC,C3TLOC,S3TLOC,
-     $ DAY,DF,DFA,APD,APDF,APT
+     $ DAY,DF,DFA,APD,APDF,APT,XLONG,CLONG,SLONG
       COMMON/CSW/SW,SWC
       COMMON/CSWI/ISW
       COMMON/LPOLYI/IYR
@@ -841,7 +845,7 @@ c
 C--------------------------------------------------------------------
       SUBROUTINE PRMSG5
       IMPLICIT NONE
-C          CIRA     11-FEB-86   
+C          CIRA     11-FEB-86
       INTEGER*4 IIEE,I
 c
       REAL*8 PT1(50),PT2(50),PT3(50),PA1(50),PA2(50),PA3(50)
@@ -852,7 +856,7 @@ c
       REAL*8 PTM(8),PDM(8,7)
       REAL*8 GSURF,RE
 c
-      CHARACTER ISD(3),IST(2),NAME(2)*4,ISDATE(3)*3,ISTIME(2)*4
+      CHARACTER ISD(3)*4,IST(2)*4,NAME(2)*4,ISDATE(3)*4,ISTIME(2)*4
 c
       COMMON/UINR/IIEE
       COMMON/PARMB/GSURF,RE
