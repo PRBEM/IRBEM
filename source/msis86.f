@@ -124,7 +124,6 @@ C **********************************************************************
       REAL*8 G1,ZH01,B01,DM01,ZHM01,HC01,ZC01,HCC01,ZCC01,RC01
       REAL*8 G14,ZH14,B14,DM14,ZHM14,HC14,ZC14,HCC14,ZCC14,RC14
       REAL*8 DENSS,GLOBE5,CCOR,GLOB5L,TZ,DDUM
-      REAL*8 TR12  ! not used but added for consistency with newer MSIS models
 c
       CHARACTER NAME(2)*4,ISDATE(3)*4,ISTIME(2)*4
 c
