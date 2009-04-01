@@ -66,6 +66,20 @@ void drift_shell1_(long int *kext, long int *options,
 		   double *posit,
 		   long int *ind);
 
+void drift_bounce_orbit1_(long int *kext, long int *options,
+			  long int *sysaxes, long int *iyear,
+			  long int *idoy, double * UT,
+			  double *x1, double *x2, double *x3, double *alpha,
+			  double *maginput,
+			  double *Lm,
+			  double *Lstar, 
+			  double *Blocal,
+			  double *Bmin, 
+			  double *Bmir, 
+			  double *J,
+			  double *posit,
+			  long int *ind);
+
 void trace_field_line1_(long int *kext, long int *options,
 		   long int *sysaxes, long int *iyear,
 		   long int *idoy, double * UT,
