@@ -1946,7 +1946,7 @@ C
       SUBROUTINE RC_SYMM_S (X,Y,Z,BX,BY,BZ)
       IMPLICIT  REAL * 8  (A - H, O - Z)
       DATA DS,DC/1.D-2,0.99994999875D0/, D/1.D-4/,DRD/5.D3/  ! DS=SIN(THETA) AT THE BOUNDARY OF THE LINEARITY
-                                                                        REGION; DC=SQRT(1-DS**2);  DRD=1/(2*D)
+                                                             !           REGION; DC=SQRT(1-DS**2);  DRD=1/(2*D)
       RHO2=X**2+Y**2
       R2=RHO2+Z**2
       R=DSQRT(R2)
@@ -2108,7 +2108,7 @@ C
       SUBROUTINE PRC_SYMM_S (X,Y,Z,BX,BY,BZ)
       IMPLICIT  REAL * 8  (A - H, O - Z)
       DATA DS,DC/1.D-2,0.99994999875D0/, D/1.D-4/,DRD/5.D3/  ! DS=SIN(THETA) AT THE BOUNDARY OF THE LINEARITY
-                                                                        REGION; DC=SQRT(1-DS**2);  DRD=1/(2*D)
+                                                             !           REGION; DC=SQRT(1-DS**2);  DRD=1/(2*D)
       RHO2=X**2+Y**2
       R2=RHO2+Z**2
       R=DSQRT(R2)
