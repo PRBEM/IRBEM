@@ -218,9 +218,11 @@ c
       endif
       CALL calcul_Lstar(t_resol,r_resol,lati,longi,alti
      &     ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
-           BBo(isat)=BLOCAL(isat)/BMIN(isat)
+C           BBo(isat)=BLOCAL(isat)/BMIN(isat)  ! removed to use McIlwain Gmagmo for AP/AE
       if (Lm(isat) .le. 0.D0 .and. Lm(isat) .ne. -1.D31)
      &       Lm(isat)=-Lm(isat)
+
+         BBo(isat)=BLOCAL(isat)/(31165.3/Lm(isat)**3)  ! use McIlwain Gmagmo for B0 calc.
 !        write(6,'(I10,3f12.5)')isat,Lm(isat),BLOCAL(isat),BMIN(isat)
       enddo
       call get_AE8_AP8_flux(ntime,whichm,whatf,nene,
@@ -271,6 +273,13 @@ c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
 c
+      REAL*8       xMinP_L, xMaxP_L, XMinE_L, xMaxE_L
+      PARAMETER   (xMINP_L = 1.0)   ! minimum Lshell to calculate proton fluxes
+      PARAMETER   (xMAXP_L = 11.0)  ! maximum Lshell to calculate proton fluxes
+
+      PARAMETER   (xMINE_L = 1.2)   ! minimum Lshell to calculate electron fluxes
+      PARAMETER   (xMAXE_L = 12.0)  ! maximum Lshell to calculate electron fluxes
+
       INTEGER*4   ntmax,i,nene,ieny
       INTEGER*4   whichm  !1=AE8min 2=AE8max 3=AP8min 4=AP8max
       INTEGER*4   whatf  !1=diff 2=E range 3=int
@@ -299,7 +308,7 @@ c
          CALL Init_AE8min
          if (whatf.EQ. 1) then
             DO i=1,ntmax
-               if (L(i).GE.1.2D0 .AND. L(i).LE.11.D0) then
+               if (L(i).GE.xMINE_l .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
@@ -315,7 +324,7 @@ c loop on energies
          endif
          if (whatf.EQ. 2) then
             DO i=1,ntmax
-               if (L(i).GE.1.2D0 .AND. L(i).LE.11.D0) then
+               if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
@@ -332,7 +341,7 @@ c loop on energies
          endif
          if (whatf.EQ. 3) then
             DO i=1,ntmax
-               if (L(i).GE.1.2D0 .AND. L(i).LE.11.D0) then
+               if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
@@ -350,7 +359,7 @@ C
          CALL Init_AE8max
          if (whatf.EQ. 1) then
             DO i=1,ntmax
-               if (L(i).GE.1.2D0 .AND. L(i).LE.11.D0) then
+               if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
@@ -367,7 +376,7 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
          endif
          if (whatf.EQ. 2) then
             DO i=1,ntmax
-               if (L(i).GE.1.2D0 .AND. L(i).LE.11.D0) then
+               if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
@@ -385,7 +394,7 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
          endif
          if (whatf.EQ. 3) then
             DO i=1,ntmax
-               if (L(i).GE.1.2D0 .AND. L(i).LE.11.D0) then
+               if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
@@ -403,7 +412,7 @@ C
          CALL Init_AP8min
          if (whatf.EQ. 1) then
             DO i=1,ntmax
-               if (L(i).GE.1.17D0 .AND. L(i).LE.7.D0) then
+               if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
@@ -420,7 +429,7 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
          endif
          if (whatf.EQ. 2) then
             DO i=1,ntmax
-               if (L(i).GE.1.17D0 .AND. L(i).LE.7.D0) then
+               if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
@@ -438,7 +447,7 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
          endif
          if (whatf.EQ. 3) then
             DO i=1,ntmax
-               if (L(i).GE.1.17D0 .AND. L(i).LE.7.D0) then
+               if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
@@ -456,7 +465,7 @@ C
          CALL Init_AP8max
          if (whatf.EQ. 1) then
             DO i=1,ntmax
-               if (L(i).GE.1.17D0 .AND. L(i).LE.7.D0) then
+               if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
@@ -473,7 +482,7 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
          endif
          if (whatf.EQ. 2) then
             DO i=1,ntmax
-               if (L(i).GE.1.17D0 .AND. L(i).LE.7.D0) then
+               if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
@@ -491,7 +500,7 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
          endif
          if (whatf.EQ. 3) then
             DO i=1,ntmax
-               if (L(i).GE.1.17D0 .AND. L(i).LE.7.D0) then
+               if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
                      CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
