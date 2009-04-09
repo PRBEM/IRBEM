@@ -89,7 +89,7 @@ c
       PRINT *,
      * '  ATTENTION:  THE MODEL IS VALID SUNWARD FROM X=-15 Re ONLY,'
       PRINT *,'              WHILE YOU ARE TRYING TO USE IT AT X=', X
-      PAUSE
+C      PAUSE
       ENDIF
 C
       PDYN=PARMOD(1)
