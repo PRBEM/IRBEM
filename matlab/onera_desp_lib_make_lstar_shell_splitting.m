@@ -83,14 +83,14 @@ if length(matlabd)==1,
     matlabd = repmat(matlabd,ntime,1);
 end
 
+Lm = repmat(nan,ntime,nipa);
+Lstar = repmat(nan,ntime,nipa);
+Blocal = repmat(nan,ntime,nipa);
+Bmin = repmat(nan,ntime,1);
+J = repmat(nan,ntime,nipa);
+MLT = repmat(nan,ntime,1);
 Nmax = 100000; % maximum array size in fortran library
 Nmaxpa = 25; % maximum number of pitch angles
-Lm = repmat(nan,Nmax,Nmaxpa);
-Lstar = repmat(nan,Nmax,Nmaxpa);
-Blocal = repmat(nan,Nmax,Nmaxpa);
-Bmin = repmat(nan,Nmax,1);
-J = repmat(nan,Nmax,Nmaxpa);
-MLT = repmat(nan,Nmax,1);
 if ntime>Nmax,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmax:ntime,
@@ -102,10 +102,22 @@ elseif nipa>Nmaxpa,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmaxpa:nipa,
         ii = i:min(i+Nmaxpa-1,nipa);
-        [Lm(:,ii),Lstar(:,ii),Blocal(:,ii),Bmin(:),J(:,ii),MLT(:)] = ...
+        [Lm(:,ii),Lstar(:,ii),Blocal(:,ii),Bmin_tmp,J(:,ii),MLT_tmp] = ...
             onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha(ii),maginput);
+        nanMLT = ~isfinite(MLT);
+        MLT(nanMLT) = MLT_tmp(nanMLT);
+        nanBmin = ~isfinite(Bmin);
+        Bmin(nanBmin) = Bmin_tmp(nanBmin);
     end
 else
+    % reinitialize Lm, etc for full size
+    Lm = repmat(nan,Nmax,Nmaxpa);
+    Lstar = repmat(nan,Nmax,Nmaxpa);
+    Blocal = repmat(nan,Nmax,Nmaxpa);
+    Bmin = repmat(nan,Nmax,1);
+    J = repmat(nan,Nmax,Nmaxpa);
+    MLT = repmat(nan,Nmax,1);
+    
     [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
     LmPtr = libpointer('doublePtr',Lm);
     LstarPtr = libpointer('doublePtr',Lstar);
@@ -114,7 +126,7 @@ else
     JPtr = libpointer('doublePtr',J);
     MLTPtr = libpointer('doublePtr',MLT);
     if nipa<Nmaxpa,
-        alpha = [alpha(:)',repmat(nan,1,Nmaxpa-nipa)];
+        alpha = [alpha(:)',repmat(nan,1,Nmaxpa-nipa)]; % pad alpha
     end
     maginput = maginput';
     % expand arrays
@@ -134,8 +146,17 @@ else
     Bmin = get(BminPtr,'value');
     J = get(JPtr,'value');
     MLT = get(MLTPtr,'value');
+
+    % shrinkwrap Lm, etc
+    Lm = Lm(1:ntime,1:nipa);
+    Lstar = Lstar(1:ntime,1:nipa);
+    Blocal = Blocal(1:ntime,1:nipa);
+    Bmin = Bmin(1:ntime);
+    J = J(1:ntime,1:nipa);
+    MLT = MLT(1:ntime);
 end
 
+% flags to nan
 % the flag value is actually -1d31
 Lm(Lm<-1e30) = nan;
 Lstar(Lstar<-1e30) = nan;
@@ -144,9 +165,3 @@ Bmin(Bmin<-1e30) = nan;
 J(J<-1e30) = nan;
 MLT(MLT<-1e30) = nan;
 
-Lm = Lm(1:ntime,1:nipa);
-Lstar = Lstar(1:ntime,1:nipa);
-Blocal = Blocal(1:ntime,1:nipa);
-Bmin = Bmin(1:ntime);
-J = J(1:ntime,1:nipa);
-MLT = MLT(1:ntime);
