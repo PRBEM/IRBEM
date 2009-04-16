@@ -5693,10 +5693,22 @@
         model to fly<br />
         </font>
     </p>
-    <div style="MARGIN-LEFT: 40px">1=AE8 MIN<br />
-        2=AE8 MAX<br />
-        3=AP8 MIN<br />
-        4=AP8 MAX<br />
+    <div style="MARGIN-LEFT: 40px">
+	<TABLE>
+	<TR><TH>whichm</TH><TH></TH><TH align=left>Model</TH></TR>
+	<TR><TD align=right>1</TD><TD>=</TD><TD>AE8 MIN</TD></TR>
+	<TR><TD align=right>2</TD><TD>=</TD><TD>AE8 MAX</TD></TR>
+	<TR><TD align=right>3</TD><TD>=</TD><TD>AP8 MIN</TD></TR>
+	<TR><TD align=right>4</TD><TD>=</TD><TD>AP8 MAX</TD></TR>
+	<TR><TD align=right>-1</TD><TD>=</TD><TD>AE8 MIN - ESA Interpolation</TD></TR>
+	<TR><TD align=right>-2</TD><TD>=</TD><TD>AE8 MAX - ESA Interpolation</TD></TR>
+	<TR><TD align=right>-3</TD><TD>=</TD><TD>AP8 MIN - ESA Interpolation</TD></TR>
+	<TR><TD align=right>-4</TD><TD>=</TD><TD>AP8 MAX - ESA Interpolation</TD></TR>
+	</TABLE>
+	<br>
+      <i>The ESA Interpolation scheme provides for better flux interpolations at low altitudes.</br>
+      See: E. J. Daly, et al., "Problems with models of the radiation belts",<br>
+      IEEE Trans. Nucl. Sci, Vol 43, No. 2, Apr. 1996. DOI 10.1109/23.490889<br></i>
     </div>
     <p>
     </p>
@@ -5796,10 +5808,22 @@
         model to fly<br />
         </font>
     </p>
-    <div style="MARGIN-LEFT: 40px">1=AE8 MIN<br />
-        2=AE8 MAX<br />
-        3=AP8 MIN<br />
-        4=AP8 MAX<br />
+    <div style="MARGIN-LEFT: 40px">
+	<TABLE>
+	<TR><TH>whichm</TH><TH></TH><TH align=left>Model</TH></TR>
+	<TR><TD align=right>1</TD><TD>=</TD><TD>AE8 MIN</TD></TR>
+	<TR><TD align=right>2</TD><TD>=</TD><TD>AE8 MAX</TD></TR>
+	<TR><TD align=right>3</TD><TD>=</TD><TD>AP8 MIN</TD></TR>
+	<TR><TD align=right>4</TD><TD>=</TD><TD>AP8 MAX</TD></TR>
+	<TR><TD align=right>-1</TD><TD>=</TD><TD>AE8 MIN - ESA Interpolation</TD></TR>
+	<TR><TD align=right>-2</TD><TD>=</TD><TD>AE8 MAX - ESA Interpolation</TD></TR>
+	<TR><TD align=right>-3</TD><TD>=</TD><TD>AP8 MIN - ESA Interpolation</TD></TR>
+	<TR><TD align=right>-4</TD><TD>=</TD><TD>AP8 MAX - ESA Interpolation</TD></TR>
+	</TABLE>
+	<br>
+      <i>The ESA Interpolation scheme provides for better flux interpolations at low altitudes.</br>
+      See: E. J. Daly, et al., "Problems with models of the radiation belts",<br>
+      IEEE Trans. Nucl. Sci, Vol 43, No. 2, Apr. 1996. DOI 10.1109/23.490889<br></i>
     </div>
     <p>
     </p>
@@ -5868,6 +5892,7 @@
         <font face="ARIAL, HELVETICA">CALL </font><font face="ARIAL, HELVETICA">get_ae8_ap8_flux</font> <font face="ARIAL, HELVETICA">(</font><font face="ARIAL, HELVETICA">ntime,whichm,whatf,Nene,energy,BBo,L,flux</font> <font face="ARIAL, HELVETICA">)<br />
         <br />
         </font>&nbsp;<br />
+    <br />
         ------------------------------------------------------------ 
     </p>
     <a name="FLY_IN_AFRL_CRRES"></a> 

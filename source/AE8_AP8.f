@@ -111,7 +111,7 @@ C
       t_resol=3
       r_resol=0
       k_l=0
-      if (whichm .lt. 1 .or. whichm .gt. 4) then
+      if (ABS(whichm) .lt. 1 .or. ABS(whichm) .gt. 4) then
          whichm=1
          WRITE(6,*)
          WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -120,7 +120,7 @@ C
          WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
          WRITE(6,*)
       endif
-      if (whichm .eq. 4) then
+      if (ABS(whichm) .eq. 4) then
          kint=3
       else
          kint=2
@@ -304,20 +304,20 @@ c  init
 c
 c  AE8min
 c
-      if (whichm .EQ. 1) then
+      if (ABS(whichm) .EQ. 1) then
          CALL Init_AE8min
          if (whatf.EQ. 1) then
             DO i=1,ntmax
                if (L(i).GE.xMINE_l .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
-     &                     energy(1,ieny)-0.001D0,FL)
+                     CALL TRARA(IHEADEMIN,MAPEMIN,L(i),BBo(i),
+     &                    energy(1,ieny)-0.001D0,FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
-     &                        energy(1,ieny)+0.001D0,FL)
+                     CALL TRARA(IHEADEMIN,MAPEMIN,L(i),BBo(i),
+     &                    energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
-     &                 Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
+     &                   Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
                   enddo
                endif
             enddo
@@ -327,11 +327,11 @@ c loop on energies
                if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
-     &                     energy(1,ieny),FL)
+                     CALL TRARA(IHEADEMIN,MAPEMIN,L(i),BBo(i),
+     &                     energy(1,ieny),FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
-     &                        energy(2,ieny),FL)
+                     CALL TRARA(IHEADEMIN,MAPEMIN,L(i),BBo(i),
+     &                        energy(2,ieny),FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                  Flux(i,ieny) = (FL1-10.D0** FL)/
      &                          (energy(2,ieny)-energy(1,ieny))
@@ -344,8 +344,8 @@ c loop on energies
                if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADEMIN,MAPEMIN,L(i),BBo(i),
-     &                        energy(1,ieny),FL)
+                     CALL TRARA(IHEADEMIN,MAPEMIN,L(i),BBo(i),
+     &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
                   enddo
                endif
@@ -355,18 +355,18 @@ c loop on energies
 c
 c  AE8max
 C
-      if (whichm .EQ. 2) then
+      if (ABS(whichm) .EQ. 2) then
          CALL Init_AE8max
          if (whatf.EQ. 1) then
             DO i=1,ntmax
                if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
-     &                     energy(1,ieny)-0.001D0,FL)
+                     CALL TRARA(IHEADEMAX,MAPEMAX,L(i),BBo(i),
+     &                     energy(1,ieny)-0.001D0,FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
-     &                        energy(1,ieny)+0.001D0,FL)
+                     CALL TRARA(IHEADEMAX,MAPEMAX,L(i),BBo(i),
+     &                        energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
@@ -379,11 +379,11 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
-     &                     energy(1,ieny),FL)
+                     CALL TRARA(IHEADEMAX,MAPEMAX,L(i),BBo(i),
+     &                     energy(1,ieny),FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
-     &                        energy(2,ieny),FL)
+                     CALL TRARA(IHEADEMAX,MAPEMAX,L(i),BBo(i),
+     &                        energy(2,ieny),FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/
      &                    (energy(2,ieny)-energy(1,ieny))
@@ -397,8 +397,8 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                if (L(i).GE. xMINE_L .AND. L(i).LE. xMAXE_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADEMAX,MAPEMAX,L(i),BBo(i),
-     &                        energy(1,ieny),FL)
+                     CALL TRARA(IHEADEMAX,MAPEMAX,L(i),BBo(i),
+     &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
                   enddo
                endif
@@ -408,18 +408,18 @@ c loop on energies
 c
 c  AP8min
 C
-      if (whichm .EQ. 3) then
+      if (ABS(whichm) .EQ. 3) then
          CALL Init_AP8min
          if (whatf.EQ. 1) then
             DO i=1,ntmax
                if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
-     &                     energy(1,ieny)-0.001D0,FL)
+                     CALL TRARA(IHEADPMIN,MAPPMIN,L(i),BBo(i),
+     &                     energy(1,ieny)-0.001D0,FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
-     &                        energy(1,ieny)+0.001D0,FL)
+                     CALL TRARA(IHEADPMIN,MAPPMIN,L(i),BBo(i),
+     &                        energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
@@ -432,11 +432,11 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
-     &                     energy(1,ieny),FL)
+                     CALL TRARA(IHEADPMIN,MAPPMIN,L(i),BBo(i),
+     &                     energy(1,ieny),FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
-     &                        energy(2,ieny),FL)
+                     CALL TRARA(IHEADPMIN,MAPPMIN,L(i),BBo(i),
+     &                        energy(2,ieny),FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/
      &                     (energy(2,ieny)-energy(1,ieny))
@@ -450,8 +450,8 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADPMIN,MAPPMIN,L(i),BBo(i),
-     &                        energy(1,ieny),FL)
+                     CALL TRARA(IHEADPMIN,MAPPMIN,L(i),BBo(i),
+     &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
                   enddo
                endif
@@ -461,18 +461,18 @@ c loop on energies
 c
 c  AP8max
 C
-      if (whichm .EQ. 4) then
+      if (ABS(whichm) .EQ. 4) then
          CALL Init_AP8max
          if (whatf.EQ. 1) then
             DO i=1,ntmax
                if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
-     &                     energy(1,ieny)-0.001D0,FL)
+                     CALL TRARA(IHEADPMAX,MAPPMAX,L(i),BBo(i),
+     &                     energy(1,ieny)-0.001D0,FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
-     &                        energy(1,ieny)+0.001D0,FL)
+                     CALL TRARA(IHEADPMAX,MAPPMAX,L(i),BBo(i),
+     &                        energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
@@ -485,11 +485,11 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
-     &                     energy(1,ieny),FL)
+                     CALL TRARA(IHEADPMAX,MAPPMAX,L(i),BBo(i),
+     &                     energy(1,ieny),FL, whichm)
                      FL1 = 10.D0** FL
-                     CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
-     &                        energy(2,ieny),FL)
+                     CALL TRARA(IHEADPMAX,MAPPMAX,L(i),BBo(i),
+     &                        energy(2,ieny),FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/
      &                     (energy(2,ieny)-energy(1,ieny))
@@ -503,8 +503,8 @@ c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                if (L(i).GE. xMINP_L .AND. L(i).LE.xMAXP_L) then
 c loop on energies
                   do ieny=1,nene
-                     CALL TRARA1(IHEADPMAX,MAPPMAX,L(i),BBo(i),
-     &                        energy(1,ieny),FL)
+                     CALL TRARA(IHEADPMAX,MAPPMAX,L(i),BBo(i),
+     &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
                   enddo
                endif
@@ -513,6 +513,64 @@ c loop on energies
       endif
       end
 !
+!--------------------------------------------------------------------------------------------
+!+
+! NAME:
+!	TRARA
+
+! PURPOSE:
+!	This subroutine wraps the original TRARA1 and the ESA_TRARA1 functions.
+!       if WHATM is negative, then the ESA models are used, if positive, then the
+!       original TRARA1 is used.
+!
+! CATEGORY:
+!	Radiation belt model
+!
+! CALLING SEQUENCE:
+!	CALL TRARA(DESCR,MAP,FL,BB0,E,F, whichm)
+!
+! INPUTS:
+!	DESCR(8) -> Header of specified trapped dadiation model
+!	MAP(...) -> MAP of trapped radiation model (see block data)
+!	FL -> L-value
+!	BB0 -> B/B0 magnetic field strength normalized to field strength at magnetic equator
+!	E -> energy in MeV
+!       whichm -> Which model to use.
+!
+! OUTPUTS:
+!	F -> Decadic logarithm of integral fluxes in #/(cm2 s)
+!
+! COMMON BLOCKS:
+!
+! MODIFICATION HISTORY:
+!	Written by: H. Evans - April 2009
+!-
+!--------------------------------------------------------------------------------------------
+      SUBROUTINE TRARA(DESCR, MAP, FL, BB0, E, F, whichm)
+      IMPLICIT NONE
+
+      INTEGER*4 MAP(*)
+      INTEGER*4 DESCR(8)
+      REAL*8    FL, BB0, E, F
+      INTEGER*4 whichm
+
+      REAL*4    xDESCR(8)
+      INTEGER*4 i
+
+      IF (whichm .GT. 0) THEN
+         CALL TRARA1    ( DESCR, MAP, FL, BB0, E, F)
+      ELSE
+C        ESA versions of A*-8 models used REAL*4 numbers in
+C        the map headers.
+         DO i=1,8
+            xDESCR(i) = DESCR(i)
+         ENDDO
+         CALL ESA_TRARA1( xDESCR, MAP, FL, BB0, E, F)
+      ENDIF
+      RETURN
+      END
+      
+
 !--------------------------------------------------------------------------------------------
 !+
 ! NAME:
