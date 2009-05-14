@@ -1,4 +1,4 @@
-function [Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput)
+function [Lm,Lstar,Bmirror,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput)
 %***************************************************************************************************
 % Copyright 2006, T.P. O'Brien
 %
@@ -19,9 +19,9 @@ function [Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splittin
 %
 %***************************************************************************************************
 %
-% function [Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput)
+% function [Lm,Lstar,Bmirror,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput)
 % returns magnetic coordinates as described in onera documentation
-% Lm, Lstar, Blocal, and J are length(x1) x length(alpha)
+% Lm, Lstar, Bmirror, and J are length(x1) x length(alpha)
 % Bmin and MLT are length(x1) x 1
 % kext - specified the external field model
 % For the kext argument, see helps for onera_desp_lib_kext
@@ -85,7 +85,7 @@ end
 
 Lm = repmat(nan,ntime,nipa);
 Lstar = repmat(nan,ntime,nipa);
-Blocal = repmat(nan,ntime,nipa);
+Bmirror = repmat(nan,ntime,nipa);
 Bmin = repmat(nan,ntime,1);
 J = repmat(nan,ntime,nipa);
 MLT = repmat(nan,ntime,1);
@@ -95,14 +95,14 @@ if ntime>Nmax,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmax:ntime,
         ii = i:min(i+Nmax-1,ntime);
-        [Lm(ii,:),Lstar(ii,:),Blocal(ii,:),Bmin(ii),J(ii,:),MLT(ii)] = ...
+        [Lm(ii,:),Lstar(ii,:),Bmirror(ii,:),Bmin(ii),J(ii,:),MLT(ii)] = ...
             onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),alpha,maginput(ii,:));
     end
 elseif nipa>Nmaxpa,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmaxpa:nipa,
         ii = i:min(i+Nmaxpa-1,nipa);
-        [Lm(:,ii),Lstar(:,ii),Blocal(:,ii),Bmin_tmp,J(:,ii),MLT_tmp] = ...
+        [Lm(:,ii),Lstar(:,ii),Bmirror(:,ii),Bmin_tmp,J(:,ii),MLT_tmp] = ...
             onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha(ii),maginput);
         nanMLT = ~isfinite(MLT);
         MLT(nanMLT) = MLT_tmp(nanMLT);
@@ -113,7 +113,7 @@ else
     % reinitialize Lm, etc for full size
     Lm = repmat(nan,Nmax,Nmaxpa);
     Lstar = repmat(nan,Nmax,Nmaxpa);
-    Blocal = repmat(nan,Nmax,Nmaxpa);
+    Bmirror = repmat(nan,Nmax,Nmaxpa);
     Bmin = repmat(nan,Nmax,1);
     J = repmat(nan,Nmax,Nmaxpa);
     MLT = repmat(nan,Nmax,1);
@@ -121,7 +121,7 @@ else
     [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
     LmPtr = libpointer('doublePtr',Lm);
     LstarPtr = libpointer('doublePtr',Lstar);
-    BlocalPtr = libpointer('doublePtr',Blocal);
+    BmirrorPtr = libpointer('doublePtr',Bmirror);
     BminPtr = libpointer('doublePtr',Bmin);
     JPtr = libpointer('doublePtr',J);
     MLTPtr = libpointer('doublePtr',MLT);
@@ -138,11 +138,11 @@ else
     x3 = [x3(:)', repmat(nan,1,Nmax-ntime)];
     maginput = [maginput, repmat(nan,25,Nmax-ntime)];
     calllib('onera_desp_lib','make_lstar_shell_splitting1_',ntime,nipa,kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,alpha,maginput,...
-        LmPtr,LstarPtr,BlocalPtr,BminPtr,JPtr,MLTPtr);
+        LmPtr,LstarPtr,BmirrorPtr,BminPtr,JPtr,MLTPtr);
     % have to do this next bit because Ptr's aren't really pointers
     Lm = get(LmPtr,'value');
     Lstar = get(LstarPtr,'value');
-    Blocal = get(BlocalPtr,'value');
+    Bmirror = get(BmirrorPtr,'value');
     Bmin = get(BminPtr,'value');
     J = get(JPtr,'value');
     MLT = get(MLTPtr,'value');
@@ -150,7 +150,7 @@ else
     % shrinkwrap Lm, etc
     Lm = Lm(1:ntime,1:nipa);
     Lstar = Lstar(1:ntime,1:nipa);
-    Blocal = Blocal(1:ntime,1:nipa);
+    Bmirror = Bmirror(1:ntime,1:nipa);
     Bmin = Bmin(1:ntime);
     J = J(1:ntime,1:nipa);
     MLT = MLT(1:ntime);
@@ -160,7 +160,7 @@ end
 % the flag value is actually -1d31
 Lm(Lm<-1e30) = nan;
 Lstar(Lstar<-1e30) = nan;
-Blocal(Blocal<-1e30) = nan;
+Bmirror(Bmirror<-1e30) = nan;
 Bmin(Bmin<-1e30) = nan;
 J(J<-1e30) = nan;
 MLT(MLT<-1e30) = nan;
