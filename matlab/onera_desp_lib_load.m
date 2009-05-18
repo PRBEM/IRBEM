@@ -25,11 +25,7 @@ function onera_desp_lib_load(libfile,headerfile)
 % if not present, attempts to load it using a headerfile
 if ~libisloaded('onera_desp_lib'),
     if nargin < 2,
-       if ~isempty(findstr(computer,'64')), % 64-bit architecture
-           headerfile = 'onera_desp_lib_64.h';
-       else,
-           headerfile = 'onera_desp_lib.h';
-       end
+        headerfile = 'onera_desp_lib.h';
     end
     if nargin < 1,
         if ispc,

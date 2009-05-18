@@ -23,9 +23,9 @@ Paul O'Brien paul.obrien@aero.org
  */
 
 
-void make_lstar1_(long int *ntime, long int *kext,
-		  long int *options,long int *sysaxes,
-		  long int *iyear,long int *idoy,
+void make_lstar1_(int *ntime, int *kext,
+		  int *options,int *sysaxes,
+		  int *iyear,int *idoy,
 		  double *UT,double *x1,
 		  double *x2,double *x3,
 		  double *maginput, double *Lm,
@@ -33,13 +33,13 @@ void make_lstar1_(long int *ntime, long int *kext,
 		  double *Bmin, double *J,
 		  double *MLT);
 
-void make_lstar_shell_splitting1_(long int *ntime, 
-				  long int *Nipa,
-				  long int *kext,
-				  long int *options,
-				  long int *sysaxes,
-				  long int *iyear,
-				  long int *idoy,
+void make_lstar_shell_splitting1_(int *ntime, 
+				  int *Nipa,
+				  int *kext,
+				  int *options,
+				  int *sysaxes,
+				  int *iyear,
+				  int *idoy,
 				  double *UT,
 				  double *x1,
 				  double *x2,
@@ -53,9 +53,9 @@ void make_lstar_shell_splitting1_(long int *ntime,
 				  double *J,
 				  double *MLT);
 
-void drift_shell1_(long int *kext, long int *options,
-		   long int *sysaxes, long int *iyear,
-		   long int *idoy, double * UT,
+void drift_shell1_(int *kext, int *options,
+		   int *sysaxes, int *iyear,
+		   int *idoy, double * UT,
 		   double *x1, double *x2, double *x3,
 		   double *maginput,
 		   double *Lm,
@@ -64,11 +64,11 @@ void drift_shell1_(long int *kext, long int *options,
 		   double *Bmin, 
 		   double *J,
 		   double *posit,
-		   long int *ind);
+		   int *ind);
 
-void drift_bounce_orbit1_(long int *kext, long int *options,
-			  long int *sysaxes, long int *iyear,
-			  long int *idoy, double * UT,
+void drift_bounce_orbit1_(int *kext, int *options,
+			  int *sysaxes, int *iyear,
+			  int *idoy, double * UT,
 			  double *x1, double *x2, double *x3, double *alpha,
 			  double *maginput,
 			  double *Lm,
@@ -78,11 +78,11 @@ void drift_bounce_orbit1_(long int *kext, long int *options,
 			  double *Bmir, 
 			  double *J,
 			  double *posit,
-			  long int *ind);
+			  int *ind);
 
-void trace_field_line1_(long int *kext, long int *options,
-		   long int *sysaxes, long int *iyear,
-		   long int *idoy, double * UT,
+void trace_field_line1_(int *kext, int *options,
+		   int *sysaxes, int *iyear,
+		   int *idoy, double * UT,
 		   double *x1, double *x2, double *x3,
 		   double *maginput,
 		   double *Lm,
@@ -90,21 +90,21 @@ void trace_field_line1_(long int *kext, long int *options,
 		   double *Bmin, 
 		   double *J,
 		   double *posit,
-		   long int *ind);
+		   int *ind);
 
-void get_field1_(long int *kext, long int *options,
-		 long int *sysaxes,
-		 long int *iyear,long int *idoy,
+void get_field1_(int *kext, int *options,
+		 int *sysaxes,
+		 int *iyear,int *idoy,
 		 double *UT,double *x1,
 		 double *x2,double *x3,
 		 double *maginput,
 		 double *Bgeo,
 		 double *B);
 
-void find_mirror_point1_(long int *kext, 
-			 long int *options,
-			 long int *sysaxes,
-			 long int *iyear,long int *idoy,
+void find_mirror_point1_(int *kext, 
+			 int *options,
+			 int *sysaxes,
+			 int *iyear,int *idoy,
 			 double *UT,double *x1,
 			 double *x2,double *x3,
 			 double *alpha,
@@ -113,83 +113,83 @@ void find_mirror_point1_(long int *kext,
 			 double *Bmirror,
 			 double *xGEO);
 
-void find_foot_point1_(long int *kext, 
-		       long int *options,
-		       long int *sysaxes,
-		       long int *iyear,long int *idoy,
+void find_foot_point1_(int *kext, 
+		       int *options,
+		       int *sysaxes,
+		       int *iyear,int *idoy,
 		       double *UT,double *x1,
 		       double *x2,double *x3,
 		       double *stop_alt,
-		       long int *hemi_flag,
+		       int *hemi_flag,
 		       double *maginput,
 		       double *xfoot,
 		       double *Bfoot,
 		       double *Bfootmag);
 
-void get_hemi1_(long int *kext, 
-		long int *options,
-		long int *sysaxes,
-		long int *iyear,long int *idoy,
+void get_hemi1_(int *kext, 
+		int *options,
+		int *sysaxes,
+		int *iyear,int *idoy,
 		double *UT,double *x1,
 		double *x2,double *x3,
 		double *maginput,
-		long int *xHEMI);
+		int *xHEMI);
 
-void find_magequator1_(long int *kext, 
-			 long int *options,
-			 long int *sysaxes,
-			 long int *iyear,long int *idoy,
+void find_magequator1_(int *kext, 
+			 int *options,
+			 int *sysaxes,
+			 int *iyear,int *idoy,
 			 double *UT,double *x1,
 			 double *x2,double *x3,
 			 double *maginput,
 			 double *Bmin,
 			 double *xGEO);
 
-void get_mlt1_(long int *iyr, long int *idoy,
+void get_mlt1_(int *iyr, int *idoy,
 	       double *UT, double *xGEO, double *MLT);
 
-void fly_in_nasa_aeap1_(long int *ntime, long int *sysaxes,
-			long int *whichm, long int *whatf,
-			long int *Nene, double *energy, 
-			long int *iyear, long int *idoy, double *UT,
+void fly_in_nasa_aeap1_(int *ntime, int *sysaxes,
+			int *whichm, int *whatf,
+			int *Nene, double *energy, 
+			int *iyear, int *idoy, double *UT,
 			double *x1,double *x2, double *x3,
 			double *flux);
 
-void get_ae8_ap8_flux_(long int *ntime, long int *whichm, long int *whatf,
-		       long int *Nene, double *energy, 
+void get_ae8_ap8_flux_(int *ntime, int *whichm, int *whatf,
+		       int *Nene, double *energy, 
 		       double *BBo, double *L, double *flux);
 
-void fly_in_afrl_crres1_(long int *ntime, long int *sysaxes,
-			 long int *whichm, long int *whatf,
-			 long int *nene, double *energy, 
-			 long int *iyear, long int *idoy, double *UT,
+void fly_in_afrl_crres1_(int *ntime, int *sysaxes,
+			 int *whichm, int *whatf,
+			 int *nene, double *energy, 
+			 int *iyear, int *idoy, double *UT,
 			 double *x1, double *x2, double *x3,
 			 double *Ap15,
 			 double *flux,
 			 char *ascii_path,
-			 long int *strlen);
+			 int *strlen);
 
-void get_crres_flux_(long int *ntime, long int *whichm, long int *whatf,
-		     long int *nene, double *energy, 
+void get_crres_flux_(int *ntime, int *whichm, int *whatf,
+		     int *nene, double *energy, 
 		     double *BBo,double *L, double *Ap15,
 		     double *flux,
 		     char *ascii_path,
-		     long int *strlen);
+		     int *strlen);
 
-void sgp4_tle1_(long int *runtype,double *startsfe,double *stopsfe,double *deltasec,
-		char *InFileByte,long int *strlenIn,
-		char *OutFileByte,long int *strlenOut);
+void sgp4_tle1_(int *runtype,double *startsfe,double *stopsfe,double *deltasec,
+		char *InFileByte,int *strlenIn,
+		char *OutFileByte,int *strlenOut);
 
-void sgp4_ele1_(long int *sysaxes,
-		long int *Yr,long int *Mon,long int *Day,long int *Hr,long int *Minute,double *Sec,
+void sgp4_ele1_(int *sysaxes,
+		int *Yr,int *Mon,int *Day,int *Hr,int *Minute,double *Sec,
 		double *e1, double *e2,	double *e3, double *e4,	double *e5, double *e6,
-		long int *ele_opts,
+		int *ele_opts,
 		double *startsfe,double *stopsfe,double *deltasec,
-		long int *outYr,long int *outDoy, double *outSec,
+		int *outYr,int *outDoy, double *outSec,
 		double *x1, double *x2,	double *x3);
 
-void coord_trans_vec1_(long int *ntime, long int *sysaxesIN,long int *sysaxesOUT,
-		   long int *iyr,long int *idoy,double *secs,
+void coord_trans_vec1_(int *ntime, int *sysaxesIN,int *sysaxesOUT,
+		   int *iyr,int *idoy,double *secs,
 		   double *xINV,double *xOUTV);
 
 void rv2coe_(double *R, double *V, 
@@ -197,25 +197,25 @@ void rv2coe_(double *R, double *V,
 	     double *Argp, double *Nu, double *M, double *ArgLat,
 	     double *TrueLon, double *LonPer);
 
-void fly_in_ige1_(long int *launch_year, long int *duration,
-		  long int *whichm, long int *whatf,
-		  long int *nene, double *energy,
+void fly_in_ige1_(int *launch_year, int *duration,
+		  int *whichm, int *whatf,
+		  int *nene, double *energy,
 		  double *Lower_flux, double *Mean_flux, double *Upper_flux);
 
-void fly_in_meo_gnss1_(long int *launch_year, long int *duration,
-		  long int *whichm, long int *whatf,
-		  long int *nene, double *energy,
+void fly_in_meo_gnss1_(int *launch_year, int *duration,
+		  int *whichm, int *whatf,
+		  int *nene, double *energy,
 		  double *Lower_flux, double *Mean_flux, double *Upper_flux);
 
-void nrlmsise00_(long int *ntime,long int *whichAp,
-		long int *DOY,double *UT,double *ALT,double *LAT,double *LON,
+void nrlmsise00_(int *ntime,int *whichAp,
+		int *DOY,double *UT,double *ALT,double *LAT,double *LON,
 		double *F107A,double *F107,double *AP,double *Dens,double *Temp);
 
-void msise90_(long int *ntime,long int *whichAp,
-		long int *DOY,double *UT,double *ALT,double *LAT,double *LON,
+void msise90_(int *ntime,int *whichAp,
+		int *DOY,double *UT,double *ALT,double *LAT,double *LON,
 		double *F107A,double *F107,double *AP,double *Dens,double *Temp);
 
-void msis86_(long int *ntime,long int *whichAp,
-		long int *DOY,double *UT,double *ALT,double *LAT,double *LON,
+void msis86_(int *ntime,int *whichAp,
+		int *DOY,double *UT,double *ALT,double *LAT,double *LON,
 		double *F107A,double *F107,double *AP,double *Dens,double *Temp);
 
