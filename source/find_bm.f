@@ -84,7 +84,7 @@ C
        cste=B0/sn2
        dsreb = Lb/(Nreb*1.d0)
 C
-C calcul du sens du depart 
+C calcul du sens du depart
 C
        CALL sksyst(-dsreb,xx0,x1,Bl,Ifail)
        IF (Ifail.LT.0) THEN
@@ -152,11 +152,11 @@ C
           xmin(3) = baddata
 	  RETURN
        ENDIF
-C           
+C
 C calcul de Bmirror point
 C
-       DO i=1,100
-         CALL sksyst(dsreb/100.d0,xmin,x1,Bl,Ifail)
+       DO i=1,1000
+         CALL sksyst(dsreb/1000.d0,xmin,x1,Bl,Ifail)
          IF (Ifail.LT.0) THEN
 	    Bmir=baddata
             xmin(1) = baddata
