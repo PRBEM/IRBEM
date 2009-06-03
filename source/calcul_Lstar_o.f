@@ -38,7 +38,7 @@ C
        REAL*8     B(3),Bl,B0,Bmin,B1,B3
        REAL*8     dsreb,smin
 
-       INTEGER*4  I,J,Iflag,Iflag_I,Ilflag,Ifail
+       INTEGER*4  I,J,Iflag,Iflag_I,Ilflag,Ifail,Iflag3
        REAL*8     Lm,Lstar,Lb
        REAL*8     leI,leI0,leI1
        REAL*8     XY,YY
@@ -48,6 +48,7 @@ C
        REAL*8     tet(10*Nder_def),phi(10*Nder_def)
        REAL*8     tetl,tet1,dtet
        REAL*8     somme
+       REAL*8     Bmin3,x3(3),xmin3(3),Bl3,rr32,x13(3),Bl13,ds3
 C
        REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
 C
@@ -356,12 +357,86 @@ C
 	 Ilflag = 0
 	 RETURN
 	ENDIF
+
+C rajout D. Boscher 25 Mars 2009
+       Bmin3 = Bl
+       xmin3(1) = x1(1)
+       xmin3(2) = x1(2)
+       xmin3(3) = x1(3)
+       x13(1) = x1(1)
+       x13(2) = x1(2)
+       x13(3) = x1(3)
+       Iflag3 = 0
+       DO J = 1,Nrebmax
+         CALL sksyst(dsreb,x13,x3,Bl3,Ifail)
+         IF (Bl3 .GT. Bl) GOTO 203
+         IF (Bl3.LT.Bmin3) THEN
+           xmin3(1) = x3(1)
+           xmin3(2) = x3(2)
+           xmin3(3) = x3(3)
+           Bmin3 = Bl3
+         ENDIF
+         IF (Bl3 .LT. B0) Iflag3 = 1    !test pas a l'equateur
+         x13(1) = x3(1)
+         x13(2) = x3(2)
+         x13(3) = x3(3)
        ENDDO
+203    CONTINUE
+       rr32 = xmin3(1)*xmin3(1)+xmin3(2)*xmin3(2)+xmin3(3)*xmin3(3)
+       IF (rr32 .LT. 1.03d0) GOTO 303
+       IF (Iflag3 .EQ. 1) THEN
+         x13(1) = x1(1)
+         x13(2) = x1(2)
+         x13(3) = x1(3)
+         Bl13 = Bl
+         DO J=1,Nrebmax
+           CALL sksyst(dsreb,x13,x3,Bl3,Ifail)
+           IF (Bl3 .LT. B0) GOTO 204
+           x13(1) = x3(1)
+           x13(2) = x3(2)
+           x13(3) = x3(3)
+           Bl13 = Bl3
+       ENDDO
+204    CONTINUE
+        ds3 = dsreb*(B0-Bl13)/(Bl3-Bl13)
+        CALL sksyst(ds3,x13,x3,Bl3,Ifail)
+        rr32  = x3(1)*x3(1)+x3(2)*x3(2)+x3(3)*x3(3)
+        IF (rr32 .LT. 1.03D0) GOTO 303
+C
+        x13(1) = x1(1)
+        x13(2) = x1(2)
+        x13(3) = x1(3)
+        Bl13 = Bl
+        Iflag3 = 0
+        DO J=1,Nrebmax
+         CALL sksyst(dsreb,x13,x3,Bl3,Ifail)
+         IF (Bl3 .GT. Bl) GOTO 205
+         IF (Bl3 .GT. B0 .AND. Iflag3 .EQ. 1) GOTO 205
+         IF (Bl3 .LT. B0) Iflag3 = 1
+         x13(1) = x3(1)
+         x13(2) = x3(2)
+         x13(3) = x3(3)
+         Bl13 = Bl3
+        ENDDO
+205     CONTINUE
+        IF (J .EQ. Nrebmax) GOTO 303
+        ds3 = dsreb*(B0-Bl13)/(Bl3-Bl13)
+        CALL sksyst(ds3,x13,x3,Bl3,Ifail)
+        rr32  = x3(1)*x3(1)+x3(2)*x3(2)+x3(3)*x3(3)
+        IF (rr32 .LT. 1.03D0) GOTO 303
+       ENDIF
+c end rajout
+       ENDDO
+303    CONTINUE
 c       write(6,*)(tet(I),I=1,Nder)
 c       read(5,*)
 C
 C calcul de somme de BdS sur la calotte nord
 C
+       IF (rr32 .LT. 1.03d0) THEN
+         Ilflag = 0
+         RETURN
+       ENDIF
        x1(1) = 0.D0
        x1(2) = 0.D0
        x1(3) = 1.D0
