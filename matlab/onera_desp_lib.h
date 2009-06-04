@@ -33,6 +33,24 @@ void make_lstar1_(int *ntime, int *kext,
 		  double *Bmin, double *J,
 		  double *MLT);
 
+void landi2lstar1_(int *ntime, int *kext,
+		  int *options,int *sysaxes,
+		  int *iyear,int *idoy,
+		  double *UT,double *x1,
+		  double *x2,double *x3,
+		  double *maginput, double *Lm,
+		  double *Lstar, double *Blocal,
+		  double *Bmin, double *J,
+		  double *MLT);
+
+void empiricallstar1_(int *ntime, int *kext,
+		      int *options,int *sysaxes,
+		      int *iyear,int *idoy,
+		      double *UT,double *x1,
+		      double *x2,double *x3,
+		      double *maginput, double *Lm,
+		      double *Lstar, double *J);
+
 void make_lstar_shell_splitting1_(int *ntime, 
 				  int *Nipa,
 				  int *kext,
