@@ -110,6 +110,15 @@ void trace_field_line1_(int *kext, int *options,
 		   double *posit,
 		   int *ind);
 
+void trace_field_line_towards_earth1_(int *kext, int *options,
+				     int *sysaxes, int *iyear,
+				     int *idoy, double * UT,
+				     double *x1, double *x2, double *x3,
+				     double *maginput,
+				      double *ds,
+				     double *posit,
+				     int *ind);
+
 void get_field1_(int *kext, int *options,
 		 int *sysaxes,
 		 int *iyear,int *idoy,
