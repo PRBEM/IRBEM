@@ -44,10 +44,7 @@ void landi2lstar1_(int *ntime, int *kext,
 		  double *MLT);
 
 void empiricallstar1_(int *ntime, int *kext,
-		      int *options,int *sysaxes,
-		      int *iyear,int *idoy,
-		      double *UT,double *x1,
-		      double *x2,double *x3,
+		      int *options,int *idoy,
 		      double *maginput, double *Lm,
 		      double *Lstar, double *J);
 
