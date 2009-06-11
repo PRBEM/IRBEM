@@ -69,7 +69,7 @@ if ntime>Nmax,
     for i = 1:Nmax:ntime,
         ii = i:min(i+Nmax-1,ntime);
         [Lm(ii),Lstar(ii),Blocal(ii),Bmin(ii),J(ii),MLT(ii)] = ...
-            onera_desp_lib_make_lstar(kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),maginput(ii,:));
+            onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),maginput(ii,:));
     end
 else
     [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
