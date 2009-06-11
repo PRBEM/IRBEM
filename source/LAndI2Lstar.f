@@ -17514,24 +17514,13 @@ c                      9: G2
 c                     10: G3
 c
 c Declare internal variables
-      INTEGER*4  option1,isat,DayIndexL,DayIndexR,i
-      REAL*8     Lmax(12,2100),Imax(12,2100)
-      REAL*8     Lupper(12,1001),Iupper(12,1001)
-      REAL*8     Lm4(12,100),A0(12,100),A1(12,100),A2(12,100),A3(12,100)
-      REAL*8     A4(12,100)
-      REAL*8     Lm5(12,100),A50(12,100),A51(12,100),A52(12,100)
-      REAL*8     A53(12,100),A54(12,100),A55(12,100)
-      REAL*8     slope,origin,XJL,XJR,LupperL,LupperR,Lstar1,Lstar2
-      REAL*8     LstarL,LstarR
+      INTEGER*4  option1,isat
 c
 c Declare output variables
       REAL*8     BLOCAL(ntime_max),BMIN(ntime_max),XJ(ntime_max)
       REAL*8     MLT(ntime_max)
       REAL*8     Lm(ntime_max),Lstar(ntime_max)
 C
-      COMMON/LAndI2LstarCom/Lmax,Imax,Lupper,Iupper,Lm4,A0,A1,A2,A3,A4,
-     &Lm5,A50,A51,A52,A53,A54,A55
-c
 c     This method to compute L* is only available for IGRF + Olson-Pfitzer quiet
       if (options(5) .ne. 0) options(5)=0  ! force internal field to be IGRF
       if (kext .ne. 5) kext=5 ! force external field to be Olson-Pfitzer quiet
@@ -17542,11 +17531,12 @@ c     force inputs to use make_lstar but only Lm will be computed (not L* at thi
       call make_lstar1(ntime,kext,options,sysaxes,iyearsat,
      &  idoy,UT,xIN1,xIN2,xIN3,maginput,Lm,Lstar,BLOCAL,BMIN,XJ,MLT)
 c
-c     now compute L* according to fit functions
-      call EmpiricalLstar1(ntime,kext,options,idoy,maginput,Lm,
-     &Lstar,XJ)
-c
       options(1)=option1
+c
+c     now compute L* according to fit functions
+      call EmpiricalLstar1(ntime,kext,options,iyearsat,idoy,maginput,
+     &Lm,XJ,Lstar)
+c
       end
 c
 !--------------------------------------------------------------------------------------------
@@ -17568,6 +17558,7 @@ c
 !	ntime: number of time steps to be computed
 !   kext: index of external field model being used (May 2009 only Olson-Pfitzer Quiet is available)
 !   options:
+!   iyearsat: year (integer)
 !   idoy: day of year (1=1st of January)
 !   maginput: drivers for external magnetic fields
 !   Lm: McIlwain L
@@ -17578,14 +17569,15 @@ c
 !
 ! COMMON BLOCKS:
 !   COMMON/LAndI2LstarCom/Lmax,Imax,Lupper,Iupper,Lm4,A0,A1,A2,A3,A4,Lm5,A50,A51,A52,A53,A54,A55
-
+!   COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
+!
 !
 ! MODIFICATION HISTORY:
 !	Written by: S. Bourdarie (introduced in version 4.4), May 2009
 !-
 !--------------------------------------------------------------------------------------------
-      SUBROUTINE EmpiricalLstar1(ntime,kext,options,idoy,maginput,Lm,
-     &Lstar,XJ)
+      SUBROUTINE EmpiricalLstar1(ntime,kext,options,iyearsat,idoy,
+     &maginput,Lm,XJ,Lstar)
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
@@ -17594,6 +17586,7 @@ c declare inputs
       INTEGER*4    ntime_max,kext,options(5)
       PARAMETER (ntime_max=100000)
       INTEGER*4    ntime
+      INTEGER*4    iyearsat(ntime_max)
       integer*4    idoy(ntime_max)
       real*8     maginput(25,ntime_max)
 c                      1: Kp
@@ -17607,8 +17600,11 @@ c                      8: G1
 c                      9: G2
 c                     10: G3
 c
+      REAL*8     XJ(ntime_max),Lm(ntime_max)
+c
 c Declare internal variables
-      INTEGER*4  isat,DayIndexL,DayIndexR,i,iflag
+      INTEGER*4  isat,DayIndexL,DayIndexR,i,iflag,iyear,kint
+      INTEGER*4  firstJanuary,lastDecember,currentdoy,JULDAY
       REAL*8     Lmax(12,2100),Imax(12,2100)
       REAL*8     Lupper(12,1001),Iupper(12,1001)
       REAL*8     Lm4(12,100),A0(12,100),A1(12,100),A2(12,100),A3(12,100)
@@ -17617,13 +17613,15 @@ c Declare internal variables
       REAL*8     A53(12,100),A54(12,100),A55(12,100)
       REAL*8     slope,origin,XJL,XJR,LupperL,LupperR,Lstar1,Lstar2
       REAL*8     LstarL,LstarR,LnXJ,XJatLossCone
+      REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
+      REAL*8     pi,dec_year
 c
 c Declare output variables
-      REAL*8     XJ(ntime_max)
-      REAL*8     Lm(ntime_max),Lstar(ntime_max)
+      REAL*8     Lstar(ntime_max)
 C
       COMMON/LAndI2LstarCom/Lmax,Imax,Lupper,Iupper,Lm4,A0,A1,A2,A3,A4,
      &Lm5,A50,A51,A52,A53,A54,A55
+      COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
 c
 c     This method to compute L* is only available for IGRF + Olson-Pfitzer quiet
       if (options(5) .ne. 0) options(5)=0  ! force internal field to be IGRF
@@ -17857,5 +17855,62 @@ c       Finally compute L* according to fit functions
 !	   write(6,*)iflag,isat,Lstar(isat)
 !	endif
       enddo
+c
+c
+c if required by user compute Phi instead of L*    
+      if (options(1) .EQ. 2) then
+        pi=2.D0*atan(1.D0)
+        iyear=1800
+	kint=options(5)
+	IF (kint .lt. 0) THEN
+	   kint=0
+	   WRITE(6,*)
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)'Invalid internal field specification'
+	   WRITE(6,*)'Selecting IGRF'
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)
+	ENDIF
+	if (kint .gt. 3) THEN
+	   kint=0
+	   WRITE(6,*)
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)'Invalid internal field specification'
+	   WRITE(6,*)'Selecting IGRF'
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)
+	ENDIF
+c
+        CALL INITIZE
+	if (kint .eq. 2) CALL JensenANDCain1960
+	if (kint .eq. 3) CALL GSFC1266
+        DO isat = 1,ntime
+c	   write(6,*)real(isat)*100./real(ntime), '% done'
+c
+           if (kint .le. 1) then
+              if (options(2) .eq. 0) then
+	        if (iyearsat(isat) .ne. iyear) then
+	           iyear=iyearsat(isat)
+	           dec_year=iyear+0.5d0
+	           CALL INIT_DTD(dec_year)
+	        endif
+	      else
+	        if (iyearsat(isat) .ne. iyear .or.
+     &          MOD(idoy(isat)*1.d0,options(2)*1.d0) .eq. 0) THEN
+	           iyear=iyearsat(isat)
+		   firstJanuary=JULDAY(iyear,01,01)
+		   lastDecember=JULDAY(iyear,12,31)
+		   currentdoy=(idoy(isat)/options(2))*options(2)
+		   if (currentdoy .eq. 0) currentdoy=1
+	           dec_year=iyear+currentdoy*1.d0/
+     &             ((lastDecember-firstJanuary+1)*1.d0)
+	           CALL INIT_DTD(dec_year)
+                endif
+	      endif
+	   endif
+	   if (Lstar(isat) .NE. baddata) Lstar(isat)=2.d0*pi*Bo/Lstar(isat)
+	enddo
+      endif
+
       end
 
