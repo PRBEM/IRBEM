@@ -62,12 +62,13 @@ else
     LstarPtr = libpointer('doublePtr',Lstar);
     maginput = maginput';
     % expand arrays
+    iyear = [iyear(:)', repmat(nan,1,Nmax-ntime)];
     idoy = [idoy(:)', repmat(nan,1,Nmax-ntime)];
     maginput = [maginput, repmat(nan,25,Nmax-ntime)];
     Lm = [Lm(:)', repmat(nan,1,Nmax-ntime)];
     J = [J(:)', repmat(nan,1,Nmax-ntime)];
     
-    calllib('onera_desp_lib','empiricallstar1_',ntime,kext,options,idoy,maginput,Lm,LstarPtr,J);
+    calllib('onera_desp_lib','empiricallstar1_',ntime,kext,options,iyear,idoy,maginput,Lm,J,LstarPtr);
     % have to do this next bit because Ptr's aren't really pointers
     Lstar = get(LstarPtr,'value');
 end

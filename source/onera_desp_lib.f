@@ -1154,7 +1154,7 @@ C
         COMMON/GENER/ERA,AQUAD,BQUAD
         COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
 C
-      pi=2.D0*atan(1.D0)
+      pi=4.D0*atan(1.D0)
         iyear=1800
 	kint=options(5)
 	IF (kint .lt. 0) THEN

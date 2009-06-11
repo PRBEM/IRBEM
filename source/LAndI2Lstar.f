@@ -17859,7 +17859,7 @@ c
 c
 c if required by user compute Phi instead of L*    
       if (options(1) .EQ. 2) then
-        pi=2.D0*atan(1.D0)
+        pi=4.D0*atan(1.D0)
         iyear=1800
 	kint=options(5)
 	IF (kint .lt. 0) THEN

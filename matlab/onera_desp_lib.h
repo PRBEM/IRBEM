@@ -44,9 +44,9 @@ void landi2lstar1_(int *ntime, int *kext,
 		  double *MLT);
 
 void empiricallstar1_(int *ntime, int *kext,
-		      int *options,int *idoy,
+		      int *options,int *iyear,int *idoy,
 		      double *maginput, double *Lm,
-		      double *Lstar, double *J);
+		      double *J, double *Lstar);
 
 void make_lstar_shell_splitting1_(int *ntime, 
 				  int *Nipa,
