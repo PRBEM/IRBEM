@@ -73,6 +73,27 @@ c  subroutine EmpiricalLstar: 8 arguments
       RETURN
       END
 c
+C-----------------------------------------------------------------------------
+C IDL Wrappers
+C-----------------------------------------------------------------------------
+
+      REAL*4 FUNCTION LAndI2Lstar_shell_splitting(argc, argv)   ! Called by IDL
+      INCLUDE 'wrappers.inc'
+c
+       j = loc(argc)                    ! Obtains the number of arguments (argc)
+                                       ! Because argc is passed by VALUE.
+      call LAndI2Lstar_shell_splitting1(%VAL(argv(1)),%VAL(argv(2)),
+     &  %VAL(argv(3)),%VAL(argv(4)),%VAL(argv(5)),%VAL(argv(6)),
+     &  %VAL(argv(7)),%VAL(argv(8)),%VAL(argv(9)),%VAL(argv(10)),
+     &  %VAL(argv(11)),%VAL(argv(12)),%VAL(argv(13)),%VAL(argv(14)),
+     &  %VAL(argv(15)),%VAL(argv(16)),%VAL(argv(17)),%VAL(argv(18)),
+     &  %VAL(argv(19)))
+c
+      LAndI2Lstar_shell_splitting = 9.9
+
+      RETURN
+      END
+c
 !--------------------------------------------------------------------------------------------
 !+
 ! NAME:
@@ -17460,7 +17481,7 @@ c To be used only where Lm>7.5 and I> 1.
 !--------------------------------------------------------------------------------------------
 !+
 ! NAME:
-!	LAndI2Lstar_OlsonPfitzerQuiet
+!	LAndI2Lstar
 !
 ! PURPOSE:
 !	This subroutine allows to compute magnetic parameters using IGRF+Olson-Pfitzer Quiet
@@ -17471,7 +17492,7 @@ c To be used only where Lm>7.5 and I> 1.
 !
 !
 ! CALLING SEQUENCE:
-!	CALL LAndI2Lstar_OlsonPfitzerQuiet
+!	CALL LAndI2Lstar
 !
 ! INPUTS:
 !	None
@@ -17536,6 +17557,133 @@ c
 c     now compute L* according to fit functions
       call EmpiricalLstar1(ntime,kext,options,iyearsat,idoy,maginput,
      &Lm,XJ,Lstar)
+c
+      end
+c
+!--------------------------------------------------------------------------------------------
+!+
+! NAME:
+!	LAndI2Lstar
+!
+! PURPOSE:
+!	This subroutine allows to compute magnetic parameters using IGRF+Olson-Pfitzer Quiet
+!   magnetic field models. L, I, B, Bo, MLT is computed with the well know make_Lstar of this package
+!   whereas L* calculation is empirical and deduced from Lm, I and day of year.
+!
+! CATEGORY:
+!
+!
+! CALLING SEQUENCE:
+!	CALL LAndI2Lstar
+!
+! INPUTS:
+!	None
+!
+! OUTPUTS:
+!	None (in common blocks)
+!
+! COMMON BLOCKS:
+!   COMMON/LAndI2LstarCom/Lmax,Imax,Lupper,Iupper,Lm4,A0,A1,A2,A3,A4,Lm5,A50,A51,A52,A53,A54,A55
+
+!
+! MODIFICATION HISTORY:
+!	Written by: S. Bourdarie (introduced in version 4.4), May 2009
+!-
+!--------------------------------------------------------------------------------------------
+      SUBROUTINE LAndI2Lstar_shell_splitting1(ntime,Nipa,kext,options,
+     &  sysaxes,iyearsat,idoy,UT,xIN1,xIN2,xIN3,
+     &  alpha,maginput,Lm,Lstar,BLOCAL,BMIN,XJ,MLT)
+c
+      IMPLICIT NONE
+      INCLUDE 'variables.inc'
+c
+c declare inputs
+      INTEGER*4    ntime_max,kext,k_ext,k_l,options(5),Nalp,Nipa
+      PARAMETER (ntime_max=100000)
+      PARAMETER (Nalp=25)
+      INTEGER*4    ntime,sysaxes
+      INTEGER*4    iyearsat(ntime_max)
+      integer*4    idoy(ntime_max)
+      real*8     UT(ntime_max)
+      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+      real*8     alpha(Nalp)
+      real*8     maginput(25,ntime_max)
+c                      1: Kp
+c                      2: Dst
+c                      3: dens
+c                      4: velo
+c                      5: Pdyn
+c                      6: ByIMF
+c                      7: BzIMF
+c                      8: G1
+c                      9: G2
+c                     10: G3
+c
+c Declare internal variables
+      INTEGER*4  option1,isat,IPA,ntime_tmp,sysaxesOUT,sysaxesIN
+      REAL*8     BLOCAL_tmp(ntime_max),BMIN_tmp(ntime_max)
+      REAL*8     XJ_tmp(ntime_max),MLT_tmp(ntime_max)
+      REAL*8     Lm_tmp(ntime_max),Lstar_tmp(ntime_max)
+      REAL*8     xIN(3),xOUT(3),BL,BMIR,xGEO(3)
+c
+c Declare output variables
+      REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime_max)
+      REAL*8     XJ(ntime_max,Nalp),MLT(ntime_max)
+      REAL*8     Lm(ntime_max,Nalp),Lstar(ntime_max,Nalp)
+C
+c     This method to compute L* is only available for IGRF + Olson-Pfitzer quiet
+      if (options(5) .ne. 0) options(5)=0  ! force internal field to be IGRF
+      if (kext .ne. 5) kext=5 ! force external field to be Olson-Pfitzer quiet
+c
+c     force inputs to use make_lstar but only Lm will be computed (not L* at this point)
+      option1=options(1)
+      options(1)=0
+c
+c Compute Bmin at all locations first. 
+      call make_lstar1(ntime,kext,options,sysaxes,iyearsat,
+     &  idoy,UT,xIN1,xIN2,xIN3,maginput,Lm_tmp,Lstar_tmp,BLOCAL_tmp,
+     &  BMIN,XJ_tmp,MLT)
+      ntime_tmp=1
+      sysaxesOUT=0
+      sysaxesIN=1
+      DO isat = 1,ntime
+        if (BMIN(isat) .NE. baddata) then
+	  call coord_trans1(sysaxes,sysaxesOUT,iyearsat(isat),
+     &       idoy(isat),UT(isat),xIN,xOUT)
+          DO IPA=1,Nipa
+            options(1)=0
+            if (alpha(IPA).ne.90.0d0) then
+              CALL find_bm(xOUT(2),xOUT(3),xOUT(1),alpha(IPA),BL,BMIR,
+     &           xGEO)
+              call make_lstar1(ntime_tmp,kext,options,sysaxesIN,
+     &           iyearsat,idoy,UT,xGEO(1),xGEO(2),xGEO(3),maginput,
+     &           Lm_tmp,Lstar_tmp,BLOCAL_tmp,BMIN_tmp,XJ_tmp,MLT_tmp)
+            ELSE
+              call make_lstar1(ntime_tmp,kext,options,sysaxes,iyearsat,
+     &           idoy,UT,xIN1,xIN2,xIN3,maginput,Lm_tmp,Lstar_tmp,
+     &           BLOCAL_tmp,BMIN_tmp,XJ_tmp,MLT_tmp)
+	    ENDIF
+	    Lm(isat,IPA)=Lm_tmp(1)
+	    XJ(isat,IPA)=XJ_tmp(1)
+	    BLOCAL(isat,IPA)=BLOCAL_tmp(1)
+            options(1)=option1
+c
+c     now compute L* according to fit functions
+            call EmpiricalLstar1(ntime_tmp,kext,options,iyearsat,idoy,
+     &        maginput,Lm_tmp,XJ_tmp,Lstar_tmp)
+            Lstar(isat,IPA)=Lstar_tmp(1)
+          enddo
+	else
+	  DO IPA=1,Nipa
+	    Lm(isat,IPA)=baddata
+	    Lstar(isat,IPA)=baddata
+	    XJ(isat,IPA)=baddata
+	    BLOCAL(isat,IPA)=baddata
+	  enddo 
+	endif
+      enddo
+c
+      options(1)=option1
 c
       end
 c
