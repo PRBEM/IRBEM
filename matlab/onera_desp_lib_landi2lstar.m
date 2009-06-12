@@ -22,9 +22,7 @@ function varargout = onera_desp_lib_landi2lstar(varargin)
 % function [Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_landi2lstar(kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
 % faster version of onera_desp_lib_make_lstar
 % Works for Olson-Pfitzer Quiet only (ignores kext and field model options)
-% ignores noLstar and makePhi option, always gives Lstar
 
 varargout = cell(1,nargout);
-
-[varargout{:}] = onera_desp_lib_make_lstar_core('landi2lstar',varargin{:});
+[varargout{:}] = onera_desp_lib_make_lstar_core(mfilename,varargin{:});
 

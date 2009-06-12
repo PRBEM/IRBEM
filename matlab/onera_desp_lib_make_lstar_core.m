@@ -1,4 +1,4 @@
-function [Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
+function [Lm,Lstar,Bmirror,Bmin,J,MLT] = onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd,x1,x2,x3,varargin)
 %***************************************************************************************************
 % Copyright 2006-2009, T.P. O'Brien
 %
@@ -18,20 +18,45 @@ function [Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_core(func_name
 %    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 %
 %***************************************************************************************************
-% [Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
-% wrapper for variants of make_lstar
+% [Lm,Lstar,Bmirror,Bmin,J,MLT] = onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
+% wrapper for variants of make_lstar for locally mirroring particles
+% [Lm,Lstar,Bmirror,Bmin,J,MLT] = onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput)
+% wrapper for variants of make_lstar_shell_splitting for particles w/ local
+% pitch angle alpha, degrees
 % func_name is a string that identifies which DLL function to call.
 % other inputs/outputs identical to onera_desp_lib_make_lstar
 
-if nargin < 9,
-    maginput = [];
-end
-
 switch(lower(func_name)),
-    case 'make_lstar', libfunc_name = 'make_lstar1_';
-    case 'landi2lstar', libfunc_name = 'landi2lstar1_';
+    case 'onera_desp_lib_make_lstar',
+        libfunc_name = 'make_lstar1_';
+        splitting = false;
+    case 'onera_desp_lib_landi2lstar',
+        libfunc_name = 'landi2lstar1_';
+        splitting = false;
+    case 'onera_desp_lib_make_lstar_shell_splitting',
+        libfunc_name = 'make_lstar_shell_splitting1_';
+        splitting = true;
+    case 'onera_desp_lib_landi2lstar_shell_splitting',
+        libfunc_name = 'landi2lstar_shell_splitting1_';
+        splitting = true;
     otherwise
         error('Unknown func_name %s',func_name);
+end
+
+if splitting,
+    alpha = varargin{1};
+    imaginput = 2;
+    Nmaxpa = 25; % maximum number of pitch angles for splitting functions
+else
+    alpha = 90;
+    imaginput = 1;
+    Nmaxpa = 1; % maximum number of pitch angles is 1 for non-splitting case
+end
+
+if length(varargin)>=imaginput,
+    maginput = varargin{imaginput};
+else
+    maginput = [];
 end
 
 matlabd = datenum(matlabd);
@@ -39,6 +64,7 @@ matlabd = datenum(matlabd);
 onera_desp_lib_load;
 
 ntime = length(x1);
+nipa = length(alpha);
 kext = onera_desp_lib_kext(kext);
 options = onera_desp_lib_options(options);
 sysaxes = onera_desp_lib_sysaxes(sysaxes);
@@ -55,30 +81,50 @@ if length(matlabd)==1,
     matlabd = repmat(matlabd,ntime,1);
 end
 
-siz_in = size(x1);
-
+Lm = repmat(nan,ntime,nipa);
+Lstar = repmat(nan,ntime,nipa);
+Bmirror = repmat(nan,ntime,nipa);
+Bmin = repmat(nan,ntime,1);
+J = repmat(nan,ntime,nipa);
+MLT = repmat(nan,ntime,1);
 Nmax = 100000; % maximum array size in fortran library
-Lm = repmat(nan,Nmax,1);
-Lstar = Lm;
-Blocal = Lm;
-Bmin = Lm;
-J = Lm;
-MLT = Lm;
 if ntime>Nmax,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmax:ntime,
         ii = i:min(i+Nmax-1,ntime);
-        [Lm(ii),Lstar(ii),Blocal(ii),Bmin(ii),J(ii),MLT(ii)] = ...
-            onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),maginput(ii,:));
+        [Lm(ii,:),Lstar(ii,:),Bmirror(ii,:),Bmin(ii),J(ii,:),MLT(ii)] = ...
+            onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),alpha,maginput(ii,:));
+    end
+elseif nipa>Nmaxpa,
+    % break up the calculation into chunks the libarary can handle
+    for i = 1:Nmaxpa:nipa,
+        ii = i:min(i+Nmaxpa-1,nipa);
+        [Lm(:,ii),Lstar(:,ii),Bmirror(:,ii),Bmin_tmp,J(:,ii),MLT_tmp] = ...
+            onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha(ii),maginput);
+        nanMLT = ~isfinite(MLT);
+        MLT(nanMLT) = MLT_tmp(nanMLT);
+        nanBmin = ~isfinite(Bmin);
+        Bmin(nanBmin) = Bmin_tmp(nanBmin);
     end
 else
+    % reinitialize Lm, etc for full size
+    Lm = repmat(nan,Nmax,Nmaxpa);
+    Lstar = repmat(nan,Nmax,Nmaxpa);
+    Bmirror = repmat(nan,Nmax,Nmaxpa);
+    Bmin = repmat(nan,Nmax,1);
+    J = repmat(nan,Nmax,Nmaxpa);
+    MLT = repmat(nan,Nmax,1);
+    
     [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
     LmPtr = libpointer('doublePtr',Lm);
     LstarPtr = libpointer('doublePtr',Lstar);
-    BlocalPtr = libpointer('doublePtr',Blocal);
+    BmirrorPtr = libpointer('doublePtr',Bmirror);
     BminPtr = libpointer('doublePtr',Bmin);
     JPtr = libpointer('doublePtr',J);
     MLTPtr = libpointer('doublePtr',MLT);
+    if nipa<Nmaxpa,
+        alpha = [alpha(:)',repmat(nan,1,Nmaxpa-nipa)]; % pad alpha
+    end
     maginput = maginput';
     % expand arrays
     iyear = [iyear(:)', repmat(nan,1,Nmax-ntime)];
@@ -89,36 +135,36 @@ else
     x3 = [x3(:)', repmat(nan,1,Nmax-ntime)];
     maginput = [maginput, repmat(nan,25,Nmax-ntime)];
     
-    calllib('onera_desp_lib',libfunc_name,ntime,kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,maginput,...
-        LmPtr,LstarPtr,BlocalPtr,BminPtr,JPtr,MLTPtr);
+    if splitting,
+        calllib('onera_desp_lib',libfunc_name,ntime,nipa,kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,alpha,maginput,...
+            LmPtr,LstarPtr,BmirrorPtr,BminPtr,JPtr,MLTPtr);
+    else
+        calllib('onera_desp_lib',libfunc_name,ntime,kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,maginput,...
+            LmPtr,LstarPtr,BmirrorPtr,BminPtr,JPtr,MLTPtr);
+    end
+    
     % have to do this next bit because Ptr's aren't really pointers
     Lm = get(LmPtr,'value');
     Lstar = get(LstarPtr,'value');
-    Blocal = get(BlocalPtr,'value');
+    Bmirror = get(BmirrorPtr,'value');
     Bmin = get(BminPtr,'value');
     J = get(JPtr,'value');
     MLT = get(MLTPtr,'value');
+    
+    % shrinkwrap Lm, etc
+    Lm = Lm(1:ntime,1:nipa);
+    Lstar = Lstar(1:ntime,1:nipa);
+    Bmirror = Bmirror(1:ntime,1:nipa);
+    Bmin = Bmin(1:ntime);
+    J = J(1:ntime,1:nipa);
+    MLT = MLT(1:ntime);
 end
 
+% flags to nan
 % the flag value is actually -1d31
 Lm(Lm<-1e30) = nan;
 Lstar(Lstar<-1e30) = nan;
-Blocal(Blocal<-1e30) = nan;
+Bmirror(Bmirror<-1e30) = nan;
 Bmin(Bmin<-1e30) = nan;
 J(J<-1e30) = nan;
 MLT(MLT<-1e30) = nan;
-
-% truncate arrays
-Lm = Lm(1:ntime);
-Lstar = Lstar(1:ntime);
-Blocal = Blocal(1:ntime);
-Bmin = Bmin(1:ntime);
-J = J(1:ntime);
-MLT = MLT(1:ntime);
-
-Lm = reshape(Lm,siz_in);
-Lstar = reshape(Lstar,siz_in);
-Blocal = reshape(Blocal,siz_in);
-Bmin = reshape(Bmin,siz_in);
-J = reshape(J,siz_in);
-MLT = reshape(MLT,siz_in);

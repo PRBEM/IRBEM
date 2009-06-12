@@ -30,7 +30,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA">This function allows one to compute magnetic coordinate
-    at any s/c position, i.e. L, L*, Blocal, Bequator.&nbsp;A set of internal/external
+    at any s/c position, i.e. L, L*, Blocal/Bmirror, Bequator.&nbsp;A set of internal/external
     field&nbsp;can be selected.</font><br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
@@ -360,7 +360,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA">This function allows one to compute magnetic coordinate
-    at any s/c position, i.e. L, L*, Blocal, Bequator.&nbsp;A set of internal/external
+    at any s/c position, i.e. L, L*, Blocal/Bmirror, Bequator.&nbsp;A set of internal/external
     field&nbsp;can be selected. Right now this routine differs from MAKE_LSTAR because L*
     is deduced from Lm, I and day of year empirically. This is set only for IGRF+Olson-Pfitzer quiet
      field model (kext can only be 5). The errors in L* values are less than 2%.</font><br />
@@ -973,7 +973,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA">This function allows one to compute the magnetic coordinates
-    at any s/c position and pitch-angle, i.e. L, L*, Blocal, Bequator.&nbsp;A set of internal/external
+    at any s/c position and pitch-angle, i.e. L, L*, Bmirror, Bequator.&nbsp;A set of internal/external
     field&nbsp;can be selected</font><font face="ARIAL, HELVETICA">.</font> 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
@@ -1303,7 +1303,7 @@
         <font face="ARIAL, HELVETICA"><strong>Lstar or &#934; :</strong> L Roederer&nbsp;
         or &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>] (array(100000,25) of double)</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at mirror
+        <font face="ARIAL, HELVETICA"><b>Bmirror:</b> magnitude of magnetic field at mirror
         point (array(100000,25) of double) - nT</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmin:</b> magnitude of magnetic field at equator
@@ -1342,7 +1342,7 @@
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">[Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput) </font>
+    <font face="ARIAL, HELVETICA">[Lm,Lstar,Bmirror,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput) </font>
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM IDL:</font></font> 
     </h3>
@@ -1364,7 +1364,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA">This function allows one to compute the magnetic coordinates
-    at any s/c position and pitch-angle, i.e. L, L*, Blocal, Bequator.&nbsp;A set of internal/external
+    at any s/c position and pitch-angle, i.e. L, L*, Bmirror, Bequator.&nbsp;A set of internal/external
     field&nbsp;can be selected. 
     Right now this routine differs from MAKE_LSTAR_SHELL_SPLITTING because L* is deduced from Lm, I and day of year empirically. 
     This is set only for IGRF+Olson-Pfitzer quiet field model (kext can only be 5). 
@@ -1697,7 +1697,7 @@
         <font face="ARIAL, HELVETICA"><strong>Lstar or &#934; :</strong> L Roederer&nbsp;
         or &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>] (array(100000,25) of double)</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at mirror
+        <font face="ARIAL, HELVETICA"><b>Bmirror:</b> magnitude of magnetic field at mirror
         point (array(100000,25) of double) - nT</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmin:</b> magnitude of magnetic field at equator
@@ -1733,9 +1733,9 @@
         &nbsp;<img style="WIDTH: 500px; HEIGHT: 375px" alt="" src="Lstar_conventions.png" /> 
         &nbsp;<img style="WIDTH: 500px; HEIGHT: 375px" alt="" src="Lm_conventions.png" /> 
     </p>
-    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font>  
     </h3>
-    <font face="ARIAL, HELVETICA">[Lm,Lstar,Blocal,Bmin,J,MLT] = onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput) </font>
+    <font face="ARIAL, HELVETICA">[Lm,Lstar,Bmirror,Bmin,J,MLT] = onera_desp_lib_landi2lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput) </font>
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM IDL:</font></font> 
     </h3>

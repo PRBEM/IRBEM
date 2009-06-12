@@ -52,9 +52,6 @@ function varargout = onera_desp_lib_make_lstar(varargin)
 %
 % maginput(18th element,*) to maginput(25th element,*): for future use
 %
-% IMPORTANT: all inputs must be present. For those which are not used a dummy value can be provided.
-%
 
 varargout = cell(1,nargout);
-
-[varargout{:}] = onera_desp_lib_make_lstar_core('make_lstar',varargin{:});
+[varargout{:}] = onera_desp_lib_make_lstar_core(mfilename,varargin{:});

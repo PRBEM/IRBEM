@@ -17625,6 +17625,8 @@ c Declare internal variables
       REAL*8     XJ_tmp(ntime_max),MLT_tmp(ntime_max)
       REAL*8     Lm_tmp(ntime_max),Lstar_tmp(ntime_max)
       REAL*8     xIN(3),xOUT(3),BL,BMIR,xGEO(3)
+      REAL*8     maginput_tmp(25)
+      INTEGER*4  imagin
 c
 c Declare output variables
       REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime_max)
@@ -17648,31 +17650,41 @@ c Compute Bmin at all locations first.
       sysaxesIN=1
       DO isat = 1,ntime
         if (BMIN(isat) .NE. baddata) then
-	  call coord_trans1(sysaxes,sysaxesOUT,iyearsat(isat),
-     &       idoy(isat),UT(isat),xIN,xOUT)
-          DO IPA=1,Nipa
-            options(1)=0
-            if (alpha(IPA).ne.90.0d0) then
-              CALL find_bm(xOUT(2),xOUT(3),xOUT(1),alpha(IPA),BL,BMIR,
-     &           xGEO)
-              call make_lstar1(ntime_tmp,kext,options,sysaxesIN,
-     &           iyearsat,idoy,UT,xGEO(1),xGEO(2),xGEO(3),maginput,
-     &           Lm_tmp,Lstar_tmp,BLOCAL_tmp,BMIN_tmp,XJ_tmp,MLT_tmp)
-            ELSE
-              call make_lstar1(ntime_tmp,kext,options,sysaxes,iyearsat,
-     &           idoy,UT,xIN1,xIN2,xIN3,maginput,Lm_tmp,Lstar_tmp,
-     &           BLOCAL_tmp,BMIN_tmp,XJ_tmp,MLT_tmp)
-	    ENDIF
-	    Lm(isat,IPA)=Lm_tmp(1)
-	    XJ(isat,IPA)=XJ_tmp(1)
-	    BLOCAL(isat,IPA)=BLOCAL_tmp(1)
-            options(1)=option1
-c
+           do imagin = 1,25
+              maginput_tmp(imagin) = maginput(isat,imagin)
+           enddo
+           DO IPA=1,Nipa
+              options(1)=0
+              if (alpha(IPA).ne.90.0d0) then
+                 xIN(1) = xIN1(isat)
+                 xIN(2) = xIN2(isat)
+                 xIN(3) = xIN3(isat)
+                 call coord_trans1(sysaxes,sysaxesOUT,iyearsat(isat),
+     &                idoy(isat),UT(isat),xIN,xOUT)
+                 CALL find_bm(xOUT(2),xOUT(3),xOUT(1),alpha(IPA),BL,
+     &                BMIR,xGEO)
+                 call make_lstar1(ntime_tmp,kext,options,sysaxesIN,
+     &                iyearsat,idoy,UT,xGEO(1),xGEO(2),xGEO(3),
+     &                maginput_tmp,Lm_tmp,Lstar_tmp,BLOCAL_tmp,BMIN_tmp,
+     &                XJ_tmp,MLT_tmp)
+              ELSE
+                 call make_lstar1(ntime_tmp,kext,options,sysaxes,
+     &                iyearsat(isat),idoy(isat),UT(isat),xIN1(isat),
+     &                xIN2(isat),xIN3(isat),maginput_tmp,
+     &                Lm_tmp,Lstar_tmp,BLOCAL_tmp,BMIN_tmp,XJ_tmp,
+     &                MLT_tmp)
+              ENDIF
+              Lm(isat,IPA)=Lm_tmp(1)
+              XJ(isat,IPA)=XJ_tmp(1)
+              BLOCAL(isat,IPA)=BLOCAL_tmp(1)
+              options(1)=option1
+c     
 c     now compute L* according to fit functions
-            call EmpiricalLstar1(ntime_tmp,kext,options,iyearsat,idoy,
-     &        maginput,Lm_tmp,XJ_tmp,Lstar_tmp)
-            Lstar(isat,IPA)=Lstar_tmp(1)
-          enddo
+              call EmpiricalLstar1(ntime_tmp,kext,options,
+     &             iyearsat(isat),idoy(isat),
+     &             maginput_tmp,Lm_tmp,XJ_tmp,Lstar_tmp)
+              Lstar(isat,IPA)=Lstar_tmp(1)
+           enddo
 	else
 	  DO IPA=1,Nipa
 	    Lm(isat,IPA)=baddata
