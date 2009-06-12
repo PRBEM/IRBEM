@@ -76,7 +76,7 @@ c
      &         de2ra, xpdotp, T, sec, JD, pi, j3, j4, j3oj2, tumin
 	REAL*8  secs,xGEI(3),xGEO(3),xOUT(3),alti,lati,longi,dec_y
         REAL*8 inclination,perigee,apogee,AscendingNode
-	REAL*8 Argument_Perigee,MeanAnomaly,BC
+	REAL*8 Argument_Perigee,MeanAnomaly,BC,mu
         Real*8 startsfe, stopsfe, deltasec
         REAL*8 outputArray(10,nmax)
 c
@@ -107,6 +107,7 @@ c
         DE2RA         =    0.01745329251994330D0
         pi            =    3.14159265358979D0
         xpdotp        =  1440.0 / (2.0 *pi)  ! 229.1831180523293D0
+        mu     = 398600.8D0            ! in km3 / s2
 
         ! sgp4fix identify constants and allow alternate values
         CALL getgravconst( whichconst, tumin, radiusearthkm, xke, j2, 
@@ -126,14 +127,18 @@ c     &      ACCESS = 'SEQUENTIAL' )
 	Ecco=(apogee-perigee)/(apogee+perigee+2.D0*RadiusEarthKm)
 	Argpo=Argument_Perigee
 	Mo=MeanAnomaly
-	No=(24.D0/1.4D0)/(SQRT(
-     &  (0.5D0*(apogee+perigee+2.D0*RadiusEarthKm)/RadiusEarthKm)**3))
+Cwrong	No=(24.D0/1.4D0)/(SQRT(
+Cwrong     &  (0.5D0*(apogee+perigee+2.D0*RadiusEarthKm)/RadiusEarthKm)**3))
+	a = 0.5D0*(apogee+perigee+2.D0*RadiusEarthKm)
+	No=(43200.D0/PI) * SQRT(mu/a**3)
+	a = a/RadiusEarthKm
+
 	BSTAR=0.D0
 *
 * ---------------------- CONVERT TO INTERNAL UNITS --------------------
 * ---- RADIANS, DISTANCE IN EARTH RADII, AND VELOCITY IN ER/KEMIN) ----
         No     = No / XPDOTP
-        a      = (No*TUMin)**(-2.0D0/3.0D0)
+Cxxxx        a      = (No*TUMin)**(-2.0D0/3.0D0)
         Inclo  = Inclo  * DE2RA
         nodeo  = nodeo * DE2RA
         Argpo  = Argpo * DE2RA
