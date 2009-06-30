@@ -42,6 +42,30 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
         VERSN = FORTRAN_VERSION
       END
 
+
+
+c function returns version of fortran source code
+
+      REAL*4 FUNCTION GET_NTIME_MAX(argc, argv)   ! Called by IDL
+      INCLUDE 'wrappers.inc'
+c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
+
+       j = loc(argc)                    ! Obtains the number of arguments (argc)
+                                       ! Because argc is passed by VALUE.
+
+      call GET_NTIME_MAX1(%VAL(argv(1)))
+
+      GET_NTIME_MAX = 9.9
+
+      RETURN
+      END
+
+      SUBROUTINE GET_NTIME_MAX1(ntime_max1)
+        INCLUDE 'ntime_max.inc' ! include file created by make
+        INTEGER*4 ntime_max1
+        ntime_max1 = ntime_max
+      END
+
       REAL*4 FUNCTION make_lstar(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
 c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
@@ -71,10 +95,10 @@ c
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'
 C
 c declare inputs
-      INTEGER*4    ntime_max,kext,k_ext,k_l,options(5)
-      PARAMETER (ntime_max=100000)
+      INTEGER*4    kext,k_ext,k_l,options(5)
       INTEGER*4    ntime,sysaxes
       INTEGER*4    iyearsat(ntime_max)
       integer*4    idoy(ntime_max)
@@ -585,10 +609,10 @@ c
 c
 	IMPLICIT NONE
 	INCLUDE 'variables.inc'
+        INCLUDE 'ntime_max.inc'
 C
 c declare inputs
-        INTEGER*4    ntime_max,kext,k_ext,k_l,options(5),Nalp,Nipa
-	PARAMETER (ntime_max=100000)
+        INTEGER*4    kext,k_ext,k_l,options(5),Nalp,Nipa
 	PARAMETER (Nalp=25)
         INTEGER*4    ntime,sysaxes
 	INTEGER*4    iyearsat(ntime_max)
@@ -1153,10 +1177,10 @@ c
 c
 	IMPLICIT NONE
 	INCLUDE 'variables.inc'
+        INCLUDE 'ntime_max.inc'
 C
 c declare inputs
-        INTEGER*4    ntime_max,whichinv,options(5)
-	PARAMETER (ntime_max=100000)
+        INTEGER*4    whichinv,options(5)
         INTEGER*4    ntime,sysaxes
 	INTEGER*4    iyearsat(ntime_max)
 	integer*4    idoy(ntime_max)
@@ -5238,11 +5262,12 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
+      INCLUDE 'ntime_max.inc'
+      INTEGER*4 ISW,ntime,whichAp,DOY(ntime_max),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
-      REAL*8 F107A(100000),F107(100000),AP(7,100000)
-      REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
+      REAL*8 UT(ntime_max),ALT(ntime_max),LAT(ntime_max),LONG(ntime_max)
+      REAL*8 F107A(ntime_max),F107(ntime_max),AP(7,ntime_max)
+      REAL*8 Dens(8,ntime_max),Temp(2,ntime_max),APin(7),D(8),T(2)
 c
       COMMON/CSWI/ISW
       DO I=1,25
@@ -5302,11 +5327,12 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
+      INCLUDE 'ntime_max.inc'
+      INTEGER*4 ISW,ntime,whichAp,DOY(ntime_max),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
-      REAL*8 F107A(100000),F107(100000),AP(7,100000)
-      REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
+      REAL*8 UT(ntime_max),ALT(ntime_max),LAT(ntime_max),LONG(ntime_max)
+      REAL*8 F107A(ntime_max),F107(ntime_max),AP(7,ntime_max)
+      REAL*8 Dens(8,ntime_max),Temp(2,ntime_max),APin(7),D(8),T(2)
 c
       COMMON/CSWI/ISW
       DO I=1,25
@@ -5356,11 +5382,12 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
+      INCLUDE 'ntime_max.inc'
+      INTEGER*4 ISW,ntime,whichAp,DOY(ntime_max),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
-      REAL*8 F107A(100000),F107(100000),AP(7,100000)
-      REAL*8 Dens(9,100000),Temp(2,100000),APin(7),D(8),T(2)
+      REAL*8 UT(ntime_max),ALT(ntime_max),LAT(ntime_max),LONG(ntime_max)
+      REAL*8 F107A(ntime_max),F107(ntime_max),AP(7,ntime_max)
+      REAL*8 Dens(9,ntime_max),Temp(2,ntime_max),APin(7),D(8),T(2)
 c
       COMMON/CSWI/ISW
       DO I=1,25

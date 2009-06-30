@@ -48,7 +48,7 @@ end
 
 siz_in = size(matlabd);
 
-Nmax = 100000; % maximum array size in fortran library
+Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
 Lstar = repmat(nan,Nmax,1);
 if ntime>Nmax,
     % break up the calculation into chunks the libarary can handle

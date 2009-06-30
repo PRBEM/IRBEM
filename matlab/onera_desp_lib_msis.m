@@ -52,7 +52,7 @@ out = [];
 sysaxes = onera_desp_lib_sysaxes(sysaxes);
 X = onera_desp_lib_coord_trans(X,[sysaxes 0],date); % get alt, lat, lon
 
-Nmax = 100000;
+Nmax = onera_desp_lib_ntime_max;
 N = length(date);
 if N > Nmax,
     for i = 1:Nmax:ntime,

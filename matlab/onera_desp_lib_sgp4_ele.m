@@ -155,7 +155,7 @@ onera_desp_lib_load;
 
 startsfe = (startdate-elements.epoch)*24*60*60; % seconds from epoch
 stopsfe = (enddate-elements.epoch)*24*60*60; % seconds from epoch
-nmax = 100000;
+nmax = onera_desp_lib_ntime_max;
 ntimes = floor((stopsfe-startsfe)/deltasec);
 
 pos.date = repmat(nan,ntimes,1);

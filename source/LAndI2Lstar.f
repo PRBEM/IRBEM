@@ -17513,10 +17513,10 @@ c To be used only where Lm>7.5 and I> 1.
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'
 c
 c declare inputs
-      INTEGER*4    ntime_max,kext,k_ext,k_l,options(5)
-      PARAMETER (ntime_max=100000)
+      INTEGER*4    kext,k_ext,k_l,options(5)
       INTEGER*4    ntime,sysaxes
       INTEGER*4    iyearsat(ntime_max)
       integer*4    idoy(ntime_max)
@@ -17596,10 +17596,10 @@ c
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'
 c
 c declare inputs
-      INTEGER*4    ntime_max,kext,k_ext,k_l,options(5),Nalp,Nipa
-      PARAMETER (ntime_max=100000)
+      INTEGER*4    kext,k_ext,k_l,options(5),Nalp,Nipa
       PARAMETER (Nalp=25)
       INTEGER*4    ntime,sysaxes
       INTEGER*4    iyearsat(ntime_max)
@@ -17741,10 +17741,10 @@ c
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'
 c
 c declare inputs
-      INTEGER*4    ntime_max,kext,options(5)
-      PARAMETER (ntime_max=100000)
+      INTEGER*4    kext,options(5)
       INTEGER*4    ntime
       INTEGER*4    iyearsat(ntime_max)
       integer*4    idoy(ntime_max)

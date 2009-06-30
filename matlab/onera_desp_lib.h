@@ -24,6 +24,7 @@ Paul O'Brien paul.obrien@aero.org
 
 
 void irbem_fortran_version1_(int *version);
+void get_ntime_max1_(int *ntime_max);
 
 void make_lstar1_(int *ntime, int *kext,
 		  int *options,int *sysaxes,

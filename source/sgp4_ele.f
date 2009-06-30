@@ -71,14 +71,13 @@ C      REAL*8 sec
 C      REAL*8 e1,e2,e3,e4,e5,e6
 C      INTEGER*4 ele_opts(5)
 C      REAL*8 startsfe, stopsfe, deltasec
-C      PARAMETER (nmax=100000)    
-C      INTEGER*4 iaYear(nmax),iaDoy(nmax)
-C      REAL*8 ut(nmax),x1(nmax),x2(nmax),x3(nmax)
+C      INTEGER*4 iaYear(ntime_max),iaDoy(ntime_max)
+C      REAL*8 ut(ntime_max),x1(ntime_max),x2(ntime_max),x3(ntime_max)
 C
 C     As with all (most?) onera library calls, the maximum array size
-C     is limited to 100,000 elements.  If startsfe/stopsfe/deltasec 
-C     are given such that the trajectory exceeds 100,000 positions, 
-C     only the first 100,000 will be returned.  Errors will be issued 
+C     is limited to ntime_max elements.  If startsfe/stopsfe/deltasec 
+C     are given such that the trajectory exceeds ntime_max positions, 
+C     only the first ntime_max will be returned.  Errors will be issued 
 C     to STDOUT, but not through IDL/Matlab wrappers.   
 C                              Contributed by Timothy Guild, 3.7.07
 C                               timothy.guild@aero.org
@@ -92,12 +91,12 @@ C
      +                       iaYear,iaDoy,ut,x1,x2,x3)
 
       IMPLICIT NONE
+      INCLUDE 'ntime_max.inc'
 
-      INTEGER*4 nmax,ii,numOutputLines,sysaxes,debug
-      PARAMETER (nmax=100000)
+      INTEGER*4 ii,numOutputLines,sysaxes,debug
       INTEGER*4 iyr, imon, iday, ihr, imin,idoy
-      INTEGER*4 iaYear(nmax),iaDoy(nmax)
-      REAL*8 ut(nmax),x1(nmax),x2(nmax),x3(nmax)
+      INTEGER*4 iaYear(ntime_max),iaDoy(ntime_max)
+      REAL*8 ut(ntime_max),x1(ntime_max),x2(ntime_max),x3(ntime_max)
       REAL*8 sec
       REAL*8 e1, e2, e3, e4, e5, e6
       REAL*8 keepe1, keepe2, keepe3, keepe4, keepe5, keepe6
@@ -109,8 +108,8 @@ C
       EXTERNAL GET_DOY
       INTEGER*4 GET_DOY
       real*8     xGEO(3), MLT
-      REAL*8 output(10,nmax) ! keeps the trajectory info from SGP4_orb1
-      REAL*8 xINV(3,nmax),xOUTV(3,nmax)
+      REAL*8 output(10,ntime_max) ! keeps the trajectory info from SGP4_orb1
+      REAL*8 xINV(3,ntime_max),xOUTV(3,ntime_max)
       INTEGER*4 sysaxesFROM,sysaxesTO
 
       INCLUDE 'astconst.cmn'
@@ -214,12 +213,12 @@ c     compute epoch from inputs.  epoch in Julian Days.
 c     compute how many lines the output array should have here
       numOutputLines = (stopsfe - startsfe)/deltasec
 
-      IF (numOutputLines .gt. nmax) THEN
-         PRINT*,'SGP4_ELE:  Given > 100,000 timesteps in the orbit'
+      IF (numOutputLines .gt. ntime_max) THEN
+         PRINT*,'SGP4_ELE:  Given > ntime_max timesteps in the orbit'
          PRINT*,'propagation.  ONERA library requires less than that,'
          PRINT*,' so SGP4_ELE has truncated your request.  '
-         stopsfe = startsfe + nmax*deltasec ! this forces the stop time to be 
-                                ! at most NMAX times, as required by ONERA lib
+         stopsfe = startsfe + ntime_max*deltasec ! this forces the stop time to be 
+                                ! at most NTIME_MAX times, as required by ONERA lib
       ENDIF
 
 c     Now call the orbit propagator with the epoch and proper 

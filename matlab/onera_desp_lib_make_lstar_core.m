@@ -87,7 +87,7 @@ Bmirror = repmat(nan,ntime,nipa);
 Bmin = repmat(nan,ntime,1);
 J = repmat(nan,ntime,nipa);
 MLT = repmat(nan,ntime,1);
-Nmax = 100000; % maximum array size in fortran library
+Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
 if ntime>Nmax,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmax:ntime,

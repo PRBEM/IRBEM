@@ -20,6 +20,7 @@ Make Variables
 
      OS            REQUIRED.  The operating system being used.
      ENV           REQUIRED.  The environment/architecture being used (eg. Fortran compiler).
+     NTIME_MAX     OPTIONAL.  Integer, maximum value of ntimes parameter (size of time dimension in arrays)
 
   A detailed description of each variable follows...
 
@@ -97,6 +98,9 @@ Make Variables
                                   compiler for Cygwin systems. 
 				  Produce ELF 32-bit MSB dynamic lib.
 
+     NTIME_MAX=<ntime_max>
+	ntime_max is a 32-bit integer (signed, but should be positive). Default is 100000.
+	It controls the length of the time dimension in pre-allocated arrays in many functions.
 
 Examples
 --------
@@ -105,7 +109,7 @@ Examples
   the System V gnu compiler environment and to produce a ELF 64-bit MSB dynamic lib
   use the command...
 
-     make OS=sunos ENV=gnu64 all
+     make OS=sunos ENV=gnu64 NTIME_MAX=100000 all
 
   Note that `all' is at the end of each command line after any `make'
   variables.

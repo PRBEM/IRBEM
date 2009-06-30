@@ -110,7 +110,7 @@ NE = size(energy,1); % number of energies
 NEmax = 25; % maximum number of energies
 
 ntime = length(x1);
-Nmax = 100000; % maximum array size in fortran library
+Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
 Flux = repmat(nan,Nmax,1);
 if isempty(Ap15),
     Ap15 = repmat(nan,1,Nmax);

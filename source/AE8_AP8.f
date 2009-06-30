@@ -51,13 +51,13 @@
 !	whatf -> which kind of flux, 1=differential 2=E range 3=integral (long integer)
 !	Nene -> Number of energy channels to compute
 !	energy -> energy (MeV) at which fluxes must be computed (double array [2,25])
-!	iyear,idoy,UT -> times when flux are to be computed (not usefull if imput position is not in GSE, GSM, SM,GEI) (respectively long array(100000), long array(100000), double array(100000))
-!	xIN1 -> first coordinate in the chosen system (double array [100000])
-!	xIN2 -> second coordinate in the chosen system (double array [100000])
-!	xIN3 -> third coordinate in the chosen system (double array [100000])
+!	iyear,idoy,UT -> times when flux are to be computed (not usefull if imput position is not in GSE, GSM, SM,GEI) (respectively long array(ntime_max), long array(ntime_max), double array(ntime_max))
+!	xIN1 -> first coordinate in the chosen system (double array [ntime_max])
+!	xIN2 -> second coordinate in the chosen system (double array [ntime_max])
+!	xIN3 -> third coordinate in the chosen system (double array [ntime_max])
 !
 ! OUTPUTS:
-!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [100000,25])
+!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,25])
 !
 ! COMMON BLOCKS:
 !	COMMON/GENER/ERA,AQUAD,BQUAD
@@ -76,10 +76,10 @@
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'
 C
 c declare inputs
-      INTEGER*4 ntime_max,nene_max
-      PARAMETER (ntime_max=100000)
+      INTEGER*4 nene_max
       PARAMETER (nene_max=25)
       INTEGER*4  ntime,sysaxes,whichm,whatf,Nene
       INTEGER*4  iyear(ntime_max),idoy(ntime_max)
@@ -250,11 +250,11 @@ C           BBo(isat)=BLOCAL(isat)/BMIN(isat)  ! removed to use McIlwain Gmagmo 
 !	whatf -> which kind of flux, 1=differential 2=E range 3=integral (long integer)
 !	Nene -> Number of energy channels to compute
 !	energy -> energy (MeV) at which fluxes must be computed (double array [2,25])
-!	BBo -> Blocal/Bequator (double array [100000])
-!	L -> McIlwain L (double array [100000])
+!	BBo -> Blocal/Bequator (double array [ntime_max])
+!	L -> McIlwain L (double array [ntime_max])
 !
 ! OUTPUTS:
-!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [100000,25])
+!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,25])
 !
 ! COMMON BLOCKS:
 !	COMMON /PROMIN/ IHEADPMIN, MAPPMIN
@@ -272,6 +272,7 @@ C           BBo(isat)=BLOCAL(isat)/BMIN(isat)  ! removed to use McIlwain Gmagmo 
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'
 c
       REAL*8       xMinP_L, xMaxP_L, XMinE_L, xMaxE_L
       PARAMETER   (xMINP_L = 1.0)   ! minimum Lshell to calculate proton fluxes
@@ -286,7 +287,7 @@ c
       INTEGER*4 MAPPMIN(16582), MAPPMAX(16291),
      &           MAPEMIN(13168), MAPEMAX(13548)
       REAL*8      energy(2,25)
-      REAL*8      flux(100000,25),BBo(100000),L(100000)
+      REAL*8      flux(ntime_max,25),BBo(ntime_max),L(ntime_max)
       REAL*8    FL,FL1
       INTEGER*4 IHEADPMIN(8),IHEADPMAX(8),IHEADEMIN(8),IHEADEMAX(8)
 c

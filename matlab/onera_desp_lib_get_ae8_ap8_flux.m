@@ -61,7 +61,7 @@ NE = size(energy,1); % number of energies
 NEmax = 25; % maximum number of energies
 
 ntime = length(BBo);
-Nmax = 100000; % maximum array size in fortran library
+Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
 Flux = repmat(nan,ntime,NE);
 if (ntime>Nmax) || (NE>NEmax),
     % break up the calculation into chunks the libarary can handle

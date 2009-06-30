@@ -24,7 +24,7 @@
 !                                        system to another one
 !               SUBROUTINE coord_trans_vec1: Generic coordinate transformation from one Earth or Heliospheric coordinate
 !                                        system to another one (handle up to
-!                                        100000 positions)
+!                                        ntime_max positions)
 !
 !***************************************************************************************************
 !---------------------------------------------------------------------------------------------------
@@ -1137,7 +1137,7 @@ C      REAL*8 xINV(3,nmax), xOUTV(3,nmax)
 C      INTEGER*4 numpoints
 C
 C     As with all (most?) onera library calls, the maximum array size
-C     is limited to 100,000 elements
+C     is limited to ntime_max elements
 C                              Contributed by Timothy Guild, 2.2.07
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
@@ -1146,11 +1146,11 @@ C
      &   iyear,idoy,secs,xINV,xOUTV)
 
       IMPLICIT NONE
+      INCLUDE 'ntime_max.inc'
 
       INTEGER*4 nmax,i,ntime, sysaxesIN, sysaxesOUT
-      PARAMETER (nmax=100000)
-      INTEGER*4 iyear(nmax),idoy(nmax),y,d
-      REAL*8 secs(nmax),xINV(3,nmax),xOUTV(3,nmax)
+      INTEGER*4 iyear(ntime_max),idoy(ntime_max),y,d
+      REAL*8 secs(ntime_max),xINV(3,ntime_max),xOUTV(3,ntime_max)
       REAL*8 xIN(3),xOUT(3),s   ! local vars
 	
       ! Loop over the number of points specified, calling 

@@ -1,4 +1,4 @@
-function info = onera_desp_lib_load(libfile,headerfile)
+function ntime_max = onera_desp_lib_ntime_max()
 %***************************************************************************************************
 % Copyright 2009, T.P. O'Brien
 %
@@ -16,28 +16,14 @@ function info = onera_desp_lib_load(libfile,headerfile)
 %
 %    You should have received a copy of the GNU Lesser General Public License
 %    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
-%
 %***************************************************************************************************
 %
-%function onera_desp_lib_load(libfile,@prototypefunction);
-%function onera_desp_lib_load(libfile,headerfile);
-% checks for the presence of the onera_desp_lib dynamic library in memory
-% if not present, attempts to load it using a headerfile
-if ~libisloaded('onera_desp_lib'),
-    if nargin < 2,
-        headerfile = 'onera_desp_lib.h';
-    end
-    if nargin < 1,
-        if ispc,
-           libfile = 'onera_desp_lib.dll';
-        elseif ismac,
-           libfile = 'onera_desp_lib.dylib';
-        else
-           libfile = 'onera_desp_lib.so';
-        end
-    end
-    loadlibrary(libfile,headerfile,'alias','onera_desp_lib');
-end
+% ntime_max = onera_desp_lib_ntime_max()
+% size of ntime dimension in fortran arrays
 
-% command to generate proto file -- don't do this anymore as it creates problems for 64-bit machines
-% loadlibrary('onera_desp_lib.dll','onera_desp_lib.h','alias','onera_desp_lib','mfilename','onera_desp_lib_proto.m'); disp('remember to move the proto file');
+onera_desp_lib_load;
+
+nPtr = libpointer('int32Ptr',-1);
+calllib('onera_desp_lib','get_ntime_max1_',nPtr);
+ntime_max = nPtr.value;
+

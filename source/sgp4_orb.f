@@ -60,9 +60,9 @@
      &     perigee,apogee,AscendingNode,Argument_Perigee,MeanAnomaly,
      &     startsfe,stopsfe,deltasec,sysaxes,OutputArray)
         IMPLICIT NONE
+        INCLUDE 'ntime_max.inc'
 c   TBG, 3.27.07:  added input argument sysaxes for internal rotation.  
-        INTEGER*4 k, error, whichconst,strlenOut,nmax,istep,sysaxes
-        PARAMETER (nmax=100000)
+        INTEGER*4 k, error, whichconst,strlenOut,istep,sysaxes
         INTEGER*4 i,j, Year,yr,mon,day,hr,min,doy,GET_DOY,isec
 	INTEGER*4 Minute,numberOfOutputLines
 c
@@ -78,7 +78,7 @@ c
         REAL*8 inclination,perigee,apogee,AscendingNode
 	REAL*8 Argument_Perigee,MeanAnomaly,BC,mu
         Real*8 startsfe, stopsfe, deltasec
-        REAL*8 outputArray(10,nmax)
+        REAL*8 outputArray(10,ntime_max)
 c
 c
 c        Character*500 OutFileName
