@@ -20,6 +20,28 @@ C-----------------------------------------------------------------------------
 C Wrappers and procedures for ONERA_DESP_LIB
 C-----------------------------------------------------------------------------
 
+c function returns version of fortran source code
+
+      REAL*4 FUNCTION IRBEM_FORTRAN_VERSION(argc, argv)   ! Called by IDL
+      INCLUDE 'wrappers.inc'
+c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
+
+       j = loc(argc)                    ! Obtains the number of arguments (argc)
+                                       ! Because argc is passed by VALUE.
+
+      call IRBEM_FORTRAN_VERSION1(%VAL(argv(1)))
+
+      IRBEM_FORTRAN_VERSION = 9.9
+
+      RETURN
+      END
+
+      SUBROUTINE IRBEM_FORTRAN_VERSION1(VERSN)
+        INCLUDE 'fortran_version.inc' ! include file created by make
+        INTEGER*4 VERSN
+        VERSN = FORTRAN_VERSION
+      END
+
       REAL*4 FUNCTION make_lstar(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
 c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
