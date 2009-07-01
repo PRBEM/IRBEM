@@ -24,6 +24,6 @@ function ntime_max = onera_desp_lib_ntime_max()
 onera_desp_lib_load;
 
 nPtr = libpointer('int32Ptr',-1);
-calllib('onera_desp_lib','get_ntime_max1_',nPtr);
+calllib('onera_desp_lib','get_irbem_ntime_max1_',nPtr);
 ntime_max = nPtr.value;
 

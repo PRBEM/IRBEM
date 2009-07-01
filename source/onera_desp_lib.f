@@ -46,21 +46,21 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
 c function returns version of fortran source code
 
-      REAL*4 FUNCTION GET_NTIME_MAX(argc, argv)   ! Called by IDL
+      REAL*4 FUNCTION GET_IRBEM_NTIME_MAX(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
 c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
 
-      call GET_NTIME_MAX1(%VAL(argv(1)))
+      call GET_IRBEM_NTIME_MAX1(%VAL(argv(1)))
 
       GET_NTIME_MAX = 9.9
 
       RETURN
       END
 
-      SUBROUTINE GET_NTIME_MAX1(ntime_max1)
+      SUBROUTINE GET_IRBEM_NTIME_MAX1(ntime_max1)
         INCLUDE 'ntime_max.inc' ! include file created by make
         INTEGER*4 ntime_max1
         ntime_max1 = ntime_max
