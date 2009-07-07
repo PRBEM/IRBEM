@@ -55,7 +55,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
       call GET_IRBEM_NTIME_MAX1(%VAL(argv(1)))
 
-      GET_NTIME_MAX = 9.9
+      GET_IRBEM_NTIME_MAX = 9.9
 
       RETURN
       END
