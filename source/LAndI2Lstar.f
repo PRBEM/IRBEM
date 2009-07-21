@@ -17890,6 +17890,7 @@ c       Finally compute L* according to fit functions
      &      A53(DayIndexL,i)*LnXJ*LnXJ*LnXJ+
      &      A54(DayIndexL,i)*LnXJ*LnXJ*LnXJ*LnXJ+
      &      A55(DayIndexL,i)*LnXJ*LnXJ*LnXJ*LnXJ*LnXJ
+            if (A50(DayIndexL,i) .lt. -9.D30) Lstar1=baddata
             do i=2,99
               if (Lm4(DayIndexL,i+1) .eq. 0.D0) goto 350
               if (Lm4(DayIndexL,i) .ge. Lm(isat)) goto 350
@@ -17899,15 +17900,22 @@ c       Finally compute L* according to fit functions
      &      A2(DayIndexL,i-1)*LnXJ*LnXJ+
      &      A3(DayIndexL,i-1)*LnXJ*LnXJ*LnXJ+
      &      A4(DayIndexL,i-1)*LnXJ*LnXJ*LnXJ*LnXJ
-            slope=(Lstar1-Lstar2)/(Lm5(DayIndexL,1)-Lm4(DayIndexL,i-1))
-            origin=Lstar1-slope*Lm5(DayIndexL,1)
-            LstarL=slope*Lm(isat)+origin
+            if (A0(DayIndexL,i-1) .lt. -9.D30) Lstar2=baddata
+	    if (Lstar1 .eq. baddata .or. Lstar2 .eq. baddata) then
+	       LstarL=baddata
+	    else
+               slope=(Lstar1-Lstar2)/
+     &               (Lm5(DayIndexL,1)-Lm4(DayIndexL,i-1))
+               origin=Lstar1-slope*Lm5(DayIndexL,1)
+               LstarL=slope*Lm(isat)+origin
+	    endif
             i=1
             Lstar1=A50(DayIndexR,i)+A51(DayIndexR,i)*LnXJ+
      &      A52(DayIndexR,i)*LnXJ*LnXJ+
      &      A53(DayIndexR,i)*LnXJ*LnXJ*LnXJ+
      &      A54(DayIndexR,i)*LnXJ*LnXJ*LnXJ*LnXJ+
      &      A55(DayIndexR,i)*LnXJ*LnXJ*LnXJ*LnXJ*LnXJ
+            if (A50(DayIndexR,i) .lt. -9.D30) Lstar1=baddata
             do i=2,99
               if (Lm4(DayIndexR,i+1) .eq. 0.D0) goto 360
               if (Lm4(DayIndexR,i) .ge. Lm(isat)) goto 360
@@ -17917,9 +17925,15 @@ c       Finally compute L* according to fit functions
      &      A2(DayIndexR,i-1)*LnXJ*LnXJ+
      &      A3(DayIndexR,i-1)*LnXJ*LnXJ*LnXJ+
      &      A4(DayIndexR,i-1)*LnXJ*LnXJ*LnXJ*LnXJ
-            slope=(Lstar1-Lstar2)/(Lm5(DayIndexR,1)-Lm4(DayIndexR,i-1))
-            origin=Lstar1-slope*Lm5(DayIndexR,1)
-            LstarR=slope*Lm(isat)+origin
+            if (A0(DayIndexR,i-1) .lt. -9.D30) Lstar2=baddata
+	    if (Lstar1 .eq. baddata .or. Lstar2 .eq. baddata) then
+	       LstarR=baddata
+	    else
+               slope=(Lstar1-Lstar2)/
+     &               (Lm5(DayIndexR,1)-Lm4(DayIndexR,i-1))
+               origin=Lstar1-slope*Lm5(DayIndexR,1)
+               LstarR=slope*Lm(isat)+origin
+	    endif
 	  else
             do i=2,99
               if (Lm5(DayIndexL,i+1) .eq. 0.D0) goto 400
@@ -17931,14 +17945,22 @@ c       Finally compute L* according to fit functions
      &      A53(DayIndexL,i)*LnXJ*LnXJ*LnXJ+
      &      A54(DayIndexL,i)*LnXJ*LnXJ*LnXJ*LnXJ+
      &      A55(DayIndexL,i)*LnXJ*LnXJ*LnXJ*LnXJ*LnXJ
+            if (A50(DayIndexL,i) .lt. -9.D30) Lstar1=baddata
             Lstar2=A50(DayIndexL,i-1)+A51(DayIndexL,i-1)*LnXJ+
      &      A52(DayIndexL,i-1)*LnXJ*LnXJ+
      &      A53(DayIndexL,i-1)*LnXJ*LnXJ*LnXJ+
      &      A54(DayIndexL,i-1)*LnXJ*LnXJ*LnXJ*LnXJ+
      &      A55(DayIndexL,i-1)*LnXJ*LnXJ*LnXJ*LnXJ*LnXJ
-            slope=(Lstar1-Lstar2)/(Lm5(DayIndexL,i)-Lm5(DayIndexL,i-1))
-            origin=Lstar1-slope*Lm5(DayIndexL,i)
-            LstarL=slope*Lm(isat)+origin
+            if (A50(DayIndexL,i-1) .lt. -9.D30) Lstar1=baddata
+	    if (Lstar1 .eq. baddata .or. Lstar2 .eq. baddata) then
+	       LstarL=baddata
+	    else
+               slope=(Lstar1-Lstar2)/
+     &               (Lm5(DayIndexL,i)-Lm5(DayIndexL,i-1))
+               origin=Lstar1-slope*Lm5(DayIndexL,i)
+               LstarL=slope*Lm(isat)+origin
+	    endif
+	    
             do i=2,99
               if (Lm5(DayIndexR,i+1) .eq. 0.D0) goto 500
               if (Lm5(DayIndexR,i) .ge. Lm(isat)) goto 500
@@ -17949,14 +17971,21 @@ c       Finally compute L* according to fit functions
      &      A53(DayIndexR,i)*LnXJ*LnXJ*LnXJ+
      &      A54(DayIndexR,i)*LnXJ*LnXJ*LnXJ*LnXJ+
      &      A55(DayIndexR,i)*LnXJ*LnXJ*LnXJ*LnXJ*LnXJ
+            if (A50(DayIndexR,i) .lt. -9.D30) Lstar1=baddata
             Lstar2=A50(DayIndexR,i-1)+A51(DayIndexR,i-1)*LnXJ+
      &      A52(DayIndexR,i-1)*LnXJ*LnXJ+
      &      A53(DayIndexR,i-1)*LnXJ*LnXJ*LnXJ+
      &      A54(DayIndexR,i-1)*LnXJ*LnXJ*LnXJ*LnXJ+
      &      A55(DayIndexR,i-1)*LnXJ*LnXJ*LnXJ*LnXJ*LnXJ
-            slope=(Lstar1-Lstar2)/(Lm5(DayIndexR,i)-Lm5(DayIndexR,i-1))
-            origin=Lstar1-slope*Lm5(DayIndexR,i)
-            LstarR=slope*Lm(isat)+origin
+            if (A50(DayIndexR,i-1) .lt. -9.D30) Lstar2=baddata
+	    if (Lstar1 .eq. baddata .or. Lstar2 .eq. baddata) then
+	       LstarR=baddata
+	    else
+               slope=(Lstar1-Lstar2)/
+     &               (Lm5(DayIndexR,i)-Lm5(DayIndexR,i-1))
+               origin=Lstar1-slope*Lm5(DayIndexR,i)
+               LstarR=slope*Lm(isat)+origin
+	    endif
 	  endif
         else
           do i=2,99
@@ -17968,14 +17997,20 @@ c       Finally compute L* according to fit functions
      &    A2(DayIndexL,i)*LnXJ*LnXJ+
      &    A3(DayIndexL,i)*LnXJ*LnXJ*LnXJ+
      &    A4(DayIndexL,i)*LnXJ*LnXJ*LnXJ*LnXJ
+          if (A0(DayIndexL,i) .lt. -9.D30) Lstar1=baddata
           Lstar2=A0(DayIndexL,i-1)+A1(DayIndexL,i-1)*LnXJ+
      &    A2(DayIndexL,i-1)*LnXJ*LnXJ+
      &    A3(DayIndexL,i-1)*LnXJ*LnXJ*LnXJ+
      &    A4(DayIndexL,i-1)*LnXJ*LnXJ*LnXJ*LnXJ
-          slope=(Lstar1-Lstar2)/(Lm4(DayIndexL,i)-Lm4(DayIndexL,i-1))
-          origin=Lstar1-slope*Lm4(DayIndexL,i)
-          LstarL=slope*Lm(isat)+origin
-
+          if (A0(DayIndexL,i-1) .lt. -9.D30) Lstar2=baddata
+	  if (Lstar1 .eq. baddata .or. Lstar2 .eq. baddata) then
+	     LstarL=baddata
+	  else
+             slope=(Lstar1-Lstar2)/(Lm4(DayIndexL,i)-Lm4(DayIndexL,i-1))
+             origin=Lstar1-slope*Lm4(DayIndexL,i)
+             LstarL=slope*Lm(isat)+origin
+          endif
+	  
           do i=2,100
             if (Lm4(DayIndexR,i) .eq. 0.D0) goto 700
             if (Lm4(DayIndexR,i) .ge. Lm(isat)) goto 700
@@ -17985,17 +18020,30 @@ c       Finally compute L* according to fit functions
      &    A2(DayIndexR,i)*LnXJ*LnXJ+
      &    A3(DayIndexR,i)*LnXJ*LnXJ*LnXJ+
      &    A4(DayIndexR,i)*LnXJ*LnXJ*LnXJ*LnXJ
+          if (A0(DayIndexR,i) .lt. -9.D30) Lstar1=baddata
           Lstar2=A0(DayIndexR,i-1)+A1(DayIndexR,i-1)*LnXJ+
      &    A2(DayIndexR,i-1)*LnXJ*LnXJ+
      &    A3(DayIndexR,i-1)*LnXJ*LnXJ*LnXJ+
      &    A4(DayIndexR,i-1)*LnXJ*LnXJ*LnXJ*LnXJ
-          slope=(Lstar1-Lstar2)/(Lm4(DayIndexR,i)-Lm4(DayIndexR,i-1))
-          origin=Lstar1-slope*Lm4(DayIndexR,i)
-          LstarR=slope*Lm(isat)+origin
+          if (A0(DayIndexR,i-1) .lt. -9.D30) Lstar2=baddata
+	  if (Lstar1 .eq. baddata .or. Lstar2 .eq. baddata) then
+	     LstarR=baddata
+	  else
+             slope=(Lstar1-Lstar2)/(Lm4(DayIndexR,i)-Lm4(DayIndexR,i-1))
+             origin=Lstar1-slope*Lm4(DayIndexR,i)
+             LstarR=slope*Lm(isat)+origin
+	  endif
         endif
-        slope=(LstarR-LstarL)/30.D0
-        origin=LstarL-(idoy(isat)/31)*slope
-        Lstar(isat)=slope*idoy(isat)+origin
+	if (LstarR .eq. baddata .or. LstarL .eq. baddata) then
+	   Lstar(isat)=baddata
+	   if (iflag .eq. 3) Lstar(isat)=-baddata
+	   if (iflag .eq. -3) Lstar(isat)=-baddata
+	   if (iflag .eq. -1) Lstar(isat)=-baddata
+	else
+           slope=(LstarR-LstarL)/30.D0
+           origin=LstarL-(idoy(isat)/31)*slope
+           Lstar(isat)=slope*idoy(isat)+origin
+	endif
 	if (iflag .eq. 3) then
 	  Lstar(isat)=-Lstar(isat)
 	  XJ(isat)=XJatLossCone
