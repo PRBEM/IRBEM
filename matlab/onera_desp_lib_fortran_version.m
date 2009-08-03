@@ -26,5 +26,5 @@ onera_desp_lib_load;
 
 vPtr = libpointer('int32Ptr',-1);
 calllib('onera_desp_lib','irbem_fortran_version1_',vPtr);
-V = vPtr.value;
+V = double(vPtr.value);
 
