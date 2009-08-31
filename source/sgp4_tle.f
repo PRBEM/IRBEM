@@ -80,7 +80,7 @@ c
 * ----------------------------  Locals  -------------------------------
         REAL*8 J2,TwoPi,Rad,RadiusEarthKm,VKmPerSec, xke,
      &         de2ra, xpdotp, T, sec, JD, pi, j3, j4, j3oj2, tumin
-	REAL*8  secs,xGEI(3),xGEO(3),alti,lati,longi,dec_y
+	REAL*8  secs,xGEI(3),xOUT(3),alti,lati,longi,dec_y
 
 
         INCLUDE 'SGP4.CMN'
@@ -102,7 +102,7 @@ c 3 lines change it back to minutes to be compliant with SGP4 code.
         stopmfe=stopsfe/60.0D0
         deltamin=deltasec/60.0D0
         if (runtype .eq. 0) typerun='Y'
-        if (runtype .eq. 1) then 
+        if (runtype .eq. 1) then
 	   typerun='C'
 	   if (stopmfe .LE. startmfe) stopmfe=startmfe+1440.0D0
 	endif
@@ -120,7 +120,7 @@ c
 c        write(*,*) 'Input whichconst - 721, 72, 84'
 c        read(*,*) whichconst
         whichconst=84
-c	
+c
 c  End modif Seb Dec 12, 2006
 c
         TwoPi         =    6.28318530717959D0
@@ -130,7 +130,7 @@ c
         xpdotp        =  1440.0 / (2.0 *pi)  ! 229.1831180523293D0
 
         ! sgp4fix identify constants and allow alternate values
-        CALL getgravconst( whichconst, tumin, radiusearthkm, xke, j2, 
+        CALL getgravconst( whichconst, tumin, radiusearthkm, xke, j2,
      &       j3, j4, j3oj2 )
         VKmPerSec     =  RadiusEarthKm * xke/60.0D0
 
@@ -184,7 +184,7 @@ c     &          FORM = 'UNFORMATTED', RECL = 1100, STATUS = 'UNKNOWN' )
 
 c            Write(11,*) '',SatNum,' xx'
 c            Write(*,*) SatNum
-            ! write out epoch value 
+            ! write out epoch value
             T = 0.0D0
             CALL SGP4 ( whichconst, T, Ro, Vo, Error )
 c            WRITE( 11,800 ) T, ro(1),ro(2),ro(3),vo(1),vo(2),vo(3)
@@ -230,15 +230,19 @@ c
 		     xGEI(1)=ro(1)/6371.2D0
 		     xGEI(2)=ro(2)/6371.2D0
 		     xGEI(3)=ro(3)/6371.2D0
-		     call gei2geo1(Year,DOY,secs,xGEI,xGEO)
-		     call geo_gdz(xGEO(1),xGEO(2),xGEO(3),
-     &                    lati,longi,alti)
+             call coord_trans1(13,0,Year,DOY,secs,xGEI,xOUT)
+             alti=xOUT(1)
+             lati=xOUT(2)
+             longi=xOUT(3)
+c		     call gei2geo1(Year,DOY,secs,xGEI,xGEO)
+c		     call geo_gdz(xGEO(1),xGEO(2),xGEO(3),
+c     &                    lati,longi,alti)
 c                     WRITE( 11,'(F17.8,I4,1x,A3,I3,I3,A1,I2,A1,F9.6,
 c     &                         3F17.6,3F17.8)' )
 c     &                    JD,Day,MonStr,Yr,Hr,':',Min,':',
 c     &                   Sec, ro(1),ro(2),ro(3),vo(1),vo(2),vo(3)
                      isec=INT(sec)
-                     CALL DATE_AND_TIME2DECY(Year,Mon, Day, 
+                     CALL DATE_AND_TIME2DECY(Year,Mon, Day,
      &                    hr,min,isec,Dec_y)
                      WRITE( 11,'(I2.2,A1,I2.2,A1,I4,1x,I3,A1,I2,A1,F9.6,
      &                         1x,f13.8,1x,3F17.6)' )
