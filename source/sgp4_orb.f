@@ -61,7 +61,7 @@
      &     startsfe,stopsfe,deltasec,sysaxes,OutputArray)
         IMPLICIT NONE
         INCLUDE 'ntime_max.inc'
-c   TBG, 3.27.07:  added input argument sysaxes for internal rotation.  
+c   TBG, 3.27.07:  added input argument sysaxes for internal rotation.
         INTEGER*4 k, error, whichconst,strlenOut,istep,sysaxes
         INTEGER*4 i,j, Year,yr,mon,day,hr,min,doy,GET_DOY,isec
 	INTEGER*4 Minute,numberOfOutputLines
@@ -110,7 +110,7 @@ c
         mu     = 398600.8D0            ! in km3 / s2
 
         ! sgp4fix identify constants and allow alternate values
-        CALL getgravconst( whichconst, tumin, radiusearthkm, xke, j2, 
+        CALL getgravconst( whichconst, tumin, radiusearthkm, xke, j2,
      &       j3, j4, j3oj2 )
         VKmPerSec     =  RadiusEarthKm * xke/60.0D0
 
@@ -143,7 +143,7 @@ Cxxxx        a      = (No*TUMin)**(-2.0D0/3.0D0)
         nodeo  = nodeo * DE2RA
         Argpo  = Argpo * DE2RA
         Mo     = Mo   * DE2RA
-                                                                        
+
         IF (DABS(Ecco-1.0D0) .gt. 0.000001D0) THEN
             Altp= (a*(1.0D0-Ecco))-1.0D0
             Alta= (a*(1.0D0+Ecco))-1.0D0
@@ -217,13 +217,15 @@ c
 	      xGEI(1)=ro(1)/6371.2D0
 	      xGEI(2)=ro(2)/6371.2D0
 	      xGEI(3)=ro(3)/6371.2D0
-c     TBG 3.27.07:  Exchanged two rotations for one call to coord_trans 
+c     TBG 3.27.07:  Exchanged two rotations for one call to coord_trans
 c     sysaxes now passed into sgp4_orb1
-              call coord_trans1(5,sysaxes,Year,DOY,secs,xGEI,xOUT)
+c     SGP4 outputs are given in TEME (True Equator Mean Equinox) coordinate
+c     system (so 13 index in the lib for corrdinates conversions)
+              call coord_trans1(13,sysaxes,Year,DOY,secs,xGEI,xOUT)
 c	      call gei2geo1(Year,DOY,secs,xGEI,xGEO)   ! commented out by TBG
 c	      call geo_gdz(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)  ! same here
               isec=INT(sec)
-              CALL DATE_AND_TIME2DECY(Year,Mon, Day, 
+              CALL DATE_AND_TIME2DECY(Year,Mon, Day,
      &                    hr,min,isec,Dec_y)
 c              WRITE( 11,'(I2.2,A1,I2.2,A1,I4,1x,I3,A1,I2,A1,F9.6,
 c     &                         1x,f13.8,1x,3F17.6)' )
@@ -240,8 +242,8 @@ c     Now assign trajectory info to the outputArray
 c              outputArray(8,istep) = alti
 c              outputArray(9,istep) = lati
 c              outputArray(10,istep) = longi
-              outputArray(8,istep) = xOUT(1)  ! sending back the positions rotated 
-              outputArray(9,istep) = xOUT(2)  ! to the correct sysaxes specified.  
+              outputArray(8,istep) = xOUT(1)  ! sending back the positions rotated
+              outputArray(9,istep) = xOUT(2)  ! to the correct sysaxes specified.
               outputArray(10,istep) = xOUT(3)  !  TBG, 3.27.07
            ENDIF ! if error
 
