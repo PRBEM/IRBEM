@@ -17641,7 +17641,7 @@ c     force inputs to use make_lstar but only Lm will be computed (not L* at thi
       option1=options(1)
       options(1)=0
 c
-c Compute Bmin at all locations first. 
+c Compute Bmin at all locations first.
       call make_lstar1(ntime,kext,options,sysaxes,iyearsat,
      &  idoy,UT,xIN1,xIN2,xIN3,maginput,Lm_tmp,Lstar_tmp,BLOCAL_tmp,
      &  BMIN,XJ_tmp,MLT)
@@ -17678,7 +17678,7 @@ c Compute Bmin at all locations first.
               XJ(isat,IPA)=XJ_tmp(1)
               BLOCAL(isat,IPA)=BLOCAL_tmp(1)
               options(1)=option1
-c     
+c
 c     now compute L* according to fit functions
               call EmpiricalLstar1(ntime_tmp,kext,options,
      &             iyearsat(isat),idoy(isat),
@@ -17691,7 +17691,7 @@ c     now compute L* according to fit functions
 	    Lstar(isat,IPA)=baddata
 	    XJ(isat,IPA)=baddata
 	    BLOCAL(isat,IPA)=baddata
-	  enddo 
+	  enddo
 	endif
       enddo
 c
@@ -17840,16 +17840,16 @@ c       check first if point is in the loss cone
         XJR=EXP(slope*Lm(isat)+origin)
         slope=(XJR-XJL)/30.D0
         origin=XJL-(idoy(isat)/31)*slope
-c	
+c
         if (XJ(isat) .gt. slope*idoy(isat)+origin) then ! point is in the loss cone
           if (iflag .eq. 0) iflag=3
           if (iflag .eq. -1) iflag=-3
           XJatLossCone=XJ(isat)
 	  ! set XJ(isat) to the value at the loss cone limit to compute L* anyway.
-	  ! so L* will be the same as the one at the loss cone limit even if 
+	  ! so L* will be the same as the one at the loss cone limit even if
 	  ! location is in the loss cone. Finnally L* will set to -L*.
 	  ! a negative value will indicate "in the loss cone" i.e. non trapped
-	  XJ(isat)=slope*idoy(isat)+origin  
+	  XJ(isat)=slope*idoy(isat)+origin
 c	  Lstar(isat)=baddata
 c          goto 900
         endif
@@ -17868,7 +17868,7 @@ c       next check if point is outside close drift shell zone
           Lstar(isat)=baddata
           goto 900
         endif
-c	
+c
         do i=2,10001
           if (Iupper(DayIndexR,i) .ge. XJ(isat)) goto 310
         enddo
@@ -17971,7 +17971,7 @@ c       Finally compute L* according to fit functions
                origin=Lstar1-slope*Lm5(DayIndexL,i)
                LstarL=slope*Lm(isat)+origin
 	    endif
-	    
+
             do i=2,99
               if (Lm5(DayIndexR,i+1) .eq. 0.D0) goto 500
               if (Lm5(DayIndexR,i) .ge. Lm(isat)) goto 500
@@ -18024,7 +18024,7 @@ c       Finally compute L* according to fit functions
 c	  write(6,*)A0(DayIndexL,i),A1(DayIndexL,i),A2(DayIndexL,i),
 c     &    A3(DayIndexL,i),A4(DayIndexL,i)
 c	  write(6,*)Lstar1,Lstar2,LstarL
-	  
+
           do i=2,100
             if (Lm4(DayIndexR,i) .eq. 0.D0) goto 700
             if (Lm4(DayIndexR,i) .ge. Lm(isat)) goto 700
@@ -18047,7 +18047,7 @@ c	  write(6,*)Lstar1,Lstar2,LstarL
              origin=Lstar1-slope*Lm4(DayIndexR,i)
              LstarR=slope*Lm(isat)+origin
 	  endif
-	  write(6,*)Lstar1,Lstar2,LstarR
+!	  write(6,*)Lstar1,Lstar2,LstarR
         endif
 	if (LstarR .eq. baddata .or. LstarL .eq. baddata) then
 	   Lstar(isat)=baddata
@@ -18080,7 +18080,7 @@ c	  write(6,*)Lstar1,Lstar2,LstarL
       enddo
 c
 c
-c if required by user compute Phi instead of L*    
+c if required by user compute Phi instead of L*
       if (options(1) .EQ. 2) then
         pi=4.D0*atan(1.D0)
         iyear=1800
