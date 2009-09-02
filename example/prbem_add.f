@@ -6,7 +6,7 @@ C     The Variables and associated attributes that are added to the file
 C     include:
 C         B_Calc   - calculated magnetic field strength (nT)
 C         B_Eq     - equatorial magnetic field strength (nT)
-C         I        - Adiabatic Invariant (km)
+C         I        - Adiabatic Invariant (Earth Radii)
 C         L        - McIlwain's L-shell (Earth Radii)
 C         L_star   - Roederer's L* parameter (Earth Radii)
 C         MLT      - magnetic local time (hours)
@@ -71,7 +71,6 @@ C                 values returned from IRBEM-LIB
 
 CC
 C     ------------------------------------------------------------------
-
       CALL PARSE_CMD( FILNAM, epoch_var, pos_var, sysaxes)
 
       VARNAM(1) = epoch_var
@@ -311,7 +310,6 @@ C     This version is for REAL values.
       REAL*4    VAL4
       INTEGER*4 ATTNUM, VAR_Type
 
-      NELEM = 1
       VAL4 = VAL(1)
       ATTNUM = CDF_get_attr_num( CDF_ID, ATTNAM)
 
@@ -425,7 +423,6 @@ C     CDF File variable attributes...
       INTEGER*4     DATATYPE(NVAR)
       CHARACTER*500 VAR_NOTES
 C     ------------------------------------------------------------------
-
       CALL SETCDFVALS( NVAR, VAR_NOTES, oVARNAM, CATDESC, FIELDNAM,
      &                 C_FORMAT,
      &                 LABLAXIS, SI_CONV, UNITS, DICT_KEY, AVG_TYPE,
@@ -450,7 +447,6 @@ C      PRINT*,'NVAR=',nvar,'; MAX_REC=',MAX_REC
 C        get the CDF variable number for this variable
          STATUS = CDF_LIB(GET_, zVAR_NUMBER_, vname, oVARNum(i),
      &                 NULL_, STATUS)
-
 C        The First two variables (Epoch, position) are assumed to exist
 C        so don't modify them...
          IF (i .GT. 2) THEN
@@ -461,7 +457,6 @@ C        so don't modify them...
             ENDIF
             STATUS = CDF_LIB(GET_, zVAR_NUMBER_, oVARNAM(i), oVARNum(i),
      &               NULL_, STATUS)
-
 C           Set/Add the various variable attributes/meta data.
             CALL PUT_IRBEM_ATT( CDF_ID, oVARNUM(i), 
      &            CATDESC(i),FIELDNAM(i), 
@@ -559,7 +554,7 @@ c      INCLUDE 'CDFDVF.INC'
 C     NOTE: these parameters are assumed to match the variables
 C           indicated via VARNUM(3-8), see SETCDFVALS
       REAL*8 B, B0, SI, L, LSTAR, MLT
-      REAL*4 oSI, oL, oLSTAR, oMLT, oAlpha
+      REAL*4 oSI, oL, oLSTAR, oMLT, oAlpha, oAlpha_Eq
       INTEGER*4 VarNum(10), STATUS
 
       CALL CALC_ALPHA( B, B0, oalpha)
@@ -567,6 +562,7 @@ C           indicated via VARNUM(3-8), see SETCDFVALS
       oLstar = Lstar
       oMLT   = MLT
       oSI    = SI
+      oAlpha_Eq = -1.0E+31
 
       STATUS = CDF_LIB(SELECT_, zVAR_, VarNum(3),  ! B_calc
      &                 PUT_, zVAR_SEQDATA_, B,
@@ -590,7 +586,7 @@ C           indicated via VARNUM(3-8), see SETCDFVALS
      &                 PUT_, zVAR_SEQDATA_, oALPHA,
 
      &                 SELECT_, zVAR_, VarNum(10), ! Alpha_eq - NULL for now
-     &                 PUT_, zVAR_SEQDATA_, -1.0E31,
+     &                 PUT_, zVAR_SEQDATA_, oAlpha_Eq,
 
      &                 NULL_, STATUS)
 
@@ -661,13 +657,13 @@ c      PRINT*,'IRBEM_REL: ', IRBEM_REL
 
 c      VARNAM(1) = 'Epoch'  ! this is set in the parse_cmd routine...
 c      VARNAM(2) = 'Position'
-      VARNAM(B_CALC) = 'B_Calc'
-      VARNAM(B_EQ) = 'B_Eq'
-      VARNAM(B_I) = 'I'
-      VARNAM(L) = 'L'
-      VARNAM(LSTAR) = 'L_star'
-      VARNAM(MLT) = 'MLT'
-      VARNAM(ALPHA) = 'Alpha'
+      VARNAM(B_CALC)   = 'B_Calc'
+      VARNAM(B_EQ)     = 'B_Eq'
+      VARNAM(B_I)      = 'I'
+      VARNAM(L)        = 'L'
+      VARNAM(LSTAR)    = 'L_star'
+      VARNAM(MLT)      = 'MLT'
+      VARNAM(ALPHA)    = 'Alpha'
       VARNAM(ALPHA_EQ) = 'Alpha_Eq'
 
       CATDESC(POS) = 'Position of the satellite in '//
@@ -684,59 +680,59 @@ c      VARNAM(2) = 'Position'
       CATDESC(ALPHA) ='Pitch Angle'
       CATDESC(ALPHA_EQ)='Equatorial pitch angle'
 
-      FIELDNAM(POS) = 'Satellite position (GEO)'
-      FIELDNAM(B_CALC)='Magnetic field strength'
-      FIELDNAM(B_EQ)='Equatorial magnetic field strength'
-      FIELDNAM(B_I)='Adiabatic invariant (bounce)'
-      FIELDNAM(L)='McIlwain''s L parameter'
-      FIELDNAM(LSTAR)='Roederer''s L* parameter'
-      FIELDNAM(MLT)='Magnetic Local Time'
-      FIELDNAM(ALPHA)='Pitch angle'
+      FIELDNAM(POS)     = 'Satellite position (GEO)'
+      FIELDNAM(B_CALC)  ='Magnetic field strength'
+      FIELDNAM(B_EQ)    ='Equatorial magnetic field strength'
+      FIELDNAM(B_I)     ='Adiabatic invariant (bounce)'
+      FIELDNAM(L)       ='McIlwain''s L parameter'
+      FIELDNAM(LSTAR)   ='Roederer''s L* parameter'
+      FIELDNAM(MLT)     ='Magnetic Local Time'
+      FIELDNAM(ALPHA)   ='Pitch angle'
       FIELDNAM(ALPHA_EQ)='Equat. Pitch angle'
 
-      C_FORMAT(POS)    = 'F15.3'
-      C_FORMAT(B_CALC) = 'E15.8'
-      C_FORMAT(B_EQ) = 'E15.8'
-      C_FORMAT(B_I) = 'E15.8'
-      C_FORMAT(L) = 'E15.8'
-      C_FORMAT(LSTAR) = 'E15.8'
-      C_FORMAT(MLT) = 'F7.4'
-      C_FORMAT(ALPHA) = 'F8.4'
+      C_FORMAT(POS)      = 'F15.3'
+      C_FORMAT(B_CALC)   = 'E15.8'
+      C_FORMAT(B_EQ)     = 'E15.8'
+      C_FORMAT(B_I)      = 'E15.6'
+      C_FORMAT(L)        = 'E15.6'
+      C_FORMAT(LSTAR)    = 'E15.6'
+      C_FORMAT(MLT)      = 'F7.4'
+      C_FORMAT(ALPHA)    = 'F8.4'
       C_FORMAT(ALPHA_EQ) = 'F8.4'
 
-      LABLAXIS(POS) = ''
-      LABLAXIS(B_CALC)='B'
-      LABLAXIS(B_EQ)='B_Eq'
-      LABLAXIS(B_I)='I'
-      LABLAXIS(L)='L'
-      LABLAXIS(LSTAR)='L*'
-      LABLAXIS(MLT)='MLT'
-      LABLAXIS(ALPHA)='Alpha'
-      LABLAXIS(ALPHA_EQ)='Alpha(Eq)'
+      LABLAXIS(POS)      = ' '
+      LABLAXIS(B_CALC)   ='B'
+      LABLAXIS(B_EQ)     ='B_Eq'
+      LABLAXIS(B_I)      ='I'
+      LABLAXIS(L)        ='L'
+      LABLAXIS(LSTAR)    ='L*'
+      LABLAXIS(MLT)      ='MLT'
+      LABLAXIS(ALPHA)    ='Alpha'
+      LABLAXIS(ALPHA_EQ) ='Alpha(Eq)'
 
-      SI_CONV(B_CALC)='1.0e-9>T'
-      SI_CONV(B_EQ)='1.0e-9>T'
-      SI_CONV(B_I)='1.0e3>m'
-      SI_CONV(L)='6371200.0>m'
-      SI_CONV(LSTAR)='6371200.0>m'
-      SI_CONV(MLT)='3600.0>s'
-      SI_CONV(ALPHA)='1.74533E-2>rad'
-      SI_CONV(ALPHA_EQ)='1.74533E-2>rad'
+      SI_CONV(B_CALC)    ='1.0e-9>T'
+      SI_CONV(B_EQ)      ='1.0e-9>T'
+      SI_CONV(B_I)       ='6371200.0>m'
+      SI_CONV(L)         ='6371200.0>m'
+      SI_CONV(LSTAR)     ='6371200.0>m'
+      SI_CONV(MLT)       ='3600.0>s'
+      SI_CONV(ALPHA)     ='1.74533E-2>rad'
+      SI_CONV(ALPHA_EQ)  ='1.74533E-2>rad'
 
-      UNITS(B_CALC)='nT'
-      UNITS(B_EQ)='nT'
-      UNITS(B_I)='km'
-      UNITS(L)='R_E'
-      UNITS(LSTAR)='R_E'
-      UNITS(MLT)='h'
-      UNITS(ALPHA)='degrees'
-      UNITS(ALPHA_EQ)='degrees'
+      UNITS(B_CALC)      ='nT'
+      UNITS(B_EQ)        ='nT'
+      UNITS(B_I)         ='R_E'
+      UNITS(L)           ='R_E'
+      UNITS(LSTAR)       ='R_E'
+      UNITS(MLT)         ='h'
+      UNITS(ALPHA)       ='degrees'
+      UNITS(ALPHA_EQ)    ='degrees'
 
       DO i=B_CALC,NVAR
-         DICT_KEY(i) = 'magnetic_field>amplitude'
+         DICT_KEY(i)     = 'magnetic_field>amplitude'
       ENDDO
-      DICT_KEY(MLT) = 'time>magnetic'
-      DICT_KEY(ALPHA) = 'angle>pitch'
+      DICT_KEY(MLT)      = 'time>magnetic'
+      DICT_KEY(ALPHA)    = 'angle>pitch'
       DICT_KEY(ALPHA_EQ) = 'angle>pitch'
 
       DO i=B_CALC,LSTAR
@@ -751,26 +747,26 @@ c      VARNAM(2) = 'Position'
          VALIDMIN(i)=0.0
          VALIDMAX(i)=1.0E+31
       ENDDO
-      VALIDMIN(MLT) = 0
-      VALIDMIN(ALPHA) = 0
+      VALIDMIN(MLT)     = 0
+      VALIDMIN(ALPHA)   = 0
       VALIDMIN(ALPHA_EQ)= 0
 
-      VALIDMAX(B_CALC)  = 1.0E+5   !B_Calc
-      VALIDMAX(B_EQ)  = 1.0E+5   !B_Eq
-      VALIDMAX(B_I)  = 100.0    !I
-      VALIDMAX(L)  = 100.0    !L
-      VALIDMAX(LSTAR)  = 100.0    !L_star
-      VALIDMAX(MLT)  = 24.0     !MLT 
-      VALIDMAX(ALPHA)  = 180.0    !Alpha
+      VALIDMAX(B_CALC)   = 1.0E+5   !B_Calc
+      VALIDMAX(B_EQ)     = 1.0E+5   !B_Eq
+      VALIDMAX(B_I)      = 100.0    !I
+      VALIDMAX(L)        = 100.0    !L
+      VALIDMAX(LSTAR)    = 100.0    !L_star
+      VALIDMAX(MLT)      = 24.0     !MLT 
+      VALIDMAX(ALPHA)    = 180.0    !Alpha
       VALIDMAX(ALPHA_EQ) = 180.0    !Alpha_Eq
 
-      DATATYPE(B_CALC) = CDF_DOUBLE
-      DATATYPE(B_EQ) = CDF_DOUBLE
-      DATATYPE(B_I) = CDF_FLOAT
-      DATATYPE(L) = CDF_FLOAT
-      DATATYPE(LSTAR) = CDF_FLOAT
-      DATATYPE(MLT) = CDF_FLOAT
-      DATATYPE(ALPHA) = CDF_FLOAT
+      DATATYPE(B_CALC)   = CDF_DOUBLE
+      DATATYPE(B_EQ)     = CDF_DOUBLE
+      DATATYPE(B_I)      = CDF_FLOAT
+      DATATYPE(L)        = CDF_FLOAT
+      DATATYPE(LSTAR)    = CDF_FLOAT
+      DATATYPE(MLT)      = CDF_FLOAT
+      DATATYPE(ALPHA)    = CDF_FLOAT
       DATATYPE(ALPHA_EQ) = CDF_FLOAT
 
       RETURN
@@ -780,13 +776,13 @@ C ======================================================================
 C ======================================================================
 C ======================================================================
       SUBROUTINE PARSE_CMD( file, epoch_var, pos_var, pos_sysaxes)
-      IMPLICIT NONE
+C      IMPLICIT NONE
 
       CHARACTER*(*) file, epoch_var, pos_var
       INTEGER*4     pos_sysaxes
-      
-      INTEGER*4 IARGC,nargs, i, i1,i2, e_arg, p_arg, s_arg
-      EXTERNAL IARGC
+
+      INTEGER*4 nargs, i, i1,i2, e_arg, p_arg, s_arg
+C      EXTERNAL IARGC
 
 C     max cmd line:   irbem_add -e <Epoch> -p <Position> -s <sysaxes> <file>
       CHARACTER*200   args(7),arg
@@ -886,7 +882,7 @@ C ======================================================================
          alpha = 1.0D0*ASIN( MIN(SQRT( B_eq/B_calc), 1.0D0) )
          alpha = alpha * R_to_D
       ELSE
-         alpha = -1.0D31
+         alpha = -1.0D+31
       ENDIF
 
       RETURN
