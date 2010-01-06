@@ -263,7 +263,7 @@ c
 C
        Bl = 0.D0
        DO I = 1,3
-c         WRITE(6,*)Bxext(I),Bxint(I)
+         !WRITE(6,*)Bxext(I),Bxint(I)
          BxGEO(I) = Bxext(I) + Bxint(I)
          Bl = Bl + BxGEO(I)*BxGEO(I)
        ENDDO
