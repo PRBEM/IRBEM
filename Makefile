@@ -125,6 +125,8 @@ SHAREDEXT_linux64=so
 NONSHAREDEXT_linux64=a
 AROPTIONS_linux64=-r
 
+#FOPTIONS_SHARED_linux64_intel32=-Bstatic -traceback -check bounds -check format -check output_conversion -fexceptions -fpe0 -fmath-errno
+#FOPTIONS_SHARED_linux64_intel32=-Bstatic -g -debug extended -fpe0 -O0 -check all -traceback
 FOPTIONS_SHARED_linux64_intel32=-Bstatic
 FOPTIONS_NONSHARED_linux64_intel32=-c -assume 2underscores
 FC_linux64_intel32=ifort
@@ -192,7 +194,6 @@ LIBNAME_mach_gnu32=mach
 #------------------------------------------------------------------------------
 # Compile/link entire distribution.
 #------------------------------------------------------------------------------
-
 all.help:
 	@more $(HELPDIR)/Help.all
 
