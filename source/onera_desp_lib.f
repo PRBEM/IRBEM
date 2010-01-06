@@ -224,6 +224,16 @@ c
 c
            CALL INIT_GSM(iyearsat(isat),idoy(isat),UT(isat),psi)
            tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        ! check if location is at the center of the Earth!
+        if (xIN1(isat) .eq. 0.D0 .AND. xIN2(isat) .eq. 0.D0 .AND.
+     &      xIN3(isat) .eq. 0.D0) then
+          Lm(isat)=baddata
+          Lstar(isat)=baddata
+          XJ(isat)=baddata
+          BLOCAL(isat)=baddata
+          BMIN(isat)=baddata
+          GOTO 99
+        endif
 	   if (sysaxes .EQ. 0) then
 	       alti=xIN1(isat)
 	       lati=xIN2(isat)
@@ -739,6 +749,18 @@ c
 c
            CALL INIT_GSM(iyearsat(isat),idoy(isat),UT(isat),psi)
            tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        ! check if location is at the center of the Earth!
+        if (xIN1(isat) .eq. 0.D0 .AND. xIN2(isat) .eq. 0.D0 .AND.
+     &      xIN3(isat) .eq. 0.D0) then
+	          DO IPA=1,Nipa
+		     Lm(isat,IPA)=baddata
+		     Lstar(isat,IPA)=baddata
+		     XJ(isat,IPA)=baddata
+		     BLOCAL(isat,IPA)=baddata
+		  ENDDO
+		  BMIN(isat)=baddata
+          GOTO 99
+        endif
 	   if (sysaxes .EQ. 0) then
 	       alti=xIN1(isat)
 	       lati=xIN2(isat)
@@ -1406,6 +1428,14 @@ c
 c
         CALL INIT_GSM(iyearsat,idoy,UT,psi)
         tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
+     &      xIN3 .eq. 0.D0) then
+	       Lm=baddata
+	       Lstar=baddata
+	       XJ=baddata
+	       BMIN=baddata
+	       RETURN
+        endif
 	if (sysaxes .EQ. 0) then
 	    alti=xIN1
 	    lati=xIN2
@@ -1871,6 +1901,14 @@ c
 c
         CALL INIT_GSM(iyearsat,idoy,UT,psi)
         tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
+     &      xIN3 .eq. 0.D0) then
+	       Lm=baddata
+	       XJ=baddata
+	       BMIN=baddata
+	       ind=0
+	       RETURN
+        endif
 	if (sysaxes .EQ. 0) then
 	    alti=xIN1
 	    lati=xIN2
@@ -2331,6 +2369,11 @@ c
 c
         CALL INIT_GSM(iyearsat,idoy,UT,psi)
         tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
+     &      xIN3 .eq. 0.D0) then
+	       ind=0
+	       RETURN
+        endif
 	if (sysaxes .EQ. 0) then
 	    alti=xIN1
 	    lati=xIN2
@@ -2735,6 +2778,15 @@ c
 c
         CALL INIT_GSM(iyearsat,idoy,UT,psi)
         tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
+     &      xIN3 .eq. 0.D0) then
+	       xGEO(1)=baddata
+	       xGEO(2)=baddata
+	       xGEO(3)=baddata
+	       BLOCAL=baddata
+	       BMIR=baddata
+	       RETURN
+        endif
 	if (sysaxes .EQ. 0) then
 	    alti=xIN1
 	    lati=xIN2
@@ -3225,6 +3277,14 @@ c
 c
         CALL INIT_GSM(iyearsat,idoy,UT,psi)
         tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
+     &      xIN3 .eq. 0.D0) then
+	       posit(1)=baddata
+	       posit(2)=baddata
+	       posit(3)=baddata
+	       BMIN=baddata
+	       RETURN
+        endif
 	if (sysaxes .EQ. 0) then
 	    alti=xIN1
 	    lati=xIN2
@@ -3678,6 +3738,14 @@ c
 c
         CALL INIT_GSM(iyearsat,idoy,UT,psi)
         tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
+     &      xIN3 .eq. 0.D0) then
+	       Bl=baddata
+	       BxGEO(1)=baddata
+	       BxGEO(2)=baddata
+	       BxGEO(3)=baddata
+	       RETURN
+        endif
 	if (sysaxes .EQ. 0) then
 	    alti=xIN1
 	    lati=xIN2
@@ -4026,7 +4094,7 @@ c declare inputs
 	INTEGER*4    iyr
 	integer*4    idoy
 	real*8     UT
-	real*8     xGEO
+	real*8     xGEO(3)
 c
 c Declare internal variables
         REAL*8     dyear
@@ -4043,6 +4111,11 @@ C
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,ut,psi)
 C
+        if (xGEO(1) .eq. 0.D0 .AND. xGEO(2) .eq. 0.D0 .AND.
+     &      xGEO(3) .eq. 0.D0) then
+          MLT=baddata
+          return
+        endif
         CALL geo_mag(xGEO,xMAG)
         CALL car_sph(xMAG,rM,MLAT,Mlon1)
         CALL GSM_GEO(xSUN,xTMP)
