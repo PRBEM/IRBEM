@@ -1,4 +1,4 @@
-!-- %***************************************************************************************************
+<!-- %***************************************************************************************************
 % Copyright 2004-2008, S. Bourdarie
 %
 % This file is part of IRBEM-LIB.
@@ -35,7 +35,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>kext:</b> long integer to select external magnetic
         field</font> 
@@ -174,33 +174,33 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(100000) of long integer year when
+        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>UT:</b> array(100000) of double, UT in seconds</font> 
+        <font face="ARIAL, HELVETICA"><b>UT:</b> array(GET_IRBEM_NTIME_MAX()) of double, UT in seconds</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x1:</b> array(100000) of double, first coordinate
+        <font face="ARIAL, HELVETICA"><b>x1:</b> array(GET_IRBEM_NTIME_MAX()) of double, first coordinate
         according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
         dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x2:</b> array(100000) of double, second coordinate
+        <font face="ARIAL, HELVETICA"><b>x2:</b> array(GET_IRBEM_NTIME_MAX()) of double, second coordinate
         according to sysaxes. If sysaxes is 0 then latitude has to be in degrees otherwise
         use dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x3:</b> array(100000) of double, third coordinate
+        <font face="ARIAL, HELVETICA"><b>x3:</b> array(GET_IRBEM_NTIME_MAX()) of double, third coordinate
         according to sysaxes. If sysaxes is 0 then longitude has to be in degrees otherwise
         use dimensionless variables (in Re).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,100000) of double to specify
+        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,GET_IRBEM_NTIME_MAX()) of double to specify
         magnetic fields inputs such as:<b> 
         <br />
         </b></font>
@@ -305,20 +305,20 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(100000) of double)</font> 
+        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(GET_IRBEM_NTIME_MAX()) of double)</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Lstar or &#934; :</b> L Roederer&nbsp; or &#934;=2&#960;*Bo*/Lstar
-        [nT Re<sup>2</sup>] (array(100000) of double)</font> 
+        [nT Re<sup>2</sup>] (array(GET_IRBEM_NTIME_MAX()) of double)</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at s/c (array(100000)
+        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at s/c (array(GET_IRBEM_NTIME_MAX())
         of double) - [nT]</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmin:</b> magnitude of magnetic field at equator
-        (array(100000) of double) - [nT]</font> 
+        (array(GET_IRBEM_NTIME_MAX()) of double) - [nT]</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>XJ:</b> I, related to second adiabatic invariant
-        (array(100000) of double)</font> - [Re]<br />
-        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(100000)
+        (array(GET_IRBEM_NTIME_MAX()) of double)</font> - [Re]<br />
+        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(GET_IRBEM_NTIME_MAX())
         of double) - [hour]</font> 
         <br />
         <br />
@@ -367,7 +367,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>kext:</b> long integer to select external magnetic
         field</font> 
@@ -506,33 +506,33 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(100000) of long integer year when
+        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>UT:</b> array(100000) of double, UT in seconds</font> 
+        <font face="ARIAL, HELVETICA"><b>UT:</b> array(GET_IRBEM_NTIME_MAX()) of double, UT in seconds</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x1:</b> array(100000) of double, first coordinate
+        <font face="ARIAL, HELVETICA"><b>x1:</b> array(GET_IRBEM_NTIME_MAX()) of double, first coordinate
         according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
         dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x2:</b> array(100000) of double, second coordinate
+        <font face="ARIAL, HELVETICA"><b>x2:</b> array(GET_IRBEM_NTIME_MAX()) of double, second coordinate
         according to sysaxes. If sysaxes is 0 then latitude has to be in degrees otherwise
         use dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x3:</b> array(100000) of double, third coordinate
+        <font face="ARIAL, HELVETICA"><b>x3:</b> array(GET_IRBEM_NTIME_MAX()) of double, third coordinate
         according to sysaxes. If sysaxes is 0 then longitude has to be in degrees otherwise
         use dimensionless variables (in Re).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,100000) of double to specify
+        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,GET_IRBEM_NTIME_MAX()) of double to specify
         magnetic fields inputs such as:<b> 
         <br />
         </b></font>
@@ -637,20 +637,20 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(100000) of double)</font> 
+        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(GET_IRBEM_NTIME_MAX()) of double)</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Lstar or &#934; :</b> L Roederer&nbsp; or &#934;=2&#960;*Bo*/Lstar
-        [nT Re<sup>2</sup>] (array(100000) of double)</font> 
+        [nT Re<sup>2</sup>] (array(GET_IRBEM_NTIME_MAX()) of double)</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at s/c (array(100000)
+        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at s/c (array(GET_IRBEM_NTIME_MAX())
         of double) - [nT]</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmin:</b> magnitude of magnetic field at equator
-        (array(100000) of double) - [nT]</font> 
+        (array(GET_IRBEM_NTIME_MAX()) of double) - [nT]</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>XJ:</b> I, related to second adiabatic invariant
-        (array(100000) of double)</font> - [Re]<br />
-        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(100000)
+        (array(GET_IRBEM_NTIME_MAX()) of double)</font> - [Re]<br />
+        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(GET_IRBEM_NTIME_MAX())
         of double) - [hour]</font> 
         <br />
         <br />
@@ -697,7 +697,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>kext:</b> long integer to select external magnetic
         field</font> 
@@ -808,15 +808,15 @@
         </div>
     </div>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyearsat:</b> array(100000) of long integer year when
+        <font face="ARIAL, HELVETICA"><b>iyearsat:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,100000) of double to specify
+        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,GET_IRBEM_NTIME_MAX()) of double to specify
         magnetic fields inputs such as:<b> 
         <br />
         </b></font>
@@ -913,11 +913,11 @@
         </li>
     </ol>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Lm:</b> array(100000) of double providing L McIlwain</font> 
+        <font face="ARIAL, HELVETICA"><b>Lm:</b> array(GET_IRBEM_NTIME_MAX()) of double providing L McIlwain</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>XJ:</b>  I, related to second adiabatic invariant
-        (array(100000) of double)</font> - [Re]</font> 
+        (array(GET_IRBEM_NTIME_MAX()) of double)</font> - [Re]</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>IMPORTANT:</b> all inputs must be present. For those
@@ -929,7 +929,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>Lstar or &#934; :</b> L Roederer&nbsp; or &#934;=2&#960;*Bo*/Lstar
-        [nT Re<sup>2</sup>] (array(100000) of double)</font> 
+        [nT Re<sup>2</sup>] (array(GET_IRBEM_NTIME_MAX()) of double)</font> 
         <br />
         <br />
         <br />
@@ -978,7 +978,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>Npa:</b> long integer number of pitch-angle in array
         alpha (max allowed is 25)</font> 
@@ -1160,28 +1160,28 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(100000) of long integer year when
+        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>UT:</b> array(100000) of double, UT in seconds</font> 
+        <font face="ARIAL, HELVETICA"><b>UT:</b> array(GET_IRBEM_NTIME_MAX()) of double, UT in seconds</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x1:</b> array(100000) of double, first coordinate
+        <font face="ARIAL, HELVETICA"><b>x1:</b> array(GET_IRBEM_NTIME_MAX()) of double, first coordinate
         according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
         dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x2:</b> array(100000) of double, second coordinate
+        <font face="ARIAL, HELVETICA"><b>x2:</b> array(GET_IRBEM_NTIME_MAX()) of double, second coordinate
         according to sysaxes. If sysaxes is 0 then latitude has to be in degrees otherwise
         use dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x3:</b> array(100000) of double, third coordinate
+        <font face="ARIAL, HELVETICA"><b>x3:</b> array(GET_IRBEM_NTIME_MAX()) of double, third coordinate
         according to sysaxes. If sysaxes is 0 then longitude has to be in degrees otherwise
         use dimensionless variables (in Re).</font> 
     </p>
@@ -1190,7 +1190,7 @@
         location (in degres).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,100000) of double to specify
+        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,GET_IRBEM_NTIME_MAX()) of double to specify
         magnetic fields inputs such as:<b> 
         <br />
         </b></font>
@@ -1297,22 +1297,22 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(100000</font><font face="ARIAL, HELVETICA">,25</font><font face="ARIAL, HELVETICA">)
+        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(GET_IRBEM_NTIME_MAX()</font><font face="ARIAL, HELVETICA">,25</font><font face="ARIAL, HELVETICA">)
         of double)</font> 
         <br />
         <font face="ARIAL, HELVETICA"><strong>Lstar or &#934; :</strong> L Roederer&nbsp;
-        or &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>] (array(100000,25) of double)</font> 
+        or &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>] (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmirror:</b> magnitude of magnetic field at mirror
-        point (array(100000,25) of double) - nT</font> 
+        point (array(GET_IRBEM_NTIME_MAX(),25) of double) - nT</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmin:</b> magnitude of magnetic field at equator
-        (array(100000) of double) - nT</font> 
+        (array(GET_IRBEM_NTIME_MAX()) of double) - nT</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>XJ:</b> I, related to second adiabatic invariant
-        (array(100000,25) of double)</font> 
+        (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(100000)
+        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(GET_IRBEM_NTIME_MAX())
         of double) - hour</font> 
         <br />
         &nbsp; 
@@ -1372,7 +1372,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>Npa:</b> long integer number of pitch-angle in array
         alpha (max allowed is 25)</font> 
@@ -1554,28 +1554,28 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(100000) of long integer year when
+        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         measurements are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>UT:</b> array(100000) of double, UT in seconds</font> 
+        <font face="ARIAL, HELVETICA"><b>UT:</b> array(GET_IRBEM_NTIME_MAX()) of double, UT in seconds</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x1:</b> array(100000) of double, first coordinate
+        <font face="ARIAL, HELVETICA"><b>x1:</b> array(GET_IRBEM_NTIME_MAX()) of double, first coordinate
         according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
         dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x2:</b> array(100000) of double, second coordinate
+        <font face="ARIAL, HELVETICA"><b>x2:</b> array(GET_IRBEM_NTIME_MAX()) of double, second coordinate
         according to sysaxes. If sysaxes is 0 then latitude has to be in degrees otherwise
         use dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x3:</b> array(100000) of double, third coordinate
+        <font face="ARIAL, HELVETICA"><b>x3:</b> array(GET_IRBEM_NTIME_MAX()) of double, third coordinate
         according to sysaxes. If sysaxes is 0 then longitude has to be in degrees otherwise
         use dimensionless variables (in Re).</font> 
     </p>
@@ -1584,7 +1584,7 @@
         location (in degres).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,100000) of double to specify
+        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,GET_IRBEM_NTIME_MAX()) of double to specify
         magnetic fields inputs such as:<b> 
         <br />
         </b></font>
@@ -1691,22 +1691,22 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(100000</font><font face="ARIAL, HELVETICA">,25</font><font face="ARIAL, HELVETICA">)
+        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(GET_IRBEM_NTIME_MAX()</font><font face="ARIAL, HELVETICA">,25</font><font face="ARIAL, HELVETICA">)
         of double)</font> 
         <br />
         <font face="ARIAL, HELVETICA"><strong>Lstar or &#934; :</strong> L Roederer&nbsp;
-        or &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>] (array(100000,25) of double)</font> 
+        or &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>] (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmirror:</b> magnitude of magnetic field at mirror
-        point (array(100000,25) of double) - nT</font> 
+        point (array(GET_IRBEM_NTIME_MAX(),25) of double) - nT</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmin:</b> magnitude of magnetic field at equator
-        (array(100000) of double) - nT</font> 
+        (array(GET_IRBEM_NTIME_MAX()) of double) - nT</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>XJ:</b> I, related to second adiabatic invariant
-        (array(100000,25) of double)</font> 
+        (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(100000)
+        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(GET_IRBEM_NTIME_MAX())
         of double) - hour</font> 
         <br />
         &nbsp; 
@@ -4886,7 +4886,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>whichinv:</b> long integer to select&nbsp;which conversion
         to perform</font>&nbsp;<br />
@@ -4944,11 +4944,11 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(100000) of long integer year when
+        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when
         inputs are given</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         inputs are given</font> 
     </p>
     <p>
@@ -4961,10 +4961,10 @@
         to whichinv):</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Lstar:</b> L Roederer&nbsp; (array(100000) of double)</font> 
+        <font face="ARIAL, HELVETICA"><b>Lstar:</b> L Roederer&nbsp; (array(GET_IRBEM_NTIME_MAX()) of double)</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Phi:</b> &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>]
-        (array(100000) of double)&nbsp;</font> 
+        (array(GET_IRBEM_NTIME_MAX()) of double)&nbsp;</font> 
         <br />
         <br />
         <u>Comments on adiabatic invariants:</u>&nbsp;<br />
@@ -5501,26 +5501,26 @@
     </h3>
     <font face="ARIAL, HELVETICA">Generic coordinates transformation from one Earth&nbsp;or
     Heliospheric coordinate system to another&nbsp;</font>&nbsp;<font face="Arial">Earth&nbsp;or
-    Heliospheric coordinates system. Handle up to 100000 times at once.</font> 
+    Heliospheric coordinates system. Handle up to GET_IRBEM_NTIME_MAX() times at once.</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime :</b> long integer number of time in arrays
-    (max allowed is 100000)</font>&nbsp;<br />
+    (max allowed is GET_IRBEM_NTIME_MAX())</font>&nbsp;<br />
     <font face="ARIAL, HELVETICA"><b>sysaxesIN :</b> long integer&nbsp;indicating input
     coordinates system</font>&nbsp;<br />
     <font face="ARIAL, HELVETICA"><strong>sysaxesOUT :</strong> long integer indicating
     output coordinates system<font face="Times New Roman"> </font>
     <br />
-    <strong>iyr :</strong> array(100000) of long integer - year<font face="Times New Roman"> </font>
+    <strong>iyr :</strong> array(GET_IRBEM_NTIME_MAX()) of long integer - year<font face="Times New Roman"> </font>
     <br />
-    <strong>idoy :</strong> array(100000) of&nbsp; long integer&nbsp; - day of year</font> 
+    <strong>idoy :</strong> array(GET_IRBEM_NTIME_MAX()) of&nbsp; long integer&nbsp; - day of year</font> 
     <br />
-    <font face="ARIAL, HELVETICA"><b>secs :</b>&nbsp;</font><font face="Arial">array(100000)
+    <font face="ARIAL, HELVETICA"><b>secs :</b>&nbsp;</font><font face="Arial">array(GET_IRBEM_NTIME_MAX())
     of double - UT in seconds</font> 
     <br />
-    <font face="ARIAL, HELVETICA"><b>xIN :</b> array (3,100000) of double&nbsp;with position
+    <font face="ARIAL, HELVETICA"><b>xIN :</b> array (3,GET_IRBEM_NTIME_MAX()) of double&nbsp;with position
     in&nbsp;input coordinates system.&nbsp;xIN must be in Re for Earth coordinates system
     and in AU for Heliospheric coordinates system. In case of GEODETIC coordinates system
     xIN(1,*) is&nbsp;altitude (km), xIN(2,*) is latitude (deg) and xIN(3,*) is&nbsp;East
@@ -5982,7 +5982,7 @@
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA"><b>xOUT :</b> array (3,100000) of double&nbsp;with position
+    <font face="ARIAL, HELVETICA"><b>xOUT :</b> array (3,GET_IRBEM_NTIME_MAX()) of double&nbsp;with position
     in&nbsp;output coordinates system.</font>&nbsp;<font face="Arial">xOUT is in Re for
     Earth coordinates system and in AU for Heliospheric coordinates system. In case of
     GEODETIC coordinates system xOUT(1,*) is alitude (km), xOUT(2,*) is latitude (deg)
@@ -7324,7 +7324,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>sysaxes:</b> long integer to define which coordinate
         system is provided in</font> 
@@ -7402,30 +7402,30 @@
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(100000) of long integer year when&nbsp;positions
+        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when&nbsp;positions
         are given. Can be a dummy value for the following sysaxes values: 0,1,6,7,8.<br />
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         positions are given. Can be a dummy value for the following sysaxes values: 0,1,6,7,8.</font>&nbsp; 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>UT:</b> array(100000) of double, UT in seconds when
+        <font face="ARIAL, HELVETICA"><b>UT:</b> array(GET_IRBEM_NTIME_MAX()) of double, UT in seconds when
         positions are given. Can be a dummy value for the following sysaxes values: 0,1,6,7,8</font>&nbsp; 
     </p>
     <p>
     </p>
-    <font face="ARIAL, HELVETICA"><b>x1:</b> array(100000) of double, first coordinate
+    <font face="ARIAL, HELVETICA"><b>x1:</b> array(GET_IRBEM_NTIME_MAX()) of double, first coordinate
     according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
     dimensionless variables (in Re)</font> 
     <p>
-        <font face="ARIAL, HELVETICA"><b>x2:</b> array(100000) of double, second coordinate
+        <font face="ARIAL, HELVETICA"><b>x2:</b> array(GET_IRBEM_NTIME_MAX()) of double, second coordinate
         according to sysaxes. If sysaxes is 0 then latitude has to be in degrees otherwise
         use dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x3:</b> array(100000) of double, third coordinate
+        <font face="ARIAL, HELVETICA"><b>x3:</b> array(GET_IRBEM_NTIME_MAX()) of double, third coordinate
         according to sysaxes. If sysaxes is 0 then East longitude has to be in degrees otherwise
         use dimensionless variables (in Re).</font> 
     </p>
@@ -7433,7 +7433,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-    all times and energies (array(100000,25) of double)</font> 
+    all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
     </h3>
@@ -7466,7 +7466,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of&nbsp;points in
-        arrays (max allowed is 100000)</font> 
+        arrays (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>whichm:</b> long integer to select in which NASA
@@ -7517,14 +7517,14 @@
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>BBo:</b> array(100000) of double. Provide B/Bequator
+        <font face="ARIAL, HELVETICA"><b>BBo:</b> array(GET_IRBEM_NTIME_MAX()) of double. Provide B/Bequator
         for all position where to compute the fluxes. Note that the Jensen and Cain 1960 magnetic
         field model must be used for any call to AE8min, AE8max, AP8min and GSFC 1266 (extended
         to year 1970) for any call to AP8max.<br />
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>L:</b> array(100000) of double. Provide McIlwain
+        <font face="ARIAL, HELVETICA"><b>L:</b> array(GET_IRBEM_NTIME_MAX()) of double. Provide McIlwain
         L for all position where to compute the fluxes.</font>&nbsp; Note that the Jensen
         and Cain 1960 magnetic field model must be used for any call to AE8min, AE8max, AP8min
         and GSFC 1266 (extended to year 1970) for any call to AP8max.<br />
@@ -7536,7 +7536,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-        all times and energies (array(100000,25) of double)</font> 
+        all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
         <br />
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -7582,7 +7582,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is 100000)</font> 
+    (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     <p>
         <font face="ARIAL, HELVETICA"><b>sysaxes:</b> long integer to define which coordinate
         system is provided in</font> 
@@ -7647,35 +7647,35 @@
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(100000) of long integer year when&nbsp;positions
+        <font face="ARIAL, HELVETICA"><b>iyear:</b> array(GET_IRBEM_NTIME_MAX()) of long integer year when&nbsp;positions
         are given. Can be a dummy value for the following sysaxes values: 0,1,6,7,8.<br />
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(100000) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(GET_IRBEM_NTIME_MAX()) of long integer doy when
         positions are given. Can be a dummy value for the following sysaxes values: 0,1,6,7,8.</font>&nbsp; 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>UT:</b> array(100000) of double, UT in seconds when
+        <font face="ARIAL, HELVETICA"><b>UT:</b> array(GET_IRBEM_NTIME_MAX()) of double, UT in seconds when
         positions are given. Can be a dummy value for the following sysaxes values: 0,1,6,7,8.</font>&nbsp; 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x1:</b> array(100000) of double, first coordinate
+        <font face="ARIAL, HELVETICA"><b>x1:</b> array(GET_IRBEM_NTIME_MAX()) of double, first coordinate
         according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
         dimensionless variables (in Re) </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x2:</b> array(100000) of double, second coordinate
+        <font face="ARIAL, HELVETICA"><b>x2:</b> array(GET_IRBEM_NTIME_MAX()) of double, second coordinate
         according to sysaxes. If sysaxes is 0 then latitude has to be in degrees otherwise
         use dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x3:</b> array(100000) of double, third coordinate
+        <font face="ARIAL, HELVETICA"><b>x3:</b> array(GET_IRBEM_NTIME_MAX()) of double, third coordinate
         according to sysaxes. If sysaxes is 0 then longitude has to be in degrees otherwise
         use dimensionless variables (in Re).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap15:</b> array(100000) of double, preceding 15-day
+        <font face="ARIAL, HELVETICA"><b>Ap15:</b> array(GET_IRBEM_NTIME_MAX()) of double, preceding 15-day
         running average of Ap index assuming a one day delay. Array can be set to 0 if whichm
         non equal to 5. </font>
     </p>
@@ -7695,7 +7695,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-    all times and energies (array(100000,25) of double)</font> 
+    all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
     </h3>
@@ -7739,7 +7739,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of&nbsp;points in
-        arrays (max allowed is 100000)</font> 
+        arrays (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     </p>
     <p>
     </p>
@@ -7781,18 +7781,18 @@
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>BBo:</b> array(100000) of double. Provide B/Bequator
+        <font face="ARIAL, HELVETICA"><b>BBo:</b> array(GET_IRBEM_NTIME_MAX()) of double. Provide B/Bequator
         for all position where to compute the fluxes. Note that the IGRF1985 magnetic field
         model must be used.<br />
         </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>L:</b> array(100000) of double. Provide McIlwain
+        <font face="ARIAL, HELVETICA"><b>L:</b> array(GET_IRBEM_NTIME_MAX()) of double. Provide McIlwain
         L for all position where to compute the fluxes.&nbsp; Note that the IGRF1985 magnetic
         field model must be used.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap15:</b> array(100000) of double, preceding 15-day
+        <font face="ARIAL, HELVETICA"><b>Ap15:</b> array(GET_IRBEM_NTIME_MAX()) of double, preceding 15-day
         running average of Ap index assuming a one day delay. Array can be set to 0 if whichm
         non equal to 5. </font>
     </p>
@@ -7815,7 +7815,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-        all times and energies (array(100000,25) of double)</font> 
+        all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
         <br />
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -8158,7 +8158,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays
-        (max allowed is 100000)</font> 
+        (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>WhichAp:</b> long integer</font> to select the&nbsp;kind
@@ -8183,35 +8183,35 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(100000) of long integer, Number of
+        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(GET_IRBEM_NTIME_MAX()) of long integer, Number of
         day of year (DOY=1 is for January 1st) </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(100000) of double, UT in
+        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(GET_IRBEM_NTIME_MAX()) of double, UT in
         seconds when positions are given..</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(100000) of double, Altitude
+        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Altitude
         in km (greater than 85 km).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(100000) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
         latitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(100000) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
         longitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(100000) of double, 3 month
+        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(GET_IRBEM_NTIME_MAX()) of double, 3 month
         average of F10.7 flux.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(100000) of double, daily
+        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(GET_IRBEM_NTIME_MAX()) of double, daily
         F10.7 flux for previous day.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">1st element=Daily Ap<br />
@@ -8230,7 +8230,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px"><font face="ARIAL, HELVETICA">Dens(1st element,*)=He number density (cm<sup>-3</sup>) 
@@ -8244,7 +8244,7 @@
         Dens(8th element,*)=N number density (cm<sup>-3</sup>) </font>
     </div>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Temp(1st element,*)=Exospheric temperature (K) 
@@ -8301,7 +8301,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays
-        (max allowed is 100000)</font> 
+        (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>WhichAp:</b> long integer</font> to select the&nbsp;kind
@@ -8322,35 +8322,35 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(100000) of long integer, Number of
+        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(GET_IRBEM_NTIME_MAX()) of long integer, Number of
         day of year (DOY=1 is for January 1st) </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(100000) of double, UT in
+        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(GET_IRBEM_NTIME_MAX()) of double, UT in
         seconds when positions are given..</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(100000) of double, Altitude
+        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Altitude
         (km).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(100000) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
         latitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(100000) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
         longitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(100000) of double, 3 month
+        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(GET_IRBEM_NTIME_MAX()) of double, 3 month
         average of F10.7 flux.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(100000) of double, daily
+        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(GET_IRBEM_NTIME_MAX()) of double, daily
         F10.7 flux for previous day.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">1st element=Daily Ap<br />
@@ -8375,7 +8375,7 @@
     </p>
     <font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     <p>
-        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Dens(1st element,*)=He number density (cm<sup>-3</sup>) 
@@ -8389,7 +8389,7 @@
         Dens(8th element,*)=N number density (cm<sup>-3</sup>) 
     </div>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Temp(1st element,*)=Exospheric temperature (K) 
@@ -8450,7 +8450,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays
-        (max allowed is 100000)</font> 
+        (max allowed is GET_IRBEM_NTIME_MAX())</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>WhichAp:</b> long integer to select the&nbsp;kind
@@ -8477,35 +8477,35 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(100000) of long integer, Number of
+        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(GET_IRBEM_NTIME_MAX()) of long integer, Number of
         day of year (DOY=1 is for January 1st) </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(100000) of double, UT in
+        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(GET_IRBEM_NTIME_MAX()) of double, UT in
         seconds when positions are given..</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(100000) of double, Altitude
+        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Altitude
         in km (greater than 85 km).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(100000) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
         latitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(100000) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
         longitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(100000) of double, 3 month
+        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(GET_IRBEM_NTIME_MAX()) of double, 3 month
         average of F10.7 flux.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(100000) of double, daily
+        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(GET_IRBEM_NTIME_MAX()) of double, daily
         F10.7 flux for previous day.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">1st element=Daily Ap<br />
@@ -8529,7 +8529,7 @@
     </p>
     <font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     <p>
-        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(9,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(9,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px"><font face="ARIAL, HELVETICA">Dens(1st element,*)=He number density (cm<sup>-3</sup>) 
@@ -8545,7 +8545,7 @@
         Dens(9th element,*)=Anomalous oxygen&nbsp;number density (cm<sup>-3</sup>) 
     </font></div>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,100000) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,GET_IRBEM_NTIME_MAX()) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Temp(1st element,*)=Exospheric temperature (K) 
@@ -8973,30 +8973,30 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>OUTyear:</b>&nbsp;array of long integer(100000)&nbsp;giving
+        <font face="ARIAL, HELVETICA"><b>OUTyear:</b>&nbsp;array of long integer(GET_IRBEM_NTIME_MAX())&nbsp;giving
         output year for each orbital locations</font> 
         <br />
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>OUTdoy:</b>&nbsp;array of long integer(100000)&nbsp;giving
+        <font face="ARIAL, HELVETICA"><b>OUTdoy:</b>&nbsp;array of long integer(GET_IRBEM_NTIME_MAX())&nbsp;giving
         output&nbsp;day of year&nbsp;for each orbital locations</font> 
         <br />
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>UT:</b>&nbsp;array of double(100000)&nbsp;giving
+        <font face="ARIAL, HELVETICA"><b>UT:</b>&nbsp;array of double(GET_IRBEM_NTIME_MAX())&nbsp;giving
         output&nbsp;UT (seconds)&nbsp;for each orbital locations</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>X1:</b>&nbsp;array of double(100000)&nbsp;giving
+        <font face="ARIAL, HELVETICA"><b>X1:</b>&nbsp;array of double(GET_IRBEM_NTIME_MAX())&nbsp;giving
         first coordinate of orbit according to sysaxes</font> 
         <br />
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>X2:</b>&nbsp;array of double(100000)&nbsp;giving&nbsp;second
+        <font face="ARIAL, HELVETICA"><b>X2:</b>&nbsp;array of double(GET_IRBEM_NTIME_MAX())&nbsp;giving&nbsp;second
         coordinate of orbit according to sysaxes</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>X3:</b>&nbsp;array of double(100000)&nbsp;giving&nbsp;third
+        <font face="ARIAL, HELVETICA"><b>X3:</b>&nbsp;array of double(GET_IRBEM_NTIME_MAX())&nbsp;giving&nbsp;third
         coordinate of orbit according to sysaxes</font> 
         <br />
     </p>
@@ -9131,7 +9131,7 @@
     <font face="ARIAL, HELVETICA"><b>NONE</b></font> 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA"><b>VERSN</b> Repository version number.</font> 
+    <font face="ARIAL, HELVETICA"><b>VERSN</b> Repository version number (long integer).</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -9161,7 +9161,7 @@
     <font face="ARIAL, HELVETICA"><b>NONE</b></font> 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA"><b>NTIME_MAX</b>Time dimension size.</font> 
+    <font face="ARIAL, HELVETICA"><b>NTIME_MAX</b>Time dimension size (long integer).</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
