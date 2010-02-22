@@ -34,12 +34,13 @@ function Flux = onera_desp_lib_fly_in_afrl_crres(sysaxes,whichm,energy,matlabd,x
 % if energy(:,2) is all infinities, returns integral flux above energy(:,1) (cm-2 s-1)
 % matlabd is the time in matlab date format
 % x1, x2, and x3 is the spacecraft position in the system specified by sysaxes
+% Ap15 : array (same size as x1, only needed by the CRRESELE Ap15 model) 
+% that provides the 15-day average of Ap prior to the time of interest 
+% assuming a 1 day delay
+% supply [] for Ap15 if not using Ap15 model
 % crres_path is path to AFRL CRRES text files
-% Ap15 : array (same size as x1) that provides the 15-day average of Ap
-% prior to the time of interest (only needed by the CRRESELE Ap15 model)
 % if not supplied, it will be determined by searching the matlab path
 % for a file named crrespro_active.txt and will supply that path
-% supply [] for Ap15 if not using Ap15 model
 % output: size(Flux) = length(x1) x Ne
 
 
