@@ -232,7 +232,8 @@ c
           XJ(isat)=baddata
           BLOCAL(isat)=baddata
           BMIN(isat)=baddata
-          GOTO 99
+          MLT(isat)=baddata
+          GOTO 109
         endif
 	   if (sysaxes .EQ. 0) then
 	       alti=xIN1(isat)
@@ -527,7 +528,7 @@ c
 	   endif
            if (kext .eq. 10) then
 c Input for Tsy01 storm
-	       dst_nt=maginput(3,isat)
+	       dst_nt=maginput(2,isat)
 	       Pdyn_nPa=maginput(5,isat)
 	       ByIMF_nt=maginput(6,isat)
 	       BzIMF_nt=maginput(7,isat)
@@ -583,6 +584,7 @@ c
            MLT(isat) = (Mlon1 - Mlon)/15.d0 + 12.d0
            IF (MLT(isat).GE.24.d0) MLT(isat) = MLT(isat) - 24.d0
            IF (MLT(isat).LT.0.d0) MLT(isat) = MLT(isat) + 24.d0
+109     continue
 	ENDDO
 	END
 C-----------------------------------------------------------------------------
@@ -759,7 +761,7 @@ c
 		     BLOCAL(isat,IPA)=baddata
 		  ENDDO
 		  BMIN(isat)=baddata
-          GOTO 99
+          GOTO 109
         endif
 	   if (sysaxes .EQ. 0) then
 	       alti=xIN1(isat)
@@ -1169,6 +1171,7 @@ c Compute Bmin assuming 90° PA at S/C
            MLT(isat) = (Mlon1 - Mlon)/15.d0 + 12.d0
            IF (MLT(isat).GE.24.d0) MLT(isat) = MLT(isat) - 24.d0
            IF (MLT(isat).LT.0.d0) MLT(isat) = MLT(isat) + 24.d0
+109     continue
 	ENDDO
 	END
 c
