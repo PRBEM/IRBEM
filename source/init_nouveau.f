@@ -1413,15 +1413,14 @@ C
 C
         CALL INITIZE
 C
-        rr=rr*ERA
         CT = DSIN(lati*rad)
         ST = DCOS(lati*rad)
         D  = DSQRT(AQUAD-(AQUAD-BQUAD)*CT*CT)
         CP = COS(longi*rad)
         SP = SIN(longi*rad)
         bb = (BQUAD*CT*CT+AQUAD*ST*ST)/D
-	cc = (BQUAD*BQUAD*CT*CT+AQUAD*AQUAD*ST*ST)/D/D-rr*rr
-	alti = -bb+DSQRT(bb*bb-cc)
+        cc = (BQUAD*BQUAD*CT*CT+AQUAD*AQUAD*ST*ST)/D/D-rr*rr*ERA*ERA
+        alti = -bb+DSQRT(bb*bb-cc)
 C
 	RETURN
 	END
