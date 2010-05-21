@@ -492,7 +492,7 @@ C     Internal Variables
       REAL*8     xx0(3),xx(3),x1(3),x2(3)
       REAL*8     xmin(3)
       REAL*8     B(3),Bl,B0,B1,B3
-      REAL*8     dsreb,smin
+      REAL*8     dsreb0,dsreb,smin
       
       INTEGER*4  I,J,K,Iflag,Iflag_I,Ilflag,Ifail
       INTEGER*4  Ibounce_flag
@@ -549,7 +549,8 @@ C
       ENDIF
       Bmin = B0
 C     
-      dsreb = Lb/Nreb           ! step size dipole L / Nsteps
+      dsreb0 = Lb/Nreb           ! step size dipole L / Nsteps
+      dsreb = dsreb0
 C     
 C     calcul du sens du depart
 C     (compute hemisphere)
@@ -699,7 +700,7 @@ C     et on tourne -> on se decale sur la surface en phi et on cherche teta
 C     pour avoir leI0 et B0 constants
 C     (find the thetta/phi contour on the surface of the earth that conserves
 C     B0= Bmirror and leI0=I)
-      call trace_bounce_orbit(x2,B0,1,
+      call trace_bounce_orbit(x2,B0,1,dsreb0,
      &     Bposit,posit,Nposit,Ibounce_flag)
       if (Ibounce_flag.ne.1) then
          Ilflag = 0
@@ -790,7 +791,7 @@ C
          IF (tetl.GT.pi .OR. tetl.LT.0.D0) GOTO 108
          GOTO 107
  108     CONTINUE
-         IF (J.GE.Nrebmax .AND. leI.GT.0.D0) THEN
+         IF ((J.GE.Nrebmax .AND. leI.GT.0.D0).or.(leI.LT.0.D0)) THEN
             Ilflag = 0
             RETURN
          ENDIF
@@ -811,7 +812,7 @@ C
          
          if (MOD(I-1,r_resol).eq.0) then
             ! Trace bounce orbit on field line from x1
-            call trace_bounce_orbit(x1,Bmir,istore,
+            call trace_bounce_orbit(x1,Bmir,istore,dsreb0,
      &           Bposit,posit,Nposit,Ibounce_flag)
             if (Ibounce_flag.ne.1) then
                Ilflag = 0
@@ -856,7 +857,7 @@ C     (compute the integral of BdS on the norther polar cap)
 C     
       END
       
-      SUBROUTINE trace_bounce_orbit(xstart,Bmirror,istore,
+      SUBROUTINE trace_bounce_orbit(xstart,Bmirror,istore,dsreb0,
      &     Bposit,posit,Nposit,Iflag)
 
       IMPLICIT NONE
@@ -873,10 +874,10 @@ c     Declare output variables
 
 c     Declare internal variables
       INTEGER*4 i,j,k,Ifail
-      REAL*8 lati,longi,alti,Bl,Beq,Bmir
-      REAL*8 xeq(3),xmir(3)
+      REAL*8 lati,longi,alti,Bl,Bmir
+      REAL*8 xmir(3)
       REAL*8 pi,rad,alpha
-      REAL*8 dsreb,x1(3),x2(3),B2
+      REAL*8 dsreb0,dsreb,x1(3),x2(3),B1,B2,Bvec(3)
 
       Iflag = 0
 
@@ -887,20 +888,44 @@ c     Declare internal variables
       pi = 4.D0*ATAN(1.D0)
       rad = pi/180.D0
 
-c     trace to mag equator
-      call geo_gdz(xstart(1),xstart(2),xstart(3),lati,longi,alti)
-      call loc_equator(lati,longi,alti,Beq,xeq)
+c     trace up to mirror point, leave starting pointin Bmir, xmir
 
-c     trace back to mirror point
-      call geo_gdz(xeq(1),xeq(2),xeq(3),lati,longi,alti)
-      alpha = asin(sqrt(Beq/Bmirror))/rad
-      CALL find_bm(lati,longi,alti,alpha,BL,BMIR,xmir)
+      call champ(xstart,Bvec,B1,Ifail)
 
-c     estimate dsreb
-c     assume field-line length is ~20 times dist between xmir and xeq
-      dsreb = sqrt((xmir(1)-xeq(1))**2 + (xmir(2)-xeq(2))**2 
-     &     + (xmir(3)-xeq(3))**2)/100
+      dsreb = -dsreb0 ! assume starting at northern R=1 foot point
 
+      do i = 1,3
+         x1(i) = xstart(i)
+      enddo
+
+      call sksyst(dsreb,x1,x2,B2,Ifail)
+      if (B2.GT.B1) then
+         dsreb = -dsreb ! going wrong way
+      endif
+
+      do j = 1,999
+         call sksyst(dsreb,x1,x2,B2,Ifail)
+         if (B2.GT.Bmirror) then ! still haven't crossed Bmirror
+            do i = 1,3
+               x1(i) = x2(i)
+            enddo
+            B1 = B2
+         else
+            do i = 1,3
+               xmir(i) = x2(i)
+            enddo
+            Bmir = B2
+            dsreb = dsreb/2 ! try again with smaller step (converges logarithmically)
+         endif
+         if (abs((B1/Bmirror-1.0D0)).lt.1.0D-6) then
+            goto 101 ! good convergence
+         endif
+      enddo
+ 101  continue
+
+      dsreb = -dsreb0
+
+c     trace bounce trajectory
       call sksyst(dsreb,xmir,x2,B2,Ifail)
       if (B2.GT.Bmir) then
          dsreb = -dsreb ! going wrong way
