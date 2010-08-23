@@ -92,6 +92,9 @@ Make Variables
                        ENV=pgi64    Compile using Portland Fortran compilers (PGI).
 				  Produce ELF 64-bit MSB dynamic lib.
 
+                       ENV=gfortran64    Compile using Gnu Fortran (gfortran).
+				  Produce ELF 64-bit MSB dynamic lib.
+
           OS=win32     For Cygwin on a PC. The possible environments are...
 
                        ENV=cygwin32 Compile using Gnu Fortran (g77).  This is the Fortran 
