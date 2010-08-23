@@ -17775,6 +17775,7 @@ c Declare internal variables
       REAL*8     LstarL,LstarR,LnXJ,XJatLossCone
       REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
       REAL*8     pi,dec_year
+      REAL*8     DeltaT
 c
 c Declare output variables
       REAL*8     Lstar(ntime_max)
@@ -17793,11 +17794,14 @@ c     now compute L* according to fit functions
       DO isat = 1,ntime
         DayIndexL=idoy(isat)/30+1
         DayIndexR=DayIndexL+1
+        if (DayIndexL .gt. 12) DayIndexL=12
         if (DayIndexR .gt. 12) DayIndexR=1
-	if (XJ(isat) .lt. 0.D0) then
+        DeltaT=30.D0
+        if (DayIndexL .eq. 12 .and. DayIndexR .eq. 1) DeltaT=35.D0
+        if (XJ(isat) .lt. 0.D0) then
           Lstar(isat)=baddata
           goto 900
-	endif
+        endif
 c       check first if point is in the loss cone
         if (Lm(isat) .lt. 0.D0 .and. Lm(isat) .ne. baddata) then
 	  iflag=-1
@@ -17839,8 +17843,10 @@ c       check first if point is in the loss cone
      &        (Lmax(DayIndexR,i)-Lmax(DayIndexR,i-1))
         origin=LOG(Imax(DayIndexR,i))-Lmax(DayIndexR,i)*slope
         XJR=EXP(slope*Lm(isat)+origin)
-        slope=(XJR-XJL)/30.D0
-        origin=XJL-((idoy(isat)/30)*30.d0+1.d0)*slope
+c        slope=(XJR-XJL)/30.D0
+c        origin=XJL-((idoy(isat)/30)*30.d0+1.d0)*slope
+        slope=(XJR-XJL)/DeltaT
+        origin=XJL-((DayIndexL-1)*30.d0+1.d0)*slope
 c
         if (XJ(isat) .gt. slope*idoy(isat)+origin) then ! point is in the loss cone
           if (iflag .eq. 0) iflag=3
@@ -18063,8 +18069,10 @@ c       Finally compute L* according to fit functions
           if (iflag .eq. -3) Lstar(isat)=-baddata
           if (iflag .eq. -1) Lstar(isat)=-baddata
         else
-          slope=(LstarR-LstarL)/30.D0
-          origin=LstarL-((idoy(isat)/30)*30.d0+1.d0)*slope
+c          slope=(LstarR-LstarL)/30.D0
+c          origin=LstarL-((idoy(isat)/30)*30.d0+1.d0)*slope
+          slope=(LstarR-LstarL)/DeltaT
+          origin=LstarL-((DayIndexL-1)*30.d0+1.d0)*slope
           Lstar(isat)=slope*idoy(isat)+origin
         endif
         if (iflag .eq. 3) then
