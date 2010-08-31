@@ -1784,8 +1784,50 @@ c  subroutine make_Lstar: 17 arguments
 c
 c --------------------------------------------------------------------
 c
-        SUBROUTINE trace_field_line1(kext,options,sysaxes,iyearsat,idoy,
-     &  UT,xIN1,xIN2,xIN3,maginput,Lm,BLOCAL,BMIN,XJ,posit,ind)
+      REAL*4 FUNCTION trace_field_line2(argc, argv)   ! Called by IDL
+      INCLUDE 'wrappers.inc'
+c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
+
+       j = loc(argc)                    ! Obtains the number of arguments (argc)
+                                       ! Because argc is passed by VALUE.
+
+c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
+c  passed by reference arguments.
+c
+c  subroutine make_Lstar: 17 arguments
+      call trace_field_line2_1(%VAL(argv(1)), %VAL(argv(2)),
+     +%VAL(argv(3)),
+     * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
+     * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
+     + %VAL(argv(12)), %VAL(argv(13)), %VAL(argv(14)), %VAL(argv(15)),
+     + %VAL(argv(16)), %VAL(argv(17)))
+
+      trace_field_line2 = 9.9
+
+      RETURN
+      END
+c
+c --------------------------------------------------------------------
+c
+        SUBROUTINE trace_field_line1(kext,options,sysaxes,iyearsat,
+     &  idoy,UT,xIN1,xIN2,xIN3,maginput,
+     &  Lm,BLOCAL,BMIN,XJ,posit,ind)
+        IMPLICIT NONE
+        INTEGER*4 kext,options(5),sysaxes,iyearsat,idoy
+        REAL*8 UT,xIN1,xIN2,xIN3,maginput(25),R0
+        REAL*8 Lm,BLOCAL(1000),BMIN,XJ,posit(3,1000)
+        INTEGER*4 ind
+
+        R0=1.D0
+        call trace_field_line2_1(kext,options,sysaxes,iyearsat,idoy,
+     &  UT,xIN1,xIN2,xIN3,maginput,R0,
+     &  Lm,BLOCAL,BMIN,XJ,posit,ind)
+        end
+
+        SUBROUTINE trace_field_line2_1(kext,options,sysaxes,iyearsat,
+     &  idoy,UT,xIN1,xIN2,xIN3,maginput,R0,
+     &  Lm,BLOCAL,BMIN,XJ,posit,ind)
+C - added R0 argument - radius of reference sphere
 c
 	IMPLICIT NONE
 	INCLUDE 'variables.inc'
@@ -1798,6 +1840,7 @@ c declare inputs
 	real*8     UT
 	real*8     xIN1,xIN2,xIN3
 	real*8     maginput(25)
+        real*8     R0
 c
 c Declare internal variables
 	INTEGER*4    isat,iyear
@@ -2225,7 +2268,7 @@ c Input for Alexeev 2000
 	    Al=maginput(17)
 	endif
 c
-        CALL field_line_tracing(lati,longi,alti
+        CALL field_line_tracing2(lati,longi,alti,R0
      &     ,Lm,XJ,BLOCAL,BMIN,posit,ind)
 	END
 C-----------------------------------------------------------------------------

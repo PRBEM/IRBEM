@@ -1,4 +1,4 @@
-function [Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
+function [Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options,sysaxes,matlabd,x1,x2,x3,maginput,R0)
 %***************************************************************************************************
 % Copyright 2006, T.P. O'Brien
 %
@@ -19,7 +19,7 @@ function [Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options
 %
 %***************************************************************************************************
 %
-% function [Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
+% function [Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options,sysaxes,matlabd,x1,x2,x3,maginput,R0)
 % returns spatial coordinates of field line starting from a single point
 % as described in the ONERA/DESP
 % library documentation
@@ -56,11 +56,16 @@ function [Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options
 %
 % maginput(18th element,*) to maginput(25th element,*): for future use
 %
-% IMPORTANT: all inputs must be present. For those which are not used a dummy value can be provided.
-%
+% For default maginput, use []
+% if maginput is omitted, [] is assumed
+% if R0 is omitted, R0=1 is assumed
 
 if nargin < 8,
     maginput = [];
+end
+
+if nargin < 9,
+    R0 = 1;
 end
 
 matlabd = datenum(matlabd);
@@ -92,7 +97,7 @@ POSITPtr = libpointer('doublePtr',POSIT);
 NPOSIT = 0;
 NPOSITPtr = libpointer('int32Ptr',NPOSIT);
 maginput = maginput';
-calllib('onera_desp_lib','trace_field_line1_',kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,maginput,...
+calllib('onera_desp_lib','trace_field_line2_1_',kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,maginput,R0,...
     LmPtr,BlocalPtr,BminPtr,JPtr,POSITPtr,NPOSITPtr);
 % have to do this next bit because Ptr's aren't really pointers
 Lm = get(LmPtr,'value');

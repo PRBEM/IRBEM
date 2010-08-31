@@ -121,6 +121,18 @@ void trace_field_line1_(int *kext, int *options,
 		   double *posit,
 		   int *ind);
 
+void trace_field_line2_1_(int *kext, int *options,
+			  int *sysaxes, int *iyear,
+			  int *idoy, double * UT,
+			  double *x1, double *x2, double *x3,
+			  double *maginput, double *R0,
+			  double *Lm,
+			  double *Blocal,
+			  double *Bmin, 
+			  double *J,
+			  double *posit,
+			  int *ind);
+
 void trace_field_line_towards_earth1_(int *kext, int *options,
 				     int *sysaxes, int *iyear,
 				     int *idoy, double * UT,

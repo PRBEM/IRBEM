@@ -18,9 +18,27 @@
 !
 C
 C
+
+C     Legacy wrapper w/ R0=1.0
        SUBROUTINE field_line_tracing(
      &         lati,longi,alti,Lm,leI0,Bposit,Bmin,posit,Nposit)
+       IMPLICIT NONE
+       INTEGER*4  Nreb,Ntet
+       PARAMETER (Nreb = 150, Ntet = 720)
+       INTEGER*4  Nposit
+       REAL*8     lati,longi,alti,R0
+       REAL*8     Lm,leI0,Bmin
+       REAL*8     posit(3,20*Nreb),Bposit(20*Nreb)
+
+       call field_line_tracing2(lati,longi,alti,1.D0,
+     & Lm,leI0,Bposit,Bmin,posit,Nposit)
+       end
+
+       SUBROUTINE field_line_tracing2(
+     &         lati,longi,alti,R0,Lm,leI0,Bposit,Bmin,posit,Nposit)
 C
+C    modified from field_line_tracing to add R0 parameter: radius (Re) of
+C    reference surface
        IMPLICIT NONE
        INCLUDE 'variables.inc'
 C
@@ -51,6 +69,7 @@ C
        REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
 C
        REAL*8     posit(3,20*Nreb),Bposit(20*Nreb)
+       real*8     R0,R02 ! R0^2
 C
        COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
        COMMON /flag_L/Ilflag
@@ -59,6 +78,7 @@ C
 C
        pi = 4.D0*ATAN(1.D0)
        rad = pi/180.D0
+       R02 = R0*R0
 C
        Nrebmax = 20*Nreb
 C
@@ -202,14 +222,14 @@ C
          CALL sksyst(dsreb,x1,x2,Bl,Ifail)
          IF (Ifail.LT.0) RETURN
 	 rr = sqrt(x2(1)*x2(1)+x2(2)*x2(2)+x2(3)*x2(3))
-	 IF (rr.LT.1.D0) GOTO 102
+	 IF (rr.LT.R0) GOTO 102
 	 x1(1) = x2(1)
 	 x1(2) = x2(2)
 	 x1(3) = x2(3)
        ENDDO
 102    CONTINUE
        smin = sqrt(x1(1)*x1(1)+x1(2)*x1(2)+x1(3)*x1(3))
-       smin = (1.D0-smin)/(rr-smin)
+       smin = (R0-smin)/(rr-smin)
        CALL sksyst(smin*dsreb,x1,x2,Bl,Ifail)
        IF (Ifail.LT.0) RETURN
 C
@@ -234,7 +254,7 @@ c
          Bposit(ind)=Bl
 c	 write(6,*)J,x1(1),x1(2),x1(3),Bl
          rr2 = x2(1)*x2(1)+x2(2)*x2(2)+x2(3)*x2(3)
-         IF (rr2.LT.1.) GOTO 201
+         IF (rr2.LT.R02) GOTO 201
 	 x1(1) = x2(1)
 	 x1(2) = x2(2)
 	 x1(3) = x2(3)

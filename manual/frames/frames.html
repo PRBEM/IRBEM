@@ -3824,14 +3824,15 @@
         <br />
         <font face="ARIAL, HELVETICA">------------------------------------------------------------</font><a name="TRACE_FIELD_LINE"></a> 
     </p>
-    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">TRACE_FIELD_LINE</font></font> 
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">TRACE_FIELD_LINE2</font></font> 
     </h2>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA">This function traces a full field line which crosses
     the input position.&nbsp; The output is a full array of positions of the field line,
     usefull for plotting and visualisation for a set of internal/external fields to be
-    selected.</font>&nbsp;<br />
+    selected. A new option (R0) for TRACE_FIELD_LINE2 allows user to specify the radius (RE)
+    of the reference surface between which the line is traced (R0=1 in TRACE_FIELD_LINE) </font>&nbsp;<br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <p>
@@ -4119,6 +4120,10 @@
             element): </b>for future use</font> 
         </li>
     </ol>
+    <p>
+        <font face="ARIAL, HELVETICA"><b>R0: </b>double, specifies radius of reference surface
+	between which field line is traced.</font>
+    </p>
     <br />
     <font face="ARIAL, HELVETICA"><b>IMPORTANT:</b> all inputs must be present. For those
     which are not used a dummy value can be provided.</font> 
@@ -4155,19 +4160,19 @@
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">[Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options,sysaxes,matlabd,x1,x2,x3,maginput)</font> 
+    <font face="ARIAL, HELVETICA">[Lm,Blocal,Bmin,J,POSIT] = onera_desp_lib_trace_field_line(kext,options,sysaxes,matlabd,x1,x2,x3,maginput,R0)</font> 
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM IDL:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'trace_field_line_',&nbsp;
-    kext,options,sysaxes,iyear,idoy,ut,&nbsp; x1,x2,x3, maginput, lm,blocal,bmin,xj,posit,Nposit,&nbsp;
+    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'trace_field_line2_',&nbsp;
+    kext,options,sysaxes,iyear,idoy,ut,&nbsp; x1,x2,x3,maginput,R0,lm,blocal,bmin,xj,posit,Nposit,&nbsp;
     /f_value)</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM FORTRAN:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">call trace_field_line1(kext,options,sysaxes,iyear,idoy,ut,
-    x1,x2,x3, maginput, lm,blocal,bmin,xj,posit,Nposit)</font> 
+    <font face="ARIAL, HELVETICA">call trace_field_line2_1(kext,options,sysaxes,iyear,idoy,ut,
+    x1,x2,x3, maginput,R0, lm,blocal,bmin,xj,posit,Nposit)</font> 
     <p>
         <br />
         <font face="ARIAL, HELVETICA">------------------------------------------------------------</font><a name="TRACE_FIELD_LINE_TOWARD_EARTH"></a> 
