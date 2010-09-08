@@ -1,4 +1,4 @@
-function [Lm,Lstar,Blocal,Bmin,Bmir,J,POSIT] = onera_desp_lib_drift_bounce_orbit(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput)
+function [Lm,Lstar,Blocal,Bmin,Bmir,J,POSIT,hmin,hmin_lon] = onera_desp_lib_drift_bounce_orbit(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput,R0)
 %***************************************************************************************************
 % Copyright 2007, T.P. O'Brien
 %
@@ -28,6 +28,9 @@ function [Lm,Lstar,Blocal,Bmin,Bmir,J,POSIT] = onera_desp_lib_drift_bounce_orbit
 % POSIT is 25 cell arrays of Nbnc x 3
 % and the cells contain the field line at each azimuth (up to 1000 points)
 % where the 2nd dimension spans x, y, z GEO
+% hmin - minimum altitude along drift orbit (not necessarily a point in
+% POSIT)
+% hmin_lon - longitude of minimum altitude
 % kext - specified the external field model
 % For the kext argument, see helps for onera_desp_lib_kext
 % options - controls the field tracing
@@ -59,11 +62,18 @@ function [Lm,Lstar,Blocal,Bmin,Bmir,J,POSIT] = onera_desp_lib_drift_bounce_orbit
 %
 % maginput(18th element,*) to maginput(25th element,*): for future use
 %
+% R0 minmum radial distance allowed for field line traces & bounce orbit
+% (R0<1 allowed)
+%
 % IMPORTANT: all inputs must be present. For those which are not used a dummy value can be provided.
 %
 
 if nargin < 9,
     maginput = [];
+end
+
+if nargin < 10,
+    R0=1;
 end
 
 matlabd = datenum(matlabd);
@@ -103,9 +113,11 @@ POSITarray = repmat(nan,[3 Nbounce Naz]);
 POSITPtr = libpointer('doublePtr',POSITarray);
 NPOSIT = repmat(0,Naz,1);
 NPOSITPtr = libpointer('int32Ptr',NPOSIT);
+hminPtr = libpointer('doublePtr',nan);
+hmin_lonPtr = libpointer('doublePtr',nan);
 maginput = maginput';
-calllib('onera_desp_lib','drift_bounce_orbit1_',kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,alpha,maginput,...
-    LmPtr,LstarPtr,BlocalPtr,BminPtr,BmirPtr,JPtr,POSITPtr,NPOSITPtr);
+calllib('onera_desp_lib','drift_bounce_orbit2_1_',kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,alpha,maginput,R0,...
+    LmPtr,LstarPtr,BlocalPtr,BminPtr,BmirPtr,JPtr,POSITPtr,NPOSITPtr,hminPtr,hmin_lonPtr);
 % have to do this next bit because Ptr's aren't really pointers
 Lm = get(LmPtr,'value');
 Lstar = get(LstarPtr,'value');
@@ -126,6 +138,8 @@ for i = 1:Naz,
     POSIT{i} = squeeze(POSITarray(:,1:n,i))';
     Blocal{i} = Blocalar(1:n,i);
 end
+hmin = hminPtr.value;
+hmin_lon = hmin_lonPtr.value;
 
 % the flag value is actually -1d31
 Lm(Lm<-1e30) = nan;
@@ -133,4 +147,6 @@ Lstar(Lstar<-1e30) = nan;
 Bmin(Bmin<-1e30) = nan;
 Bmir(Bmir<-1e30) = nan;
 J(J<-1e30) = nan;
+hmin(hmin<-1e30) = nan;
+hmin_lon(hmin_lon<-1e30) = nan;
 

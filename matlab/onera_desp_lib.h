@@ -109,6 +109,20 @@ void drift_bounce_orbit1_(int *kext, int *options,
 			  double *posit,
 			  int *ind);
 
+void drift_bounce_orbit2_1_(int *kext, int *options,
+			    int *sysaxes, int *iyear,
+			    int *idoy, double * UT,
+			    double *x1, double *x2, double *x3, double *alpha,
+			    double *maginput, double *R0,
+			    double *Lm,
+			    double *Lstar, 
+			    double *Blocal,
+			    double *Bmin, 
+			    double *Bmir, 
+			    double *J,
+			    double *posit,
+			    int *ind, double *hmin, double *hmin_lon);
+
 void trace_field_line1_(int *kext, int *options,
 		   int *sysaxes, int *iyear,
 		   int *idoy, double * UT,
