@@ -217,6 +217,7 @@ all.linux64.intel32: all.build
 all.linux64.gnu32: all.build
 all.linux64.gnu64: all.build
 all.linux64.pgi64: all.build
+all.linux64.gfortran64: all.build
 all.win32.cygwin32: all.build
 all.mach.gnu32: all.build
 all.sunos.sparc32: all.build
