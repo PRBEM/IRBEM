@@ -565,7 +565,7 @@ C
       REAL*8     pi,rad,tt
       REAL*8     tet(10*Nder_def),phi(10*Nder_def)
       REAL*8     tetl,tet1,dtet,lasttet
-      REAL*8     somme,R02,BrR2
+      REAL*8     somme,BrR2
 
 c variables to deal with leI~0 case
       REAL*8     x1old(3)
@@ -588,7 +588,6 @@ C
 C     
 
 
-      R02 = R0*R0
       Nder=Nder_def*r_resol     ! longitude steps
       Nreb=Nreb_def             ! steps along field line
       Ntet=Ntet_def*t_resol     ! latitude steps
@@ -940,7 +939,6 @@ C     (compute the integral of BdS on the norther polar cap)
          Ilflag = 0
          RETURN
       ENDIF
-c      somme = Bl*pi*dtet*dtet/4.D0*R02
       BrR2 = abs((x1(1)*B(1)+x1(2)*B(2)+x1(3)*B(3)))*R0 ! phi integrates B dot dA, or Br*R^2dphi*dtheta
       somme = BrR2*pi*dtet*dtet/4.D0
       DO I = 1,Nder
@@ -956,7 +954,6 @@ c      somme = Bl*pi*dtet*dtet/4.D0*R02
                Ilflag = 0
                RETURN
             ENDIF
-c            somme = somme+Bl*SIN(tetl)*dtet*2.D0*pi/Nder*R02
             BrR2 = abs((x1(1)*B(1)+x1(2)*B(2)+x1(3)*B(3)))*R0  ! phi integrates B dot dA, or Br*R^2dphi*dtheta
             somme = somme+BrR2*SIN(tetl)*dtet*2.D0*pi/Nder
 	 ENDDO

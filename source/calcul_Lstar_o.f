@@ -47,7 +47,7 @@ C
        REAL*8     pi,rad,tt
        REAL*8     tet(10*Nder_def),phi(10*Nder_def)
        REAL*8     tetl,tet1,dtet
-       REAL*8     somme
+       REAL*8     somme,BrR2
        REAL*8     Bmin3,x3(3),xmin3(3),Bl3,rr32,x13(3),Bl13,ds3
 C
        REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
@@ -445,7 +445,8 @@ C
 	   Ilflag = 0
 	   RETURN
        ENDIF
-       somme = Bl*pi*dtet*dtet/4.D0
+       BrR2 = abs((x1(1)*B(1)+x1(2)*B(2)+x1(3)*B(3))) ! phi integrates B dot dA, or Br*R^2dphi*dtheta, R=1
+       somme = BrR2*pi*dtet*dtet/4.D0
        DO I = 1,Nder
          tetl = 0.D0
          DO J = 1,Ntet
@@ -459,7 +460,8 @@ C
 	      Ilflag = 0
 	      RETURN
           ENDIF
-	  somme = somme+Bl*SIN(tetl)*dtet*2.D0*pi/Nder
+          BrR2 = abs((x1(1)*B(1)+x1(2)*B(2)+x1(3)*B(3))) ! phi integrates B dot dA, or Br*R^2dphi*dtheta, R=1
+	  somme = somme+BrR2*SIN(tetl)*dtet*2.D0*pi/Nder
 	 ENDDO
 111      CONTINUE
        ENDDO
