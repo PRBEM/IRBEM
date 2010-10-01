@@ -18,7 +18,7 @@ function [Lm,Lstar,Blocal,Bmin,Bmir,J,POSIT,hmin,hmin_lon] = onera_desp_lib_drif
 %    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 %***************************************************************************************************
 %
-%function [Lm,Lstar,Blocal,Bmin,Bmir,J,POSIT] = onera_desp_lib_drift_bounce_orbit(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput)
+% [Lm,Lstar,Blocal,Bmin,Bmir,J,POSIT,hmin,hmin_lon] = onera_desp_lib_drift_bounce_orbit(kext,options,sysaxes,matlabd,x1,x2,x3,alpha,maginput,R0)
 % returns spatial coordinates of drift-bounce orbit starting from a single point
 % as described in the ONERA/DESP
 % library documentation
