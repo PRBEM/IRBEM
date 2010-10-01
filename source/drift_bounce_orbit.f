@@ -565,7 +565,7 @@ C
       REAL*8     pi,rad,tt
       REAL*8     tet(10*Nder_def),phi(10*Nder_def)
       REAL*8     tetl,tet1,dtet,lasttet
-      REAL*8     somme,R02
+      REAL*8     somme,R02,BrR2
 
 c variables to deal with leI~0 case
       REAL*8     x1old(3)
@@ -940,7 +940,9 @@ C     (compute the integral of BdS on the norther polar cap)
          Ilflag = 0
          RETURN
       ENDIF
-      somme = Bl*pi*dtet*dtet/4.D0*R02
+c      somme = Bl*pi*dtet*dtet/4.D0*R02
+      BrR2 = abs((x1(1)*B(1)+x1(2)*B(2)+x1(3)*B(3)))*R0 ! phi integrates B dot dA, or Br*R^2dphi*dtheta
+      somme = BrR2*pi*dtet*dtet/4.D0
       DO I = 1,Nder
          tetl = 0.D0
          DO J = 1,Ntet
@@ -954,7 +956,9 @@ C     (compute the integral of BdS on the norther polar cap)
                Ilflag = 0
                RETURN
             ENDIF
-            somme = somme+Bl*SIN(tetl)*dtet*2.D0*pi/Nder*R02
+c            somme = somme+Bl*SIN(tetl)*dtet*2.D0*pi/Nder*R02
+            BrR2 = abs((x1(1)*B(1)+x1(2)*B(2)+x1(3)*B(3)))*R0  ! phi integrates B dot dA, or Br*R^2dphi*dtheta
+            somme = somme+BrR2*SIN(tetl)*dtet*2.D0*pi/Nder
 	 ENDDO
  111     CONTINUE
       ENDDO
