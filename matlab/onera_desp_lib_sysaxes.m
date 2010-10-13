@@ -29,7 +29,7 @@ function sysaxes = onera_desp_lib_sysaxes(sysaxes)
 % 2: GSM (cartesian) - Re 
 % 3: GSE (cartesian) - Re 
 % 4: SM (cartesian) - Re 
-% 5: GEI (cartesian) - Re 
+% 5: GEI (cartesian) - Re (ECI)
 % 6: MAG (cartesian) - Re 
 % 7: SPH (geo in spherical) - (radial distance, lati, longi - Re, deg., deg.)
 % 8: RLL  (radial distance, lati, longi - Re, deg., deg. - prefered to 7) 
@@ -50,7 +50,7 @@ switch(upper(sysaxes)),
     case {'GSM'},  sysaxes = 2;
     case {'GSE'},  sysaxes = 3;
     case {'SM'},   sysaxes = 4;
-    case {'GEI'},  sysaxes = 5;
+    case {'GEI','ECI'},  sysaxes = 5;
     case {'MAG'},  sysaxes = 6;
     case {'SPH'},  sysaxes = 7;
     case {'RLL'},  sysaxes = 8;
