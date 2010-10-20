@@ -933,7 +933,7 @@ C     calcul de somme de BdS sur la calotte nord
 C     (compute the integral of BdS on the norther polar cap)
       x1(1) = 0.D0
       x1(2) = 0.D0
-      x1(3) = 1.D0
+      x1(3) = R0
       CALL CHAMP(x1,B,Bl,Ifail)
       IF (Ifail.LT.0)THEN
          Ilflag = 0
