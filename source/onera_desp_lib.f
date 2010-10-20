@@ -3166,8 +3166,9 @@ c Input for Alexeev 2000
 	endif
 c
         if (alpha.eq.90.0d0) then
-          Iint=2
-          CALL CHAMP(Iint,xGEO,BxGEO,Blocal,Ifail)
+          Iint=2 ! TPO: presume this sets internal field?
+c          CALL CHAMP(Iint,xGEO,BxGEO,Blocal,Ifail) ! Iint is superfluous
+          CALL CHAMP(xGEO,BxGEO,Blocal,Ifail)
 	  IF (Ifail.LT.0) THEN
 	    Blocal=baddata
 	    Bmir=baddata
