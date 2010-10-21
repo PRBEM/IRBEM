@@ -506,7 +506,7 @@ c
          CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,
      &        longi,alti)
       ELSE
-         Bmir=0.0D0
+         Bmir=0.0
       ENDIF
       IF (Bmir.NE.baddata) THEN
          Ilflag=0
@@ -578,7 +578,7 @@ C     Output Variables
       REAL*8     posit(3,20*Nreb_def,Nder_def)
       REAL*8     Bposit(20*Nreb_def,Nder_def)
       REAL*8     hmin,hmin_lon
-      INTEGER*4  Nposit(Nder_def)
+      INTEGER*4  Nposit(Nder_def), tet_count
 C     
       COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
       COMMON /calotte/tet
@@ -610,7 +610,7 @@ C
       Lb  = rr/SIN(tt)/SIN(tt)  ! dipole L
 C     
       CALL CHAMP(xx0,B,B0,Ifail)
-      Bmir = B0 ! local field at starting point
+      Bmir = B0 ! local field at starting point - for Bmir=0 case when alpha=90
       IF (Ifail.LT.0) THEN
          Ilflag = 0
          RETURN
@@ -623,14 +623,14 @@ C
 C     calcul du sens du depart
 C     (compute hemisphere)
  10   CONTINUE
-      CALL sksyst(-dsreb,xx0,x1,Bl,Ifail)
+      CALL sksyst_var(-dsreb,xx0,x1,Bl,Ifail)
       IF (Ifail.LT.0) THEN
          Ilflag = 0
          RETURN
       ENDIF
       B1 = Bl
       
-      CALL sksyst(dsreb,xx0,x2,Bl,Ifail)
+      CALL sksyst_var(dsreb,xx0,x2,Bl,Ifail)
       IF (Ifail.LT.0) THEN
          Ilflag = 0
          RETURN
@@ -665,7 +665,7 @@ C     (compute field line and I)
       ENDDO
 C     
       DO J = 1,Nrebmax
-         CALL sksyst(dsreb,x1,x2,Bl,Ifail)
+         CALL sksyst_var(dsreb,x1,x2,Bl,Ifail)
          IF (Ifail.LT.0) THEN
             Ilflag = 0
             RETURN
@@ -709,12 +709,12 @@ C
 C     calcul de Bmin
 c     (compute Bmin)
 C     
-      CALL sksyst(dsreb,xmin,x1,B3,Ifail)
+      CALL sksyst_var(dsreb,xmin,x1,B3,Ifail)
       IF (Ifail.LT.0) THEN
          Ilflag = 0
          RETURN
       ENDIF
-      CALL sksyst(-dsreb,xmin,x1,B1,Ifail)
+      CALL sksyst_var(-dsreb,xmin,x1,B1,Ifail)
       IF (Ifail.LT.0) THEN
          Ilflag = 0
          RETURN
@@ -746,7 +746,7 @@ C
       ENDDO
       dsreb = ABS(dsreb)
       DO J = 1,Nrebmax
-         CALL sksyst(dsreb,x1,x2,Bl,Ifail)
+         CALL sksyst_var(dsreb,x1,x2,Bl,Ifail)
          IF (Ifail.LT.0) THEN
             Ilflag = 0
 	    RETURN
@@ -760,7 +760,7 @@ C
  102  CONTINUE
       smin = sqrt(x1(1)*x1(1)+x1(2)*x1(2)+x1(3)*x1(3))
       smin = (R0-smin)/(rr-smin)
-      CALL sksyst(smin*dsreb,x1,x2,Bl,Ifail)
+      CALL sksyst_var(smin*dsreb,x1,x2,Bl,Ifail)
       IF (Ifail.LT.0) THEN
          Ilflag = 0
          RETURN
@@ -800,21 +800,30 @@ C     B0= Bmirror and leI0=I)
          ENDIF
          leI1 = baddata
 C     
+         tet_count = 0          ! number of tries of different theta
  107     CONTINUE
+         tet_count = tet_count+1
+         leI = baddata
+         IF (tetl.GT.pi .OR. tetl.LT.0.D0) GOTO 108
          x1(1) = R0*SIN(tetl)*COS(phi(I))
          x1(2) = R0*SIN(tetl)*SIN(phi(I))
          x1(3) = R0*COS(tetl)
          Iflag = 0
-         leI = baddata
          CALL CHAMP(x1,B,B1,Ifail)
          IF (Ifail.LT.0) THEN
             Ilflag = 0
             RETURN
          ENDIF
+         if (B1.lt.Bmir) then
+            if (tet_count.gt.Ntet*2) goto 108 ! abort
+            ! starting point is in middle of field line. Try again at lower colat
+            tetl = tetl-dtet
+            goto 107
+         endif
 C     
          dsreb = dsreb/abs(dsreb)*dsreb0
          DO J = 1,Nrebmax
- 109        CALL sksyst(dsreb,x1,x2,Bl,Ifail)
+ 109        CALL sksyst_var(dsreb,x1,x2,Bl,Ifail)
             IF (Ifail.LT.0) THEN
                Ilflag = 0
                RETURN
@@ -885,7 +894,6 @@ C
          ElSE
             tetl = tetl+dtet
          ENDIF
-         IF (tetl.GT.pi .OR. tetl.LT.0.D0) GOTO 108
          GOTO 107
  108     CONTINUE
          IF ((J.GE.Nrebmax .AND. leI.GT.0.D0).or.(leI.LT.0.D0)) THEN
@@ -1011,12 +1019,12 @@ c     trace up to mirror point, leave starting pointin Bmir, xmir
          x1(i) = xstart(i)
       enddo
 
-      call sksyst(dsreb,x1,x2,B2,Ifail)
+      call sksyst_var(dsreb,x1,x2,B2,Ifail)
       if (B2.GT.B1) then
          dsreb = -dsreb ! going wrong way
       endif
 
-      call sksyst(dsreb,x1,x2,B2,Ifail)
+      call sksyst_var(dsreb,x1,x2,B2,Ifail)
       if (B2.GT.B1) then ! already at local min w/in resolution of dsreb
          ! store & return
          if (store.eq.1) then
@@ -1032,7 +1040,7 @@ c     trace up to mirror point, leave starting pointin Bmir, xmir
       endif
 
       do j = 1,999
-         call sksyst(dsreb,x1,x2,B2,Ifail)
+         call sksyst_var(dsreb,x1,x2,B2,Ifail)
          if (B2.GT.Bmirror) then ! still haven't crossed Bmirror
             do i = 1,3
                x1(i) = x2(i)
@@ -1056,7 +1064,7 @@ c     trace up to mirror point, leave starting pointin Bmir, xmir
       dsreb = -dsreb0
 
 c     trace bounce trajectory
-      call sksyst(dsreb,xmir,x2,B2,Ifail)
+      call sksyst_var(dsreb,xmir,x2,B2,Ifail)
       if (B2.GT.Bmir) then
          dsreb = -dsreb ! going wrong way
       endif
@@ -1076,7 +1084,7 @@ c     do trace
                posit(k,j,istore) = x1(k)
             enddo
          endif
-         call sksyst(dsreb,x1,x2,B2,Ifail)
+         call sksyst_var(dsreb,x1,x2,B2,Ifail)
          if (Ifail.LT.0) then
             Iflag = 0
             return
@@ -1096,7 +1104,7 @@ c     finish trace to Bm: Bm between x1 and x2
          j = j+1                ! prepare to store in next element
          do i = 1,10            ! this converges logarithmically, so reduces step size by up to 2^10
             dsreb = dsreb/2.0D0 ! restart with half step size
-            call sksyst(dsreb,x1,x2,B2,Ifail)
+            call sksyst_var(dsreb,x1,x2,B2,Ifail)
             if (B2.LT.Bmirror) then ! still inside bounce orbit
                do k=1,3
                   x1(k) = x2(k)
@@ -1136,3 +1144,27 @@ c     finish trace to Bm: Bm between x1 and x2
       end
 
 
+      subroutine sksyst_var(dsreb,x0,x1,B,Ifail)
+      ! sksyt but takes 1/10 size steps for R<1
+      IMPLICIT NONE
+
+      REAL*8 dsreb,x0(3),x1(3),B,xtmp(3)
+      INTEGER*4 Ifail,i,j
+
+      if ((x0(1)**2+x0(2)**2+x0(3)**2).ge.1.0) then
+         ! R>= 1.0, so use regular dsreb
+         call sksyst(dsreb,x0,x1,B,Ifail)
+         return
+      endif
+      ! else, take 10 small steps
+      do i = 1,3
+         xtmp(i) = x0(i)
+      enddo
+      do j = 1,10
+         call sksyst(dsreb/10.D0,xtmp,x1,B,Ifail)
+         if (Ifail.LT.0) return
+         do i = 1,3
+            xtmp(i) = x1(i)
+         enddo
+      enddo
+      end

@@ -1471,7 +1471,7 @@ C
 	IMPLICIT NONE
 C
 	REAL*8 precision
-	PARAMETER (precision = 1.D-3)
+	PARAMETER (precision = 1.D-5) ! increase precision to 1E-5
 C
 	REAL*8 lati,longi,lat0
         REAL*8 alti,xx,yy,zz,alt0
@@ -1501,8 +1501,8 @@ C
 	  D = SQRT(AQUAD-(AQUAD-BQUAD)*sin(lat0)*sin(lat0))
 	  lati = ATAN2(zz*(alt0+AQUAD/D/ERA),RHO*(alt0+BQUAD/D/ERA))
 	  alti = RHO/cos(lati) - AQUAD/D/ERA
-	  IF (ABS(alti - alt0).GT. precision .AND. ABS(lati -
-     &     lat0) .GT. precision) GOTO 10
+	  IF (ABS(alti - alt0).GT. precision .OR. ABS(lati -
+     &     lat0) .GT. precision) GOTO 10 ! keep looping until BOTH are within precision
           alti = alti*ERA
 	  lati = lati/rad
         ENDIF
