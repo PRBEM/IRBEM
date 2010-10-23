@@ -136,7 +136,7 @@ c     Declare internal variables
       INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
       INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
       REAL*8     yearsat,dec_year,a2000_ut
-      REAL*8     psi,tilt,BL,BMIN_tmp
+      REAL*8     psi,tilt,BL
       REAL*8     xGEO(3),xMAG(3)
       REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
       real*8     alti,lati,longi
