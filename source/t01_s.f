@@ -80,6 +80,8 @@ c
      *  HYIMF,HZIMF,BBX,BBY,BBZ
 C
       COMMON /dip_ang/tilt
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 c
       DATA A/1.00000D0,-1.19284D0,1.32478D0,0.41388D0,-0.07590D0,
      *-1.97502D0,5.68628D0,0.00000D0,0.00000D0,0.79889D0,-0.02588D0,
@@ -91,7 +93,7 @@ c
      *0.70733D0,0.30588D0,12.18290D0,40.00D0,82.76604D0,27.22990D0,
      *98.37391D0,14.39243D0,4.80011D0,7.99216D0/
 
-       ps=tilt*4.D0*ATAN(1.D0)/180.d0
+       ps=tilt*rad
 c       
       PDYN=PARMOD(1)
       DST_AST=PARMOD(2)*0.8D0-13.D0*SQRT(PDYN)

@@ -28,17 +28,16 @@ C
        REAL*8 xGEO,yGEO,zGEO
        REAL*8 xMAG,yMAG,zMAG
        REAL*8 rr,tt,pp
-       REAL*8 pi
        REAL*8 Bo
        REAL*8 BxGEO,ByGEO,BzGEO
        REAL*8 BxMAG,ByMAG,BzMAG
        REAL*8 Br,Bt,Bp
        REAL*8 xc,yc,zc
        REAL*8 ct,st,cp,sp
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
        COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
-C
-       pi = 4.D0*ATAN(1.D0)
 C
        xMAG = ct*cp*(xGEO-xc) + ct*sp*(yGEO-yc) - st*(zGEO-zc)
        yMAG = -  sp*(xGEO-xc) +    cp*(yGEO-yc)

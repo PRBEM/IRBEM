@@ -26,7 +26,7 @@ C     E G STASSINOPOULOS AND G D MEAD (see below)
 C
 C
         REAL*8    rkm, st, ct, sph, cph, br, bt, bp
-	REAL*8    alti,lati,longi,pi,rad
+	REAL*8    alti,lati,longi
         REAL*8    xGEO,yGEO,zGEO,BxGEO,ByGEO,BzGEO
         REAL*8    BGEO(3),BSPH(3)
 C
@@ -99,10 +99,10 @@ C
         INTEGER*4 i, j,norder
 C
       COMMON /intfield/  G,norder
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C      
 C     
-      pi=2.*ASIN(1.)
-      rad=pi/180.d0
       CALL geo_gdz(xGEO,yGEO,zGEO,lati,longi,alti)
       rkm=SQRT(xGEO*xGEO+yGEO*yGEO+zGEO*zGEO)
       st=SIN((90.D0-lati)*rad)

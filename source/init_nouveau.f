@@ -725,14 +725,14 @@ C
 C
        REAL*8     r,lati,longi
        REAL*8     colati
-       REAL*8     pi
        REAL*8     x(3)
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
-       pi = 2.d0*ASIN(1.d0)
-       colati = pi/2.d0 - lati*pi/180.d0
+       colati = pi/2.d0 - lati*rad
 C
-       x(1) = r*SIN(colati)*COS(longi*pi/180.d0)
-       x(2) = r*SIN(colati)*SIN(longi*pi/180.d0)
+       x(1) = r*SIN(colati)*COS(longi*rad)
+       x(2) = r*SIN(colati)*SIN(longi*rad)
        x(3) = r*COS(colati)
 C
        RETURN
@@ -745,10 +745,9 @@ C
        IMPLICIT NONE
        REAL*8     r,lati,longi
        REAL*8     SQ
-       REAL*8     pi
        REAL*8     x(3)
-C
-       pi = 2.d0*ASIN(1.d0)
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
        SQ = x(1)*x(1) + x(2)*x(2)
        r = SQRT(SQ + x(3)*x(3))
@@ -761,8 +760,8 @@ C
        ENDIF
        RETURN
 2      SQ = SQRT(SQ)
-       longi = ATAN2(x(2),x(1))*180.d0/pi
-       lati = 90.d0 - ATAN2(SQ,x(3))*180.d0/pi
+       longi = ATAN2(x(2),x(1))/rad
+       lati = 90.d0 - ATAN2(SQ,x(3))/rad
        IF (longi.LT.0.d0) longi = longi + 360.d0
        RETURN
        END
@@ -775,16 +774,17 @@ C
 C
        REAL*8     r,lati,longi
        REAL*8     colati
-       REAL*8     pi,st,ct,sp,cp
+       REAL*8     st,ct,sp,cp
        REAL*8     sph(3),x(3)
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
-       pi = 2.d0*ASIN(1.d0)
-       colati = pi/2.d0 - lati*pi/180.d0
+       colati = pi/2.d0 - lati*rad
 C
       st     = sin(colati)
       ct     = cos(colati)
-      sp     = sin(longi*pi/180.D0)
-      cp     = cos(longi*pi/180.D0)
+      sp     = sin(longi*rad)
+      cp     = cos(longi*rad)
       x(1) = sph(1) * st*cp + sph(2) * ct*cp - sph(3) * sp
       x(2) = sph(1) * st*sp + sph(2) * ct*sp + sph(3) * cp
       x(3) = sph(1) *  ct   - sph(2) *  st
@@ -801,16 +801,17 @@ C
 C
        REAL*8     r,lati,longi
        REAL*8     colati
-       REAL*8     pi,st,ct,sp,cp
+       REAL*8     st,ct,sp,cp
        REAL*8     sph(3),x(3)
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
-       pi = 2.d0*ASIN(1.d0)
-       colati = pi/2.d0 - lati*pi/180.d0
+       colati = pi/2.d0 - lati*rad
 C
       st     = sin(colati)
       ct     = cos(colati)
-      sp     = sin(longi*pi/180.D0)
-      cp     = cos(longi*pi/180.D0)
+      sp     = sin(longi*rad)
+      cp     = cos(longi*rad)
       sph(1) = x(3) *  ct + x(1) * st*cp + x(2) * st*sp
       sph(2) = -st * x(3) + x(1) * ct*cp + x(2) * ct*sp
       sph(3) =                - sp * x(1)  + x(2) *  cp
@@ -835,11 +836,11 @@ C
 	INTEGER*4 iaux
 	REAL*8    secs,gst,Slong,Srasn,Sdec
 C
-        REAL*8 rad,aux
+        REAL*8 aux
         REAL*8 dj,fday
 	REAL*8 t,vl,g,obliq,slp,sind,cosd
-C
-	DATA rad /57.29577951308D0/
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
 	IF (iyr.LT.1901 .OR. iyr.GT.2099) RETURN
 C
@@ -855,22 +856,22 @@ C
 	gst = aux-360.D0*iaux
 	aux = 358.475845D0 + 0.985600267D0*dj
 	iaux = INT(aux/360.D0)
-	g = (aux-360.D0*iaux)/rad
+	g = (aux-360.D0*iaux)*rad
 C
         Slong = vl + (1.91946D0-0.004789D0*t)*SIN(g)
      &         + 0.020094D0*SIN(2.D0*g)
-	obliq = (23.45229D0 - 0.0130125D0*t) / rad
-        slp   = (Slong - 0.005686D0) / rad
+	obliq = (23.45229D0 - 0.0130125D0*t) * rad
+        slp   = (Slong - 0.005686D0) * rad
 	sind  = SIN(obliq) * SIN(slp)
 	cosd  = SQRT(1.D0 - sind*sind)
-        Sdec  = rad * ATAN(sind/cosd)
-        Srasn = 180.D0 - rad*ATAN2(sind/(cosd*TAN(obliq))
-     &              , - COS(slp)/cosd)
+        Sdec  = ATAN(sind/cosd) / rad
+        Srasn = 180.D0 
+     &    - ATAN2(sind/(cosd*TAN(obliq)), -COS(slp)/cosd) / rad
 C
-	gst   = gst   /rad
-	Slong = Slong / rad
-        Sdec  = Sdec  / rad
-        Srasn = Srasn / rad
+	gst   = gst   * rad
+	Slong = Slong * rad
+        Sdec  = Sdec  * rad
+        Srasn = Srasn * rad
 C
         RETURN
         END
@@ -1400,16 +1401,14 @@ C
 C
         REAL*8 lati,longi
         REAL*8 alti,rr
-        REAL*8 pi,rad
         REAL*8 CT,ST,CP,SP
         REAL*8 D
 	REAL*8 bb,cc
         REAL*8 ERA,AQUAD,BQUAD
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
-C
-	pi = 4.D0*ATAN(1.D0)
-        rad = pi/180.D0
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
         CALL INITIZE
 C
@@ -1436,15 +1435,13 @@ C
 C
         REAL*8 lati,longi
         REAL*8 alti,xx,yy,zz
-        REAL*8 pi,rad
         REAL*8 CT,ST,CP,SP
         REAL*8 D,RHO
         REAL*8 ERA,AQUAD,BQUAD
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
-C
-        pi = 4.D0*ATAN(1.D0)
-        rad= pi/180.D0
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
         CALL INITIZE
 C
@@ -1475,14 +1472,12 @@ C
 C
 	REAL*8 lati,longi,lat0
         REAL*8 alti,xx,yy,zz,alt0
-        REAL*8 pi,rad
         REAL*8 D,RHO
         REAL*8 ERA,AQUAD,BQUAD
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
-C
-        pi = 4.D0*ATAN(1.D0)
-        rad= pi/180.D0
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 C
         CALL INITIZE
 	longi = ATAN2(yy,xx)/rad
@@ -1529,6 +1524,8 @@ C-----------------------------------------------------------------
         IMPLICIT NONE
 	REAL*8 ERA,AQUAD,BQUAD,EREQU,ERPOL
       	COMMON/GENER/ERA,AQUAD,BQUAD
+	real*8 rad,pi
+	common/rconst/rad,pi
 	ERA=6371.2D0
 c WGS84 World Geodetic System 84 (GPS)
 	EREQU=6378.137D0
@@ -1539,5 +1536,9 @@ c	ERPOL=6356.775D0
 c
 	AQUAD=EREQU*EREQU
 	BQUAD=ERPOL*ERPOL
+
+       pi = 4.D0*ATAN(1.D0)
+       rad = pi/180.D0
+
 	RETURN
 	END
