@@ -118,32 +118,13 @@ c     declare inputs
       real*8     alpha
       real*8     maginput(25),R0
       REAL*8 hmin,hmin_lon
-c     1: Kp
-c     2: Dst
-c     3: dens
-c     4: velo
-c     5: Pdyn
-c     6: ByIMF
-c     7: BzIMF
-c     8: G1
-c     9: G2
-c     10: G3
 c     
 c     
 c     Declare internal variables
-      INTEGER*4    iyear,kint,i,j,k
-      INTEGER*4    Ndays,activ,Ilflag,t_resol,r_resol
-      INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-      INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-      REAL*8     yearsat,dec_year,a2000_ut
-      REAL*8     psi,tilt,BL
-      REAL*8     xGEO(3),xMAG(3)
-      REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
-      real*8     alti,lati,longi
-      REAL*8     ERA,AQUAD,BQUAD
-      real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-      real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-      real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
+      INTEGER*4    kint,i,j,k
+      INTEGER*4    ifail,Ilflag,t_resol,r_resol
+      REAL*8     xGEO(3),xGEOmir(3), BL
+      REAL*8     alti,lati,longi
 c     
 c     Declare output variables
       INTEGER*4  ind(25)
@@ -153,17 +134,10 @@ c     Declare output variables
       REAL*8     XJ
       REAL*8     Lm,Lstar
 C     
-      COMMON/GENER/ERA,AQUAD,BQUAD
-      COMMON /dip_ang/tilt
       COMMON /magmod/k_ext,k_l,kint
-      COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &     ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-      COMMON /index/activ
       COMMON /flag_L/Ilflag
-      COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
+      integer*4 int_field_select, ext_field_select
 C     
-
 c     initialize outputs
       Lm=baddata
       Lstar=baddata
@@ -183,335 +157,33 @@ c     initialize outputs
       enddo
 
       Ilflag=0
-      iyear=1800
       k_ext=kext
       if (options(1).eq.0) options(1)=1
       if (options(3).lt.0 .or. options(3).gt.9) options(3)=0
       t_resol=options(3)+1
       r_resol=options(4)+1
       k_l=options(1)
-      kint=options(5)
-      IF (kint .lt. 0) THEN
-         kint=0
-         WRITE(6,*)
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)'Invalid internal field specification'
-         WRITE(6,*)'Selecting IGRF'
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)
-      ENDIF
-      if (kint .gt. 3) THEN
-         kint=0
-         WRITE(6,*)
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)'Invalid internal field specification'
-         WRITE(6,*)'Selecting IGRF'
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)
-      ENDIF
-      IF (kext .lt. 0) THEN
-         k_ext=5
-         WRITE(6,*)
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)'Invalid external field specification'
-         WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)
-      ENDIF
-      if (kext .gt. 12) THEN
-         k_ext=5
-         WRITE(6,*)
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)'Invalid external field specification'
-         WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-         WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-         WRITE(6,*)
-      ENDIF
+c
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
+c
+        CALL INITIZE
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) RETURN
+c
 c     
-      CALL INITIZE
-      if (kint .eq. 2) CALL JensenANDCain1960
-      if (kint .eq. 3) CALL GSFC1266
-      if (kint .le. 1) then
-         if (options(2) .eq. 0) then
-            if (iyearsat .ne. iyear) then
-               iyear=iyearsat
-               dec_year=iyear+0.5d0
-               CALL INIT_DTD(dec_year)
-            endif
-         else
-            if (iyearsat .ne. iyear .or.
-     &           MOD(idoy*1.d0,options(2)*1.d0) .eq. 0) THEN
-               iyear=iyearsat
-               firstJanuary=JULDAY(iyear,01,01)
-               lastDecember=JULDAY(iyear,12,31)
-               currentdoy=(idoy/options(2))*options(2)
-               if (currentdoy .eq. 0) currentdoy=1
-               dec_year=iyear+currentdoy*1.d0/
-     &              ((lastDecember-firstJanuary+1)*1.d0)
-               CALL INIT_DTD(dec_year)
-            endif
-         endif
-      endif
-c     
-      CALL INIT_GSM(iyearsat,idoy,UT,psi)
-      tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-      if (sysaxes .EQ. 0) then
-         alti=xIN1
-         lati=xIN2
-         longi=xIN3
-      endif
-      if (sysaxes .EQ. 1) then
-         xGEO(1)=xIN1
-         xGEO(2)=xIN2
-         xGEO(3)=xIN3
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 2) then
-         xGSM(1)=xIN1
-         xGSM(2)=xIN2
-         xGSM(3)=xIN3
-         CALL GSM_GEO(xGSM,xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 3) then
-         xGSE(1)=xIN1
-         xGSE(2)=xIN2
-         xGSE(3)=xIN3
-         CALL GSE_GEO(xGSE,xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 4) then
-         xSM(1)=xIN1
-         xSM(2)=xIN2
-         xSM(3)=xIN3
-         CALL SM_GEO(xSM,xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 5) then
-         xGEI(1)=xIN1
-         xGEI(2)=xIN2
-         xGEI(3)=xIN3
-         CALL GEI_GEO(xGEI,xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 6) then
-         xMAG(1)=xIN1
-         xMAG(2)=xIN2
-         xMAG(3)=xIN3
-         CALL MAG_GEO(xMAG,xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 7) then
-         xMAG(1)=xIN1
-         xMAG(2)=xIN2
-         xMAG(3)=xIN3
-         CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 8) then
-         xMAG(1)=xIN1
-         lati=xIN2
-         longi=xIN3
-         CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-      endif
-c     
-c     make inputs according to magn. field model chosen
-c     
-      if (kext .eq. 1) then
-c     Input for MEAD
-         if (maginput(1).le.3.d0) Activ=1
-         if (maginput(1).gt.3.d0 .and.
-     &        maginput(1).lt.20.d0) Activ=2
-         if (maginput(1).ge.20.d0 .and.
-     &        maginput(1).lt.30.d0) Activ=3
-         if (maginput(1).ge.30.d0) Activ=4
-c     
-         if (maginput(1).lt.0.d0 .or.
-     &        maginput(1).gt.90.d0) then
-            GOTO 99
-         endif
-      endif
-      if (kext .eq. 2) then
-c     Input for TSYG87s
-         if (maginput(1).lt.7.d0) Activ=1
-         if (maginput(1).ge.7.d0 .and.
-     &        maginput(1).lt.17.d0) Activ=2
-         if (maginput(1).ge.17.d0 .and.
-     &        maginput(1).lt.20.d0) Activ=3
-         if (maginput(1).ge.20.d0 .and.
-     &        maginput(1).lt.27.d0) Activ=4
-         if (maginput(1).ge.27.d0 .and.
-     &        maginput(1).lt.37.d0) Activ=5
-         if (maginput(1).ge.37.d0 .and.
-     &        maginput(1).lt.47.d0) Activ=6
-         if (maginput(1).ge.47.d0) Activ=7
-         if (maginput(1).ge.53.d0) Activ=8
-c     
-         if (maginput(1).lt.0.d0 .or.
-     &        maginput(1).gt.90.d0) then
-            GOTO 99
-         endif
-      endif
-      if (kext .eq. 3) then
-c     Input for TSYG87l
-         if (maginput(1).lt.7.d0) Activ=1
-         if (maginput(1).ge.7.d0 .and.
-     &        maginput(1).lt.17.d0) Activ=2
-         if (maginput(1).ge.17.d0 .and.
-     &        maginput(1).lt.27.d0) Activ=3
-         if (maginput(1).ge.27.d0 .and.
-     &        maginput(1).lt.37.d0) Activ=4
-         if (maginput(1).ge.37.d0 .and.
-     &        maginput(1).lt.47.d0) Activ=5
-         if (maginput(1).ge.47.d0) Activ=6
-c     
-         if (maginput(1).lt.0.d0 .or.
-     &        maginput(1).gt.90.d0) then
-            GOTO 99
-         endif
-      endif
-      if (kext .eq. 4) then
-c     Input for Tsy89
-         if (maginput(1).lt.7.d0) Activ=1
-         if (maginput(1).ge.7.d0 .and.
-     &        maginput(1).lt.17.d0) Activ=2
-         if (maginput(1).ge.17.d0 .and.
-     &        maginput(1).lt.27.d0) Activ=3
-         if (maginput(1).ge.27.d0 .and.
-     &        maginput(1).lt.37.d0) Activ=4
-         if (maginput(1).ge.37.d0 .and.
-     &        maginput(1).lt.47.d0) Activ=5
-         if (maginput(1).ge.47.d0 .and.
-     &        maginput(1).lt.57.d0) Activ=6
-         if (maginput(1).ge.57.d0) Activ=7
-c     
-         if (maginput(1).lt.0.d0 .or.
-     &        maginput(1).gt.90.d0) then
-            GOTO 99
-         endif
-      endif
-      if (kext .eq. 6) then
-c     Input for OP dyn
-         density=maginput(3)
-         speed=maginput(4)
-         dst_nt=maginput(2)
-c     
-         if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-            GOTO 99
-         endif
-         if (density.lt.5.d0 .or. density.gt.50.d0) then
-            GOTO 99
-         endif
-         if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-            GOTO 99
-         endif
-      endif
-      if (kext .eq. 7) then
-c     Input for Tsy96
-         dst_nt=maginput(2)
-         Pdyn_nPa=maginput(5)
-         ByIMF_nt=maginput(6)
-         BzIMF_nt=maginput(7)
-c     
-         if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-            GOTO 99
-         endif
-         if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-            GOTO 99
-         endif
-         if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-            GOTO 99
-         endif
-         if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-            GOTO 99
-         endif
-      endif
-      if (kext .eq. 8) then
-c     Input for Ostapenko97
-         dst_nt=maginput(2)
-         Pdyn_nPa=maginput(5)
-         BzIMF_nt=maginput(7)
-         fkp=maginput(1)*1.d0/10.d0
-      endif
-      if (kext .eq. 9) then
-c     Input for Tsy01
-         dst_nt=maginput(2)
-         Pdyn_nPa=maginput(5)
-         ByIMF_nt=maginput(6)
-         BzIMF_nt=maginput(7)
-         G1_tsy01=maginput(8)
-         G2_tsy01=maginput(9)
-c     
-         if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-            GOTO 99
-         endif
-         if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-            GOTO 99
-         endif
-         if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-            GOTO 99
-         endif
-         if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-            GOTO 99
-         endif
-         if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-            GOTO 99
-         endif
-         if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-            GOTO 99
-         endif
-      endif
-      if (kext .eq. 10) then
-c     Input for Tsy01 storm
-         dst_nt=maginput(2)
-         Pdyn_nPa=maginput(5)
-         ByIMF_nt=maginput(6)
-         BzIMF_nt=maginput(7)
-         G2_tsy01=maginput(9)
-         G3_tsy01=maginput(10)
-      endif
-c     
-      if (kext .eq. 11) then
-c     Input for Tsy04 storm
-         dst_nt=maginput(2)
-         Pdyn_nPa=maginput(5)
-         ByIMF_nt=maginput(6)
-         BzIMF_nt=maginput(7)
-         W1_tsy04=maginput(11)
-         W2_tsy04=maginput(12)
-         W3_tsy04=maginput(13)
-         W4_tsy04=maginput(14)
-         W5_tsy04=maginput(15)
-         W6_tsy04=maginput(16)
-      endif
-c     
-      if (kext .eq. 12) then
-c     Input for Alexeev 2000
-         a2000_iyear=iyearsat
-         firstJanuary=JULDAY(a2000_iyear,01,01)
-         currentdoy=firstJanuary+idoy-1
-         CALL CALDAT(currentdoy,a2000_iyear,
-     &        a2000_imonth,a2000_iday)
-         a2000_ut=UT
-         density=maginput(3)
-         speed=maginput(4)
-         dst_nt=maginput(2)
-         BzIMF_nt=maginput(7)
-         Al=maginput(17)
-      endif
-c     
-      if (alpha.ne.90.0d0) then
-         CALL find_bm(
-     &        lati,longi,alti,alpha,BL,BMIR,xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,
-     &        longi,alti)
-      ELSE
-         Bmir=0.0
-      ENDIF
+      CALL find_bm_nalpha(xGEO,1,alpha,BL,BMIR,xGEOmir)
       IF (Bmir.NE.baddata) THEN
          Ilflag=0
-         call trace_drift_bounce_orbit(t_resol,r_resol,
-     &        lati,longi,alti,R0,Lm,Lstar,XJ,
+         call trace_drift_bounce_orbit_opt(t_resol,r_resol,
+     &        xGEOmir,R0,Lm,Lstar,XJ,
      &        BLOCAL,Bmin,Bmir,posit,ind,hmin,hmin_lon)
          if (Lstar.eq.baddata) then
             hmin = baddata
@@ -526,9 +198,40 @@ c
 
 c     --------------------------------------------------------------------
 c     
-      
+
       SUBROUTINE trace_drift_bounce_orbit(t_resol,r_resol,
      &     lati,longi,alti,R0,Lm,Lstar,leI0,Bposit,
+     &     Bmin,Bmir,posit,Nposit,hmin,hmin_lon)
+C     
+      IMPLICIT NONE
+      INCLUDE 'variables.inc'
+      
+C     Parameters
+      INTEGER*4  Nreb_def,Nder_def,Ntet_def
+      PARAMETER (Nreb_def = 50, Nder_def = 25, Ntet_def = 720)
+      
+C     Input Variables
+      INTEGER*4 t_resol,r_resol
+      REAL*8     lati,longi,alti,R0
+      REAL*8     xx0(3)
+C     Output Variables       
+      REAL*8     Lm,Lstar,leI0,Bmin,Bmir
+      REAL*8     posit(3,20*Nreb_def,Nder_def)
+      REAL*8     Bposit(20*Nreb_def,Nder_def)
+      REAL*8     hmin,hmin_lon
+      INTEGER*4  Nposit(Nder_def)
+
+      CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
+C     
+      call trace_drift_bounce_orbit_opt(t_resol,r_resol,
+     &     xx0,R0,Lm,Lstar,leI0,Bposit,
+     &     Bmin,Bmir,posit,Nposit,hmin,hmin_lon)
+
+      RETURN
+      END      
+
+      SUBROUTINE trace_drift_bounce_orbit_opt(t_resol,r_resol,
+     &     xx0,R0,Lm,Lstar,leI0,Bposit,
      &     Bmin,Bmir,posit,Nposit,hmin,hmin_lon)
 C     
       IMPLICIT NONE
@@ -562,10 +265,12 @@ C     Internal Variables
       REAL*8     tmp_lati,tmp_longi,tmp_alti
       
 C     
-      REAL*8     pi,rad,tt
+      REAL*8     tt
       REAL*8     tet(10*Nder_def),phi(10*Nder_def)
       REAL*8     tetl,tet1,dtet,lasttet
       REAL*8     somme,BrR2
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 
 c variables to deal with leI~0 case
       REAL*8     x1old(3)
@@ -591,8 +296,6 @@ C
       Nder=Nder_def*r_resol     ! longitude steps
       Nreb=Nreb_def             ! steps along field line
       Ntet=Ntet_def*t_resol     ! latitude steps
-      pi = 4.D0*ATAN(1.D0)
-      rad = pi/180.D0
       dtet = pi/Ntet            ! theta (latitude) step
 C     
       Nrebmax = 20*Nreb         ! maximum steps along field line
@@ -602,8 +305,6 @@ c     initialize hmin,hmin_lon to starting point
       hmin = alti
       hmin_lon = longi
 
-      CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
-C     
       CALL GEO_SM(xx0,xx)
       rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))
       tt = ACOS(xx(3)/rr)
@@ -994,7 +695,7 @@ c     Declare internal variables
       INTEGER*4 i,j,k,Ifail
       REAL*8 lati,longi,alti,Bl,Bmir
       REAL*8 xmir(3)
-      REAL*8 pi,rad,alpha
+      REAL*8 alpha
       REAL*8 dsreb0,dsreb,x1(3),x2(3),B1,B2,Bvec(3)
       INTEGER*4 store ! store or not?
 
@@ -1005,9 +706,6 @@ c     Declare internal variables
       else
          store = 1
       endif
-
-      pi = 4.D0*ATAN(1.D0)
-      rad = pi/180.D0
 
 c     trace up to mirror point, leave starting pointin Bmir, xmir
 
