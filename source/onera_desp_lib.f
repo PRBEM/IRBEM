@@ -16,9 +16,10 @@
 !    You should have received a copy of the GNU Lesser General Public License
 !    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 !
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrappers and procedures for ONERA_DESP_LIB
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
+
 
 c function returns version of fortran source code
 
@@ -93,487 +94,78 @@ c
         SUBROUTINE make_lstar1(ntime,kext,options,sysaxes,iyearsat,
      &  idoy,UT,xIN1,xIN2,xIN3,maginput,Lm,Lstar,BLOCAL,BMIN,XJ,MLT)
 c
-      IMPLICIT NONE
-      INCLUDE 'variables.inc'
-      INCLUDE 'ntime_max.inc'
+	IMPLICIT NONE
+	INCLUDE 'variables.inc'
+        INCLUDE 'ntime_max.inc'
 C
 c declare inputs
-      INTEGER*4    kext,k_ext,k_l,options(5)
-      INTEGER*4    ntime,sysaxes
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
-      real*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
-      real*8     maginput(25,ntime_max)
-c                      1: Kp
-c                      2: Dst
-c                      3: dens
-c                      4: velo
-c                      5: Pdyn
-c                      6: ByIMF
-c                      7: BzIMF
-c                      8: G1
-c                      9: G2
-c                     10: G3
+        INTEGER*4    kext,k_ext,k_l,options(5)
+        INTEGER*4    ntime,sysaxes
+	INTEGER*4    iyearsat(ntime_max)
+	integer*4    idoy(ntime_max)
+	real*8     UT(ntime_max)
+	real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+	real*8     maginput(25,ntime_max)
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear,kint
-        INTEGER*4    Ndays,activ,t_resol,r_resol,Ilflag,Ilflag_old
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-        REAL*8     yearsat,dec_year,a2000_ut
-	REAL*8     psi,mlon,tilt
-	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
-	REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
+	INTEGER*4    isat,iyear,kint,ifail
+        INTEGER*4    t_resol,r_resol,Ilflag,Ilflag_old
+	REAL*8     mlon,mlon1
+	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT
 	real*8     alti,lati,longi
-        REAL*8     ERA,AQUAD,BQUAD
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables
+c Declare output variables	
         REAL*8     BLOCAL(ntime_max),BMIN(ntime_max),XJ(ntime_max)
 	REAL*8     MLT(ntime_max)
         REAL*8     Lm(ntime_max),Lstar(ntime_max)
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
-        COMMON /dip_ang/tilt
 	COMMON /magmod/k_ext,k_l,kint
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	COMMON /index/activ
         COMMON /flag_L/Ilflag
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
         DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
 C
 	Ilflag=0
 	Ilflag_old=Ilflag
-        iyear=1800
-	k_ext=kext
 	if (options(3).lt.0 .or. options(3).gt.9) options(3)=0
 	t_resol=options(3)+1
 	r_resol=options(4)+1
 	k_l=options(1)
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-c
+
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
+	
         DO isat = 1,ntime
-c	   write(6,*)real(isat)*100./real(ntime), '% done'
+	    call init_fields ( kint, iyearsat(isat), idoy(isat), 
+     6          ut(isat), options(2) )
+	
+	    call get_coordinates ( sysaxes, 
+     6        xIN1(isat), xIN2(isat), xIN3(isat), 
+     6        alti, lati, longi, xGEO )
+	    
+	    call set_magfield_inputs ( kext, maginput(1,isat), ifail )
+	
+	    if ( ifail.lt.0 ) then
+	          Lm(isat)=baddata
+		  Lstar(isat)=baddata
+		  XJ(isat)=baddata
+		  BLOCAL(isat)=baddata
+		  BMIN(isat)=baddata
+		  GOTO 99
+	       endif
 c
-           if (kint .le. 1) then
-              if (options(2) .eq. 0) then
-	        if (iyearsat(isat) .ne. iyear) then
-	           iyear=iyearsat(isat)
-	           dec_year=iyear+0.5d0
-	           CALL INIT_DTD(dec_year)
-	        endif
-	      else
-	        if (iyearsat(isat) .ne. iyear .or.
-     &          MOD(idoy(isat)*1.d0,options(2)*1.d0) .eq. 0) THEN
-	           iyear=iyearsat(isat)
-		   firstJanuary=JULDAY(iyear,01,01)
-		   lastDecember=JULDAY(iyear,12,31)
-		   currentdoy=(idoy(isat)/options(2))*options(2)
-		   if (currentdoy .eq. 0) currentdoy=1
-	           dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	           CALL INIT_DTD(dec_year)
-                endif
-	      endif
-	   endif
-c
-           CALL INIT_GSM(iyearsat(isat),idoy(isat),UT(isat),psi)
-           tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        ! check if location is at the center of the Earth!
-        if (xIN1(isat) .eq. 0.D0 .AND. xIN2(isat) .eq. 0.D0 .AND.
-     &      xIN3(isat) .eq. 0.D0) then
-          Lm(isat)=baddata
-          Lstar(isat)=baddata
-          XJ(isat)=baddata
-          BLOCAL(isat)=baddata
-          BMIN(isat)=baddata
-          MLT(isat)=baddata
-          GOTO 109
-        endif
-	   if (sysaxes .EQ. 0) then
-	       alti=xIN1(isat)
-	       lati=xIN2(isat)
-	       longi=xIN3(isat)
-	   endif
-	   if (sysaxes .EQ. 1) then
-	       xGEO(1)=xIN1(isat)
-	       xGEO(2)=xIN2(isat)
-	       xGEO(3)=xIN3(isat)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 2) then
-	       xGSM(1)=xIN1(isat)
-	       xGSM(2)=xIN2(isat)
-	       xGSM(3)=xIN3(isat)
-	       CALL GSM_GEO(xGSM,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 3) then
-	       xGSE(1)=xIN1(isat)
-	       xGSE(2)=xIN2(isat)
-	       xGSE(3)=xIN3(isat)
-	       CALL GSE_GEO(xGSE,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 4) then
-	       xSM(1)=xIN1(isat)
-	       xSM(2)=xIN2(isat)
-	       xSM(3)=xIN3(isat)
-	       CALL SM_GEO(xSM,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 5) then
-	       xGEI(1)=xIN1(isat)
-	       xGEI(2)=xIN2(isat)
-	       xGEI(3)=xIN3(isat)
-	       CALL GEI_GEO(xGEI,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 6) then
-	       xMAG(1)=xIN1(isat)
-	       xMAG(2)=xIN2(isat)
-	       xMAG(3)=xIN3(isat)
-	       CALL MAG_GEO(xMAG,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 7) then
-	       xMAG(1)=xIN1(isat)
-	       xMAG(2)=xIN2(isat)
-	       xMAG(3)=xIN3(isat)
-	       CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 8) then
-	       xMAG(1)=xIN1(isat)
-	       lati=xIN2(isat)
-	       longi=xIN3(isat)
-	       CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	   endif
-c
-c make inputs according to magn. field model chosen
-c
-           if (kext .eq. 1) then
-c Input for MEAD
-	       if (maginput(1,isat).le.3.d0) Activ=1
-	       if (maginput(1,isat).gt.3.d0 .and.
-     &         maginput(1,isat).lt.20.d0) Activ=2
-	       if (maginput(1,isat).ge.20.d0 .and.
-     &         maginput(1,isat).lt.30.d0) Activ=3
-	       if (maginput(1,isat).ge.30.d0) Activ=4
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 2) then
-c Input for TSYG87s
-	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and.
-     &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and.
-     &         maginput(1,isat).lt.20.d0) Activ=3
-	       if (maginput(1,isat).ge.20.d0 .and.
-     &         maginput(1,isat).lt.27.d0) Activ=4
-	       if (maginput(1,isat).ge.27.d0 .and.
-     &         maginput(1,isat).lt.37.d0) Activ=5
-	       if (maginput(1,isat).ge.37.d0 .and.
-     &         maginput(1,isat).lt.47.d0) Activ=6
-	       if (maginput(1,isat).ge.47.d0) Activ=7
-	       if (maginput(1,isat).ge.53.d0) Activ=8
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 3) then
-c Input for TSYG87l
-	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and.
-     &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and.
-     &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and.
-     &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and.
-     &         maginput(1,isat).lt.47.d0) Activ=5
-	       if (maginput(1,isat).ge.47.d0) Activ=6
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-           endif
-           if (kext .eq. 4) then
-c Input for Tsy89
-	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and.
-     &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and.
-     &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and.
-     &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and.
-     &         maginput(1,isat).lt.47.d0) Activ=5
-	       if (maginput(1,isat).ge.47.d0 .and.
-     &         maginput(1,isat).lt.57.d0) Activ=6
-	       if (maginput(1,isat).ge.57.d0) Activ=7
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 6) then
-c Input for OP dyn
-               density=maginput(3,isat)
-	       speed=maginput(4,isat)
-	       dst_nt=maginput(2,isat)
-c
-	       if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (density.lt.5.d0 .or. density.gt.50.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 7) then
-c Input for Tsy96
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-c
-	       if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 8) then
-c Input for Ostapenko97
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       fkp=maginput(1,isat)*1.d0/10.d0
-	   endif
-           if (kext .eq. 9) then
-c Input for Tsy01
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       G1_tsy01=maginput(8,isat)
-	       G2_tsy01=maginput(9,isat)
-c
-	       if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	          Lm(isat)=baddata
-		  Lstar(isat)=baddata
-		  XJ(isat)=baddata
-		  BLOCAL(isat)=baddata
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 10) then
-c Input for Tsy01 storm
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       G2_tsy01=maginput(9,isat)
-	       G3_tsy01=maginput(10,isat)
-	   endif
-c
-           if (kext .eq. 11) then
-c Input for Tsy04 storm
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       W1_tsy04=maginput(11,isat)
-	       W2_tsy04=maginput(12,isat)
-	       W3_tsy04=maginput(13,isat)
-	       W4_tsy04=maginput(14,isat)
-	       W5_tsy04=maginput(15,isat)
-	       W6_tsy04=maginput(16,isat)
-	   endif
-c
-           if (kext .eq. 12) then
-c Input for Alexeev 2000
-               a2000_iyear=iyearsat(isat)
-	       firstJanuary=JULDAY(a2000_iyear,01,01)
-	       currentdoy=firstJanuary+idoy(isat)-1
-	       CALL CALDAT(currentdoy,a2000_iyear,
-     &         a2000_imonth,a2000_iday)
-	       a2000_ut=UT(isat)
-               density=maginput(3,isat)
-	       speed=maginput(4,isat)
-	       dst_nt=maginput(2,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       Al=maginput(17,isat)
-	   endif
-c
-           CALL calcul_Lstar(t_resol,r_resol,lati,longi,alti
+           CALL calcul_Lstar_opt(t_resol,r_resol,XGeo
      &     ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
            if (Ilflag_old .eq.1 .and. Lstar(isat).eq. Baddata) then
 	      Ilflag=0
-              CALL calcul_Lstar(t_resol,r_resol,lati,longi,alti
+              CALL calcul_Lstar_opt(t_resol,r_resol,xGeo
      &        ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
 	   endif
 	   Ilflag_old=Ilflag
+
 99         continue
+
            CALL GDZ_GEO(lati,longi,alti
      &     ,xGEO(1),xGEO(2),xGEO(3))
            CALL geo_mag(xGEO,xMAG)
@@ -584,12 +176,13 @@ c
            MLT(isat) = (Mlon1 - Mlon)/15.d0 + 12.d0
            IF (MLT(isat).GE.24.d0) MLT(isat) = MLT(isat) - 24.d0
            IF (MLT(isat).LT.0.d0) MLT(isat) = MLT(isat) + 24.d0
-109     continue
+
 	ENDDO
+
 	END
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION make_lstar_shell_splitting(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -633,524 +226,70 @@ c declare inputs
 	real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
 	real*8     alpha(Nalp)
 	real*8     maginput(25,ntime_max)
-c                      1: Kp
-c                      2: Dst
-c                      3: dens
-c                      4: velo
-c                      5: Pdyn
-c                      6: ByIMF
-c                      7: BzIMF
-c                      8: G1
-c                      9: G2
-c                     10: G3
 c
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear,IPA,kint
-        INTEGER*4    Ndays,activ,Ilflag,t_resol,r_resol
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-        REAL*8     yearsat,dec_year,a2000_ut
-	REAL*8     psi,mlon,tilt,BL,BMIR,Bmin_tmp
-	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
-	REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
-	real*8     alti,lati,longi,alti_IPA,lati_IPA,longi_IPA
-        REAL*8     ERA,AQUAD,BQUAD
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
+	INTEGER*4    isat,iyear,IPA,kint,ifail
+        INTEGER*4    Ilflag,t_resol,r_resol
+	REAL*8     mlon,mlon1,BL,BMIR(25),Bmin_tmp
+	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT
+	REAL*8     xGEOp(3,25)
+	real*8     alti,lati,longi
 c
-c Declare output variables
+c Declare output variables	
         REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime_max)
 	REAL*8     XJ(ntime_max,Nalp),MLT(ntime_max)
         REAL*8     Lm(ntime_max,Nalp),Lstar(ntime_max,Nalp)
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
-        COMMON /dip_ang/tilt
 	COMMON /magmod/k_ext,k_l,kint
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	COMMON /index/activ
         COMMON /flag_L/Ilflag
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
         DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
 C
 	Ilflag=0
-        iyear=1800
 	k_ext=kext
 	if (options(3).lt.0 .or. options(3).gt.9) options(3)=0
 	t_resol=options(3)+1
 	r_resol=options(4)+1
 	k_l=options(1)
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
+
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
-        DO isat = 1,ntime
-c	   write(6,*)real(isat)*100./real(ntime), '% done'
-c
-           if (kint .le. 1) then
-              if (options(2) .eq. 0) then
-	        if (iyearsat(isat) .ne. iyear) then
-	           iyear=iyearsat(isat)
-	           dec_year=iyear+0.5d0
-	           CALL INIT_DTD(dec_year)
-	        endif
-	      else
-	        if (iyearsat(isat) .ne. iyear .or.
-     &          MOD(idoy(isat)*1.d0,options(2)*1.d0) .eq. 0) THEN
-	           iyear=iyearsat(isat)
-		   firstJanuary=JULDAY(iyear,01,01)
-		   lastDecember=JULDAY(iyear,12,31)
-		   currentdoy=(idoy(isat)/options(2))*options(2)
-		   if (currentdoy .eq. 0) currentdoy=1
-	           dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	           CALL INIT_DTD(dec_year)
-                endif
-	      endif
-	   endif
-c
-           CALL INIT_GSM(iyearsat(isat),idoy(isat),UT(isat),psi)
-           tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        ! check if location is at the center of the Earth!
-        if (xIN1(isat) .eq. 0.D0 .AND. xIN2(isat) .eq. 0.D0 .AND.
-     &      xIN3(isat) .eq. 0.D0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-          GOTO 109
-        endif
-	   if (sysaxes .EQ. 0) then
-	       alti=xIN1(isat)
-	       lati=xIN2(isat)
-	       longi=xIN3(isat)
-	   endif
-	   if (sysaxes .EQ. 1) then
-	       xGEO(1)=xIN1(isat)
-	       xGEO(2)=xIN2(isat)
-	       xGEO(3)=xIN3(isat)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 2) then
-	       xGSM(1)=xIN1(isat)
-	       xGSM(2)=xIN2(isat)
-	       xGSM(3)=xIN3(isat)
-	       CALL GSM_GEO(xGSM,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 3) then
-	       xGSE(1)=xIN1(isat)
-	       xGSE(2)=xIN2(isat)
-	       xGSE(3)=xIN3(isat)
-	       CALL GSE_GEO(xGSE,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 4) then
-	       xSM(1)=xIN1(isat)
-	       xSM(2)=xIN2(isat)
-	       xSM(3)=xIN3(isat)
-	       CALL SM_GEO(xSM,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 5) then
-	       xGEI(1)=xIN1(isat)
-	       xGEI(2)=xIN2(isat)
-	       xGEI(3)=xIN3(isat)
-	       CALL GEI_GEO(xGEI,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 6) then
-	       xMAG(1)=xIN1(isat)
-	       xMAG(2)=xIN2(isat)
-	       xMAG(3)=xIN3(isat)
-	       CALL MAG_GEO(xMAG,xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 7) then
-	       xMAG(1)=xIN1(isat)
-	       xMAG(2)=xIN2(isat)
-	       xMAG(3)=xIN3(isat)
-	       CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	   endif
-	   if (sysaxes .EQ. 8) then
-	       xMAG(1)=xIN1(isat)
-	       lati=xIN2(isat)
-	       longi=xIN3(isat)
-	       CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	   endif
-c
-c make inputs according to magn. field model chosen
-c
-           if (kext .eq. 1) then
-c Input for MEAD
-	       if (maginput(1,isat).le.3.d0) Activ=1
-	       if (maginput(1,isat).gt.3.d0 .and.
-     &         maginput(1,isat).lt.20.d0) Activ=2
-	       if (maginput(1,isat).ge.20.d0 .and.
-     &         maginput(1,isat).lt.30.d0) Activ=3
-	       if (maginput(1,isat).ge.30.d0) Activ=4
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 2) then
-c Input for TSYG87s
-	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and.
-     &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and.
-     &         maginput(1,isat).lt.20.d0) Activ=3
-	       if (maginput(1,isat).ge.20.d0 .and.
-     &         maginput(1,isat).lt.27.d0) Activ=4
-	       if (maginput(1,isat).ge.27.d0 .and.
-     &         maginput(1,isat).lt.37.d0) Activ=5
-	       if (maginput(1,isat).ge.37.d0 .and.
-     &         maginput(1,isat).lt.47.d0) Activ=6
-	       if (maginput(1,isat).ge.47.d0) Activ=7
-	       if (maginput(1,isat).ge.53.d0) Activ=8
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 3) then
-c Input for TSYG87l
-	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and.
-     &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and.
-     &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and.
-     &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and.
-     &         maginput(1,isat).lt.47.d0) Activ=5
-	       if (maginput(1,isat).ge.47.d0) Activ=6
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-           endif
-           if (kext .eq. 4) then
-c Input for Tsy89
-	       if (maginput(1,isat).lt.7.d0) Activ=1
-	       if (maginput(1,isat).ge.7.d0 .and.
-     &         maginput(1,isat).lt.17.d0) Activ=2
-	       if (maginput(1,isat).ge.17.d0 .and.
-     &         maginput(1,isat).lt.27.d0) Activ=3
-	       if (maginput(1,isat).ge.27.d0 .and.
-     &         maginput(1,isat).lt.37.d0) Activ=4
-	       if (maginput(1,isat).ge.37.d0 .and.
-     &         maginput(1,isat).lt.47.d0) Activ=5
-	       if (maginput(1,isat).ge.47.d0 .and.
-     &         maginput(1,isat).lt.57.d0) Activ=6
-	       if (maginput(1,isat).ge.57.d0) Activ=7
-c
-	       if (maginput(1,isat).lt.0.d0 .or.
-     &         maginput(1,isat).gt.90.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	    endif
-           if (kext .eq. 6) then
-c Input for OP dyn
-               density=maginput(3,isat)
-	       speed=maginput(4,isat)
-	       dst_nt=maginput(2,isat)
-c
-	       if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (density.lt.5.d0 .or. density.gt.50.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 7) then
-c Input for Tsy96
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-c
-	       if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 8) then
-c Input for Ostapenko97
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       fkp=maginput(1,isat)*1.d0/10.d0
-	   endif
-           if (kext .eq. 9) then
-c Input for Tsy01
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       G1_tsy01=maginput(8,isat)
-	       G2_tsy01=maginput(9,isat)
-c
-	       if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	       if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	          DO IPA=1,Nipa
-		     Lm(isat,IPA)=baddata
-		     Lstar(isat,IPA)=baddata
-		     XJ(isat,IPA)=baddata
-		     BLOCAL(isat,IPA)=baddata
-		  ENDDO
-		  BMIN(isat)=baddata
-		  GOTO 99
-	       endif
-	   endif
-           if (kext .eq. 10) then
-c Input for Tsy01 storm
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       G2_tsy01=maginput(9,isat)
-	       G3_tsy01=maginput(10,isat)
-	   endif
-c
-           if (kext .eq. 11) then
-c Input for Tsy04 storm
-	       dst_nt=maginput(2,isat)
-	       Pdyn_nPa=maginput(5,isat)
-	       ByIMF_nt=maginput(6,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       W1_tsy04=maginput(11,isat)
-	       W2_tsy04=maginput(12,isat)
-	       W3_tsy04=maginput(13,isat)
-	       W4_tsy04=maginput(14,isat)
-	       W5_tsy04=maginput(15,isat)
-	       W6_tsy04=maginput(16,isat)
-	   endif
-c
-           if (kext .eq. 12) then
-c Input for Alexeev 2000
-               a2000_iyear=iyearsat(isat)
-	       firstJanuary=JULDAY(a2000_iyear,01,01)
-	       currentdoy=firstJanuary+idoy(isat)-1
-	       CALL CALDAT(currentdoy,a2000_iyear,
-     &         a2000_imonth,a2000_iday)
-	       a2000_ut=UT(isat)
-               density=maginput(3,isat)
-	       speed=maginput(4,isat)
-	       dst_nt=maginput(2,isat)
-	       BzIMF_nt=maginput(7,isat)
-	       Al=maginput(17,isat)
-	   endif
+	
+       DO isat = 1,ntime
+	  call init_fields ( kint, iyearsat(isat), idoy(isat), 
+     6      ut(isat), options(2) )
+	
+	  call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6      alti, lati, longi, xGEO )
+	    
+	  call set_magfield_inputs ( kext, maginput(1,isat), ifail )
+	
+	  if ( ifail.lt.0 ) then
+	    DO IPA=1,Nipa
+                Lm(isat,IPA)=baddata
+                Lstar(isat,IPA)=baddata
+                XJ(isat,IPA)=baddata
+                BLOCAL(isat,IPA)=baddata
+            ENDDO
+            BMIN(isat)=baddata
+            GOTO 99
+          endif
 c
 c Compute Bmin assuming 90° PA at S/C
 	   k_l=0
            IPA=1
-           CALL calcul_Lstar(t_resol,r_resol,lati
-     &         ,longi,alti
+           CALL calcul_Lstar_opt(t_resol,r_resol,xGEO
      &         ,Lm(isat,IPA),Lstar(isat,IPA),XJ(isat,IPA)
      &         ,BLOCAL(isat,IPA),BMIN(isat))
 	   k_l=options(1)
+           CALL find_bm_nalpha(xGEO,nipa,alpha,BL,BMIR,xGEOp)
            DO IPA=1,Nipa
-             if (alpha(IPA).ne.90.0d0) then
-                CALL find_bm(
-     &           lati,longi,alti,alpha(IPA),BL,BMIR,xGEO)
-	        CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati_IPA,
-     &            longi_IPA,alti_IPA)
-             ELSE
-	         Bmir=0.d0
-	         lati_IPA=lati
-		 longi_IPA=longi
-		 alti_IPA=alti
-	     ENDIF
-	     IF (Bmir.NE.baddata) THEN
+	     IF (Bmir(ipa).NE.baddata) THEN
 	       Ilflag=0
-               CALL calcul_Lstar(t_resol,r_resol,lati_IPA
-     &         ,longi_IPA,alti_IPA
+               CALL calcul_Lstar_opt(t_resol,r_resol,xGEOp(1,ipa)
      &         ,Lm(isat,IPA),Lstar(isat,IPA),XJ(isat,IPA)
      &         ,BLOCAL(isat,IPA),BMIN_tmp)
              ELSE
@@ -1160,9 +299,9 @@ c Compute Bmin assuming 90° PA at S/C
 	       BLOCAL(isat,IPA)=baddata
 	     ENDIF
            ENDDO
+
 99         continue
-           CALL GDZ_GEO(lati,longi,alti
-     &     ,xGEO(1),xGEO(2),xGEO(3))
+
            CALL geo_mag(xGEO,xMAG)
            CALL car_sph(xMAG,rM,MLAT,Mlon1)
            CALL GSM_GEO(xSUN,xGEO)
@@ -1171,11 +310,13 @@ c Compute Bmin assuming 90° PA at S/C
            MLT(isat) = (Mlon1 - Mlon)/15.d0 + 12.d0
            IF (MLT(isat).GE.24.d0) MLT(isat) = MLT(isat) - 24.d0
            IF (MLT(isat).LT.0.d0) MLT(isat) = MLT(isat) + 24.d0
-109     continue
+
 	ENDDO
+
 	END
 c
-C-----------------------------------------------------------------------------
+c
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION Lstar_Phi(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -1206,83 +347,39 @@ c
 C
 c declare inputs
         INTEGER*4    whichinv,options(5)
-        INTEGER*4    ntime,sysaxes
+        INTEGER*4    ntime
 	INTEGER*4    iyearsat(ntime_max)
 	integer*4    idoy(ntime_max)
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear,kint
-        INTEGER*4    Ndays
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-        REAL*8     yearsat,dec_year
-	REAL*8     psi,mlon,tilt
-        REAL*8     ERA,AQUAD,BQUAD
+	INTEGER*4    isat,kint
         REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
 c
-c Declare output variables
-        REAL*8     Phi(ntime_max),Lstar(ntime_max),pi
+c Declare output variables	
+        REAL*8     Phi(ntime_max),Lstar(ntime_max)
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
         COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
+        REAL*8     pi,rad
+        common /rconst/rad,pi
+      integer*4 int_field_select, ext_field_select
 C
-      pi=4.D0*atan(1.D0)
-        iyear=1800
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
+	kint = int_field_select ( options(5) )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
+	
         DO isat = 1,ntime
-c	   write(6,*)real(isat)*100./real(ntime), '% done'
-c
-           if (kint .le. 1) then
-              if (options(2) .eq. 0) then
-	        if (iyearsat(isat) .ne. iyear) then
-	           iyear=iyearsat(isat)
-	           dec_year=iyear+0.5d0
-	           CALL INIT_DTD(dec_year)
-	        endif
-	      else
-	        if (iyearsat(isat) .ne. iyear .or.
-     &          MOD(idoy(isat)*1.d0,options(2)*1.d0) .eq. 0) THEN
-	           iyear=iyearsat(isat)
-		   firstJanuary=JULDAY(iyear,01,01)
-		   lastDecember=JULDAY(iyear,12,31)
-		   currentdoy=(idoy(isat)/options(2))*options(2)
-		   if (currentdoy .eq. 0) currentdoy=1
-	           dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	           CALL INIT_DTD(dec_year)
-                endif
-	      endif
-	   endif
+          call init_fields ( kint, iyearsat(isat),idoy(isat),-1.D0,
+     6      options(2) )
+	
 	   if (whichinv .EQ. 1) then !Lstar to Phi
 	      if (Lstar(isat) .NE. baddata) then
-	         Phi(isat)=2.d0*pi*Bo/Lstar(isat)
+	         Phi(isat)=2.D0*pi*Bo/Lstar(isat)
 	      else
 	         Phi(isat)=baddata
 	      endif
 	   else
 	      if (phi(isat) .NE. baddata) then
-	         Lstar(isat)=2.d0*pi*Bo/Phi(isat)
+	         Lstar(isat)=2.D0*pi*Bo/Phi(isat)
 	      else
 	         Lstar(isat)=baddata
 	      endif
@@ -1290,7 +387,7 @@ c
 	enddo
 	end
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION drift_shell(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -1332,432 +429,47 @@ c declare inputs
 	real*8     maginput(25)
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear,kint
-        INTEGER*4    Ndays,activ
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-        REAL*8     yearsat,dec_year,a2000_ut
-	REAL*8     psi,mlon,tilt
-	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
-	REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
+	INTEGER*4    isat,iyear,kint,ifail
+	REAL*8     xGEO(3)
 	real*8     alti,lati,longi
-        REAL*8     ERA,AQUAD,BQUAD
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables
+c Declare output variables	
         INTEGER*4  ind(48)
         REAL*8     BLOCAL(1000,48),BMIN,XJ
         REAL*8     Lm,Lstar
 	REAL*8     posit(3,1000,48)
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
-        COMMON /dip_ang/tilt
 	COMMON /magmod/k_ext,k_l,kint
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	COMMON /index/activ
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
-        DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
 C
-        iyear=1800
-	k_ext=kext
 	k_l=options(1)
-	kint=options(5)
 c
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
-        if (kint .le. 1) then
-           if (options(2) .eq. 0) then
-	      if (iyearsat .ne. iyear) then
-	         iyear=iyearsat
-	         dec_year=iyear+0.5d0
-	         CALL INIT_DTD(dec_year)
-	      endif
-	   else
-	      if (iyearsat .ne. iyear .or.
-     &        MOD(idoy*1.d0,options(2)*1.d0) .eq. 0) THEN
-	         iyear=iyearsat
-                 firstJanuary=JULDAY(iyear,01,01)
-                 lastDecember=JULDAY(iyear,12,31)
-                 currentdoy=(idoy/options(2))*options(2)
-	         if (currentdoy .eq. 0) currentdoy=1
-	         dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	         CALL INIT_DTD(dec_year)
-              endif
-	   endif
-	endif
-c
-        CALL INIT_GSM(iyearsat,idoy,UT,psi)
-        tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
-     &      xIN3 .eq. 0.D0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-        endif
-	if (sysaxes .EQ. 0) then
-	    alti=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	endif
-	if (sysaxes .EQ. 1) then
-	    xGEO(1)=xIN1
-	    xGEO(2)=xIN2
-	    xGEO(3)=xIN3
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-        endif
-	if (sysaxes .EQ. 2) then
-	    xGSM(1)=xIN1
-	    xGSM(2)=xIN2
-	    xGSM(3)=xIN3
-	    CALL GSM_GEO(xGSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 3) then
-	    xGSE(1)=xIN1
-	    xGSE(2)=xIN2
-	    xGSE(3)=xIN3
-	    CALL GSE_GEO(xGSE,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 4) then
-	    xSM(1)=xIN1
-	    xSM(2)=xIN2
-	    xSM(3)=xIN3
-	    CALL SM_GEO(xSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 5) then
-	    xGEI(1)=xIN1
-	    xGEI(2)=xIN2
-	    xGEI(3)=xIN3
-	    CALL GEI_GEO(xGEI,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 6) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL MAG_GEO(xMAG,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 7) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 8) then
-	    xMAG(1)=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	endif
-c
-c make inputs according to magn. field model chosen
-c
-        if (kext .eq. 1) then
-c Input for MEAD
-	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.30.d0) Activ=3
-	    if (maginput(1).ge.30.d0) Activ=4
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) then
 	       Lm=baddata
 	       Lstar=baddata
 	       XJ=baddata
 	       BMIN=baddata
 	       RETURN
 	    endif
-	endif
-        if (kext .eq. 2) then
-c Input for TSYG87s
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=6
-	    if (maginput(1).ge.47.d0) Activ=7
-	    if (maginput(1).ge.53.d0) Activ=8
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 3) then
-c Input for TSYG87l
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0) Activ=6
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-        endif
-        if (kext .eq. 4) then
-c Input for Tsy89
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and.
-     &      maginput(1).lt.57.d0) Activ=6
-	    if (maginput(1).ge.57.d0) Activ=7
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 6) then
-c Input for OP dyn
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (density.lt.5.d0 .or. density.gt.50.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 7) then
-c Input for Tsy96
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 8) then
-c Input for Ostapenko97
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    BzIMF_nt=maginput(7)
-	    fkp=maginput(1)*1.d0/10.d0
-	endif
-        if (kext .eq. 9) then
-c Input for Tsy01
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G1_tsy01=maginput(8)
-	    G2_tsy01=maginput(9)
-c
-	    if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	       Lm=baddata
-	       Lstar=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 10) then
-c Input for Tsy01 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G2_tsy01=maginput(9)
-	    G3_tsy01=maginput(10)
-	endif
-c
-        if (kext .eq. 11) then
-c Input for Tsy04 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    W1_tsy04=maginput(11)
-	    W2_tsy04=maginput(12)
-	    W3_tsy04=maginput(13)
-	    W4_tsy04=maginput(14)
-	    W5_tsy04=maginput(15)
-	    W6_tsy04=maginput(16)
-	endif
-c
-        if (kext .eq. 12) then
-c Input for Alexeev 2000
-            a2000_iyear=iyearsat
-	    firstJanuary=JULDAY(a2000_iyear,01,01)
-	    currentdoy=firstJanuary+idoy-1
-	    CALL CALDAT(currentdoy,a2000_iyear,
-     &      a2000_imonth,a2000_iday)
-	    a2000_ut=UT
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-	    BzIMF_nt=maginput(7)
-	    Al=maginput(17)
-	endif
-c
-        CALL trace_drift_shell(lati,longi,alti
+c	   	   
+        CALL trace_drift_shell_opt(xGeo
      &     ,Lm,Lstar,XJ,BLOCAL,BMIN,
      &     posit,ind)
 	END
 
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION trace_field_line(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -1770,7 +482,7 @@ c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine make_Lstar: 17 arguments
-      call trace_field_line1(%VAL(argv(1)), %VAL(argv(2)),
+      call trace_field_line1(%VAL(argv(1)), %VAL(argv(2)), 
      +%VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -1843,35 +555,19 @@ c declare inputs
         real*8     R0
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear
-        INTEGER*4    Ndays,activ,i,j
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-        REAL*8     yearsat,dec_year,a2000_ut
-	REAL*8     psi,mlon,tilt
-	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
-	REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
+	INTEGER*4    isat,iyear,ifail
+        INTEGER*4    i,j
+	REAL*8     xGEO(3)
 	real*8     alti,lati,longi
-        REAL*8     ERA,AQUAD,BQUAD
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables
+c Declare output variables	
         INTEGER*4  ind
         REAL*8     BLOCAL(1000),BMIN,XJ
         REAL*8     Lm
 	REAL*8     posit(3,1000)
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
-        COMMON /dip_ang/tilt
 	COMMON /magmod/k_ext,k_l,kint
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	COMMON /index/activ
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
-        DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
 C
         do i=1,3
 	   do j=1,1000
@@ -1879,399 +575,29 @@ C
 	   enddo
 	enddo
 c
-        iyear=1800
-	k_ext=kext
-	k_l=options(1)
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
-        if (kint .le. 1) then
-           if (options(2) .eq. 0) then
-	      if (iyearsat .ne. iyear) then
-	         iyear=iyearsat
-	         dec_year=iyear+0.5d0
-	         CALL INIT_DTD(dec_year)
-	      endif
-	   else
-	      if (iyearsat .ne. iyear .or.
-     &        MOD(idoy*1.d0,options(2)*1.d0) .eq. 0) THEN
-	         iyear=iyearsat
-                 firstJanuary=JULDAY(iyear,01,01)
-                 lastDecember=JULDAY(iyear,12,31)
-                 currentdoy=(idoy/options(2))*options(2)
-	         if (currentdoy .eq. 0) currentdoy=1
-	         dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	         CALL INIT_DTD(dec_year)
-              endif
-	   endif
-	endif
-c
-        CALL INIT_GSM(iyearsat,idoy,UT,psi)
-        tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
-     &      xIN3 .eq. 0.D0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-        endif
-	if (sysaxes .EQ. 0) then
-	    alti=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	endif
-	if (sysaxes .EQ. 1) then
-	    xGEO(1)=xIN1
-	    xGEO(2)=xIN2
-	    xGEO(3)=xIN3
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-        endif
-	if (sysaxes .EQ. 2) then
-	    xGSM(1)=xIN1
-	    xGSM(2)=xIN2
-	    xGSM(3)=xIN3
-	    CALL GSM_GEO(xGSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 3) then
-	    xGSE(1)=xIN1
-	    xGSE(2)=xIN2
-	    xGSE(3)=xIN3
-	    CALL GSE_GEO(xGSE,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 4) then
-	    xSM(1)=xIN1
-	    xSM(2)=xIN2
-	    xSM(3)=xIN3
-	    CALL SM_GEO(xSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 5) then
-	    xGEI(1)=xIN1
-	    xGEI(2)=xIN2
-	    xGEI(3)=xIN3
-	    CALL GEI_GEO(xGEI,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 6) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL MAG_GEO(xMAG,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 7) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 8) then
-	    xMAG(1)=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	endif
-c
-c make inputs according to magn. field model chosen
-c
-        if (kext .eq. 1) then
-c Input for MEAD
-	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.30.d0) Activ=3
-	    if (maginput(1).ge.30.d0) Activ=4
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Lm=baddata
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) then
+ 	       Lm=baddata
 	       XJ=baddata
 	       BMIN=baddata
 	       ind=0
 	       RETURN
 	    endif
-	endif
-        if (kext .eq. 2) then
-c Input for TSYG87s
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=6
-	    if (maginput(1).ge.47.d0) Activ=7
-	    if (maginput(1).ge.53.d0) Activ=8
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 3) then
-c Input for TSYG87l
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0) Activ=6
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-        endif
-        if (kext .eq. 4) then
-c Input for Tsy89
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and.
-     &      maginput(1).lt.57.d0) Activ=6
-	    if (maginput(1).ge.57.d0) Activ=7
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 6) then
-c Input for OP dyn
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (density.lt.5.d0 .or. density.gt.50.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 7) then
-c Input for Tsy96
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 8) then
-c Input for Ostapenko97
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    BzIMF_nt=maginput(7)
-	    fkp=maginput(1)*1.d0/10.d0
-	endif
-        if (kext .eq. 9) then
-c Input for Tsy01
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G1_tsy01=maginput(8)
-	    G2_tsy01=maginput(9)
-c
-	    if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	    if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	       Lm=baddata
-	       XJ=baddata
-	       BMIN=baddata
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 10) then
-c Input for Tsy01 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G2_tsy01=maginput(9)
-	    G3_tsy01=maginput(10)
-	endif
-c
-        if (kext .eq. 11) then
-c Input for Tsy04 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    W1_tsy04=maginput(11)
-	    W2_tsy04=maginput(12)
-	    W3_tsy04=maginput(13)
-	    W4_tsy04=maginput(14)
-	    W5_tsy04=maginput(15)
-	    W6_tsy04=maginput(16)
-	endif
-c
-        if (kext .eq. 12) then
-c Input for Alexeev 2000
-            a2000_iyear=iyearsat
-	    firstJanuary=JULDAY(a2000_iyear,01,01)
-	    currentdoy=firstJanuary+idoy-1
-	    CALL CALDAT(currentdoy,a2000_iyear,
-     &      a2000_imonth,a2000_iday)
-	    a2000_ut=UT
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-	    BzIMF_nt=maginput(7)
-	    Al=maginput(17)
-	endif
-c
-        CALL field_line_tracing2(lati,longi,alti,R0
+c	   	   
+        CALL field_line_tracing_opt2(xGeo,R0
      &     ,Lm,XJ,BLOCAL,BMIN,posit,ind)
 	END
-C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION trace_field_line_towards_earth(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -2315,31 +641,14 @@ c
 c Declare internal variables
       INTEGER*4    isat,iyear
       INTEGER*4    Ndays,activ,i,j
-      INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-      INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-      REAL*8     yearsat,dec_year,a2000_ut
-      REAL*8     psi,mlon,tilt
-      REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
-      REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
+      REAL*8     xGEO(3)
       real*8     alti,lati,longi
-      REAL*8     ERA,AQUAD,BQUAD
-      real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-      real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-      real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
 c Declare output variables
-      INTEGER*4  ind
+      INTEGER*4  ind, ifail
       REAL*8     posit(3,1000)
+      integer*4 int_field_select, ext_field_select
 C
-      COMMON/GENER/ERA,AQUAD,BQUAD
-      COMMON /dip_ang/tilt
-      COMMON /magmod/k_ext,k_l,kint
-      COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-      COMMON /index/activ
-      COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
-      DATA  xSUN /1.d0,0.d0,0.d0/
 C
       do i=1,3
         do j=1,1000
@@ -2347,346 +656,31 @@ C
         enddo
       enddo
 c
-      iyear=1800
       k_ext=kext
       k_l=options(1)
 	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
+
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
-        if (kint .le. 1) then
-           if (options(2) .eq. 0) then
-	      if (iyearsat .ne. iyear) then
-	         iyear=iyearsat
-	         dec_year=iyear+0.5d0
-	         CALL INIT_DTD(dec_year)
-	      endif
-	   else
-	      if (iyearsat .ne. iyear .or.
-     &        MOD(idoy*1.d0,options(2)*1.d0) .eq. 0) THEN
-	         iyear=iyearsat
-                 firstJanuary=JULDAY(iyear,01,01)
-                 lastDecember=JULDAY(iyear,12,31)
-                 currentdoy=(idoy/options(2))*options(2)
-	         if (currentdoy .eq. 0) currentdoy=1
-	         dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	         CALL INIT_DTD(dec_year)
-              endif
-	   endif
-	endif
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) then
+	       ind=0
+	       RETURN
+	    endif
 c
-        CALL INIT_GSM(iyearsat,idoy,UT,psi)
-        tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
-     &      xIN3 .eq. 0.D0) then
-	       ind=0
-	       RETURN
-        endif
-	if (sysaxes .EQ. 0) then
-	    alti=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	endif
-	if (sysaxes .EQ. 1) then
-	    xGEO(1)=xIN1
-	    xGEO(2)=xIN2
-	    xGEO(3)=xIN3
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-        endif
-	if (sysaxes .EQ. 2) then
-	    xGSM(1)=xIN1
-	    xGSM(2)=xIN2
-	    xGSM(3)=xIN3
-	    CALL GSM_GEO(xGSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 3) then
-	    xGSE(1)=xIN1
-	    xGSE(2)=xIN2
-	    xGSE(3)=xIN3
-	    CALL GSE_GEO(xGSE,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 4) then
-	    xSM(1)=xIN1
-	    xSM(2)=xIN2
-	    xSM(3)=xIN3
-	    CALL SM_GEO(xSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 5) then
-	    xGEI(1)=xIN1
-	    xGEI(2)=xIN2
-	    xGEI(3)=xIN3
-	    CALL GEI_GEO(xGEI,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 6) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL MAG_GEO(xMAG,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 7) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 8) then
-	    xMAG(1)=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	endif
-c
-c make inputs according to magn. field model chosen
-c
-        if (kext .eq. 1) then
-c Input for MEAD
-	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.30.d0) Activ=3
-	    if (maginput(1).ge.30.d0) Activ=4
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 2) then
-c Input for TSYG87s
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=6
-	    if (maginput(1).ge.47.d0) Activ=7
-	    if (maginput(1).ge.53.d0) Activ=8
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 3) then
-c Input for TSYG87l
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0) Activ=6
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       ind=0
-	       RETURN
-	    endif
-        endif
-        if (kext .eq. 4) then
-c Input for Tsy89
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and.
-     &      maginput(1).lt.57.d0) Activ=6
-	    if (maginput(1).ge.57.d0) Activ=7
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 6) then
-c Input for OP dyn
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (density.lt.5.d0 .or. density.gt.50.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 7) then
-c Input for Tsy96
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 8) then
-c Input for Ostapenko97
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    BzIMF_nt=maginput(7)
-	    fkp=maginput(1)*1.d0/10.d0
-	endif
-        if (kext .eq. 9) then
-c Input for Tsy01
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G1_tsy01=maginput(8)
-	    G2_tsy01=maginput(9)
-c
-	    if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	    if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	       ind=0
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 10) then
-c Input for Tsy01 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G2_tsy01=maginput(9)
-	    G3_tsy01=maginput(10)
-	endif
-c
-        if (kext .eq. 11) then
-c Input for Tsy04 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    W1_tsy04=maginput(11)
-	    W2_tsy04=maginput(12)
-	    W3_tsy04=maginput(13)
-	    W4_tsy04=maginput(14)
-	    W5_tsy04=maginput(15)
-	    W6_tsy04=maginput(16)
-	endif
-c
-        if (kext .eq. 12) then
-c Input for Alexeev 2000
-            a2000_iyear=iyearsat
-	    firstJanuary=JULDAY(a2000_iyear,01,01)
-	    currentdoy=firstJanuary+idoy-1
-	    CALL CALDAT(currentdoy,a2000_iyear,
-     &      a2000_imonth,a2000_iday)
-	    a2000_ut=UT
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-	    BzIMF_nt=maginput(7)
-	    Al=maginput(17)
-	endif
-c
-        CALL field_line_tracing_towards_Earth(lati,longi,alti
-     &     ,ds,posit,ind)
+        CALL field_line_tracing_towards_Earth_opt(xGEO,ds,posit,ind)
 	END
 
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION find_mirror_point(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -2699,7 +693,7 @@ c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine make_Lstar: 19 arguments
-      call find_mirror_point1(%VAL(argv(1)), %VAL(argv(2)),
+      call find_mirror_point1(%VAL(argv(1)), %VAL(argv(2)), 
      + %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -2729,443 +723,39 @@ c declare inputs
 	real*8     maginput(25)
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear,Iint
-        INTEGER*4    Ndays,activ,Ifail
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-        REAL*8     yearsat,dec_year,a2000_ut
-	REAL*8     psi,mlon,tilt
-	REAL*8     xMAG(3),xSUN(3),rM,MLAT,Mlon1
-	REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
+	INTEGER*4    isat,iyear,Iint,ifail
+	REAL*8     xMAG(3)
 	real*8     alti,lati,longi
-        REAL*8     ERA,AQUAD,BQUAD
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	real*8     BxGEO(3)
+	real*8     BxGEO(3),xGeop(3)
 c
-c Declare output variables
+c Declare output variables	
         REAL*8     BLOCAL,xGEO(3),BMIR
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
-        COMMON /dip_ang/tilt
 	COMMON /magmod/k_ext,k_l,kint
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	COMMON /index/activ
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
-        DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
 C
-        iyear=1800
-	k_ext=kext
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
-        if (kint .le. 1) then
-           if (options(2) .eq. 0) then
-	      if (iyearsat .ne. iyear) then
-	         iyear=iyearsat
-	         dec_year=iyear+0.5d0
-	         CALL INIT_DTD(dec_year)
-	      endif
-	   else
-	      if (iyearsat .ne. iyear .or.
-     &        MOD(idoy*1.d0,options(2)*1.d0) .eq. 0) THEN
-	         iyear=iyearsat
-                 firstJanuary=JULDAY(iyear,01,01)
-                 lastDecember=JULDAY(iyear,12,31)
-                 currentdoy=(idoy/options(2))*options(2)
-	         if (currentdoy .eq. 0) currentdoy=1
-	         dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	         CALL INIT_DTD(dec_year)
-              endif
-	   endif
-	endif
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) then
+	       xGEO(1)=baddata
+	       xGEO(2)=baddata
+	       xGEO(3)=baddata
+	       BLOCAL=baddata
+	       BMIR=baddata
+	       RETURN
+	    endif
 c
-        CALL INIT_GSM(iyearsat,idoy,UT,psi)
-        tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
-     &      xIN3 .eq. 0.D0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-        endif
-	if (sysaxes .EQ. 0) then
-	    alti=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    call gdz_geo(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
-	endif
-	if (sysaxes .EQ. 1) then
-	    xGEO(1)=xIN1
-	    xGEO(2)=xIN2
-	    xGEO(3)=xIN3
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-        endif
-	if (sysaxes .EQ. 2) then
-	    xGSM(1)=xIN1
-	    xGSM(2)=xIN2
-	    xGSM(3)=xIN3
-	    CALL GSM_GEO(xGSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 3) then
-	    xGSE(1)=xIN1
-	    xGSE(2)=xIN2
-	    xGSE(3)=xIN3
-	    CALL GSE_GEO(xGSE,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 4) then
-	    xSM(1)=xIN1
-	    xSM(2)=xIN2
-	    xSM(3)=xIN3
-	    CALL SM_GEO(xSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 5) then
-	    xGEI(1)=xIN1
-	    xGEI(2)=xIN2
-	    xGEI(3)=xIN3
-	    CALL GEI_GEO(xGEI,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 6) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL MAG_GEO(xMAG,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 7) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 8) then
-	    xMAG(1)=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	    call gdz_geo(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
-	endif
-c
-c make inputs according to magn. field model chosen
-c
-        if (kext .eq. 1) then
-c Input for MEAD
-	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.30.d0) Activ=3
-	    if (maginput(1).ge.30.d0) Activ=4
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 2) then
-c Input for TSYG87s
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=6
-	    if (maginput(1).ge.47.d0) Activ=7
-	    if (maginput(1).ge.53.d0) Activ=8
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 3) then
-c Input for TSYG87l
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0) Activ=6
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-        endif
-        if (kext .eq. 4) then
-c Input for Tsy89
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and.
-     &      maginput(1).lt.57.d0) Activ=6
-	    if (maginput(1).ge.57.d0) Activ=7
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 6) then
-c Input for OP dyn
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (density.lt.5.d0 .or. density.gt.50.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 7) then
-c Input for Tsy96
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 8) then
-c Input for Ostapenko97
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    BzIMF_nt=maginput(7)
-	    fkp=maginput(1)*1.d0/10.d0
-	endif
-        if (kext .eq. 9) then
-c Input for Tsy01
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G1_tsy01=maginput(8)
-	    G2_tsy01=maginput(9)
-c
-	    if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	    if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	       xGEO(1)=baddata
-	       xGEO(2)=baddata
-	       xGEO(3)=baddata
-	       BLOCAL=baddata
-	       BMIR=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 10) then
-c Input for Tsy01 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G2_tsy01=maginput(9)
-	    G3_tsy01=maginput(10)
-	endif
-c
-        if (kext .eq. 11) then
-c Input for Tsy04 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    W1_tsy04=maginput(11)
-	    W2_tsy04=maginput(12)
-	    W3_tsy04=maginput(13)
-	    W4_tsy04=maginput(14)
-	    W5_tsy04=maginput(15)
-	    W6_tsy04=maginput(16)
-	endif
-c
-        if (kext .eq. 12) then
-c Input for Alexeev 2000
-            a2000_iyear=iyearsat
-	    firstJanuary=JULDAY(a2000_iyear,01,01)
-	    currentdoy=firstJanuary+idoy-1
-	    CALL CALDAT(currentdoy,a2000_iyear,
-     &      a2000_imonth,a2000_iday)
-	    a2000_ut=UT
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-	    BzIMF_nt=maginput(7)
-	    Al=maginput(17)
-	endif
-c
-        if (alpha.eq.90.0d0) then
+        if (alpha.eq.90.0d0) then 
           Iint=2 ! TPO: presume this sets internal field?
 c          CALL CHAMP(Iint,xGEO,BxGEO,Blocal,Ifail) ! Iint is superfluous
           CALL CHAMP(xGEO,BxGEO,Blocal,Ifail)
@@ -3179,15 +769,18 @@ c          CALL CHAMP(Iint,xGEO,BxGEO,Blocal,Ifail) ! Iint is superfluous
 	    BMIR=Blocal
 	  ENDIF
 	  RETURN
-	endif
+	endif	   
 c
-        CALL find_bm(lati,longi,alti,alpha
-     &     ,BLOCAL,BMIR,xGEO)
+        CALL find_bm_nalpha(xGeo,1,alpha
+     &     ,BLOCAL,BMIR,xGEOp)
+        xGEO(1)=xGeop(1)
+        xGEO(2)=xGeop(2)
+        xGEO(3)=xGeop(3)
 	END
 
 
 
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION find_MAGequator(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3199,7 +792,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c
+c  
       call find_MAGequator1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -3228,428 +821,41 @@ c declare inputs
 	real*8     maginput(25)
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear
-        INTEGER*4    Ndays,activ
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-        REAL*8     yearsat,dec_year,a2000_ut
-	REAL*8     psi,mlon,tilt
-	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
-	REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
+	INTEGER*4    isat,iyear,ifail
+	REAL*8     xGEO(3)
 	real*8     alti,lati,longi
-        REAL*8     ERA,AQUAD,BQUAD
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables
+c Declare output variables	
         REAL*8     BMIN
 	REAL*8     posit(3)
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
-        COMMON /dip_ang/tilt
 	COMMON /magmod/k_ext,k_l,kint
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	COMMON /index/activ
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
-        DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
 C
-        iyear=1800
-	k_ext=kext
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	k_l=0
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
-        if (kint .le. 1) then
-           if (options(2) .eq. 0) then
-	      if (iyearsat .ne. iyear) then
-	         iyear=iyearsat
-	         dec_year=iyear+0.5d0
-	         CALL INIT_DTD(dec_year)
-	      endif
-	   else
-	      if (iyearsat .ne. iyear .or.
-     &        MOD(idoy*1.d0,options(2)*1.d0) .eq. 0) THEN
-	         iyear=iyearsat
-                 firstJanuary=JULDAY(iyear,01,01)
-                 lastDecember=JULDAY(iyear,12,31)
-                 currentdoy=(idoy/options(2))*options(2)
-	         if (currentdoy .eq. 0) currentdoy=1
-	         dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	         CALL INIT_DTD(dec_year)
-              endif
-	   endif
-	endif
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) then
+	       posit(1)=baddata
+	       posit(2)=baddata
+	       posit(3)=baddata
+	       BMIN=baddata
+	       RETURN
+	    endif
 c
-        CALL INIT_GSM(iyearsat,idoy,UT,psi)
-        tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
-     &      xIN3 .eq. 0.D0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-        endif
-	if (sysaxes .EQ. 0) then
-	    alti=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	endif
-	if (sysaxes .EQ. 1) then
-	    xGEO(1)=xIN1
-	    xGEO(2)=xIN2
-	    xGEO(3)=xIN3
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-        endif
-	if (sysaxes .EQ. 2) then
-	    xGSM(1)=xIN1
-	    xGSM(2)=xIN2
-	    xGSM(3)=xIN3
-	    CALL GSM_GEO(xGSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 3) then
-	    xGSE(1)=xIN1
-	    xGSE(2)=xIN2
-	    xGSE(3)=xIN3
-	    CALL GSE_GEO(xGSE,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 4) then
-	    xSM(1)=xIN1
-	    xSM(2)=xIN2
-	    xSM(3)=xIN3
-	    CALL SM_GEO(xSM,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 5) then
-	    xGEI(1)=xIN1
-	    xGEI(2)=xIN2
-	    xGEI(3)=xIN3
-	    CALL GEI_GEO(xGEI,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 6) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL MAG_GEO(xMAG,xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 7) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	    CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-	endif
-	if (sysaxes .EQ. 8) then
-	    xMAG(1)=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	endif
-c
-c make inputs according to magn. field model chosen
-c
-        if (kext .eq. 1) then
-c Input for MEAD
-	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.30.d0) Activ=3
-	    if (maginput(1).ge.30.d0) Activ=4
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 2) then
-c Input for TSYG87s
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=6
-	    if (maginput(1).ge.47.d0) Activ=7
-	    if (maginput(1).ge.53.d0) Activ=8
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 3) then
-c Input for TSYG87l
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0) Activ=6
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-        endif
-        if (kext .eq. 4) then
-c Input for Tsy89
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and.
-     &      maginput(1).lt.57.d0) Activ=6
-	    if (maginput(1).ge.57.d0) Activ=7
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 6) then
-c Input for OP dyn
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (density.lt.5.d0 .or. density.gt.50.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 7) then
-c Input for Tsy96
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 8) then
-c Input for Ostapenko97
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    BzIMF_nt=maginput(7)
-	    fkp=maginput(1)*1.d0/10.d0
-	endif
-        if (kext .eq. 9) then
-c Input for Tsy01
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G1_tsy01=maginput(8)
-	    G2_tsy01=maginput(9)
-c
-	    if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	    if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	       posit(1)=baddata
-	       posit(2)=baddata
-	       posit(3)=baddata
-	       BMIN=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 10) then
-c Input for Tsy01 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G2_tsy01=maginput(9)
-	    G3_tsy01=maginput(10)
-	endif
-c
-        if (kext .eq. 11) then
-c Input for Tsy04 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    W1_tsy04=maginput(11)
-	    W2_tsy04=maginput(12)
-	    W3_tsy04=maginput(13)
-	    W4_tsy04=maginput(14)
-	    W5_tsy04=maginput(15)
-	    W6_tsy04=maginput(16)
-	endif
-c
-        if (kext .eq. 12) then
-c Input for Alexeev 2000
-            a2000_iyear=iyearsat
-	    firstJanuary=JULDAY(a2000_iyear,01,01)
-	    currentdoy=firstJanuary+idoy-1
-	    CALL CALDAT(currentdoy,a2000_iyear,
-     &      a2000_imonth,a2000_iday)
-	    a2000_ut=UT
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-	    BzIMF_nt=maginput(7)
-	    Al=maginput(17)
-	endif
-c
-c
-        CALL loc_equator(
-     &     lati,longi,alti,BMIN,posit)
+c	   	   
+        CALL loc_equator_opt(xGeo,BMIN,posit)
 	END
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION GET_FIELD(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -3661,7 +867,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c
+c  
       call GET_FIELD1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -3690,417 +896,36 @@ c declare inputs
 	real*8     maginput(25)
 c
 c Declare internal variables
-	INTEGER*4    isat,iyear
-        INTEGER*4    Ndays,activ,Ifail
-	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-        REAL*8     yearsat,dec_year,a2000_ut
-	REAL*8     psi,mlon,tilt
-	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
-	REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
+	INTEGER*4    isat,iyear,ifail
+	REAL*8     xGEO(3)
 	real*8     alti,lati,longi
-        REAL*8     ERA,AQUAD,BQUAD
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
-        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
 c
-c Declare output variables
+c Declare output variables	
         REAL*8     BxGEO(3),Bl
 C
-        COMMON/GENER/ERA,AQUAD,BQUAD
-        COMMON /dip_ang/tilt
 	COMMON /magmod/k_ext,k_l,kint
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	COMMON /index/activ
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
-        DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
 C
-        iyear=1800
-	k_ext=kext
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	IF (kext .lt. 0) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kext .gt. 12) THEN
-	   k_ext=5
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid external field specification'
-	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	k_l=0
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
-        if (kint .le. 1) then
-           if (options(2) .eq. 0) then
-	      if (iyearsat .ne. iyear) then
-	         iyear=iyearsat
-	         dec_year=iyear+0.5d0
-	         CALL INIT_DTD(dec_year)
-	      endif
-	   else
-	      if (iyearsat .ne. iyear .or.
-     &        MOD(idoy*1.d0,options(2)*1.d0) .eq. 0) THEN
-	         iyear=iyearsat
-                 firstJanuary=JULDAY(iyear,01,01)
-                 lastDecember=JULDAY(iyear,12,31)
-                 currentdoy=(idoy/options(2))*options(2)
-	         if (currentdoy .eq. 0) currentdoy=1
-	         dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	         CALL INIT_DTD(dec_year)
-              endif
-	   endif
-	endif
-c
-        CALL INIT_GSM(iyearsat,idoy,UT,psi)
-        tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
-        if (xIN1 .eq. 0.D0 .AND. xIN2 .eq. 0.D0 .AND.
-     &      xIN3 .eq. 0.D0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-        endif
-	if (sysaxes .EQ. 0) then
-	    alti=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    CALL GDZ_GEO(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
-	endif
-	if (sysaxes .EQ. 1) then
-	    xGEO(1)=xIN1
-	    xGEO(2)=xIN2
-	    xGEO(3)=xIN3
-        endif
-	if (sysaxes .EQ. 2) then
-	    xGSM(1)=xIN1
-	    xGSM(2)=xIN2
-	    xGSM(3)=xIN3
-	    CALL GSM_GEO(xGSM,xGEO)
-	endif
-	if (sysaxes .EQ. 3) then
-	    xGSE(1)=xIN1
-	    xGSE(2)=xIN2
-	    xGSE(3)=xIN3
-	    CALL GSE_GEO(xGSE,xGEO)
-	endif
-	if (sysaxes .EQ. 4) then
-	    xSM(1)=xIN1
-	    xSM(2)=xIN2
-	    xSM(3)=xIN3
-	    CALL SM_GEO(xSM,xGEO)
-	endif
-	if (sysaxes .EQ. 5) then
-	    xGEI(1)=xIN1
-	    xGEI(2)=xIN2
-	    xGEI(3)=xIN3
-	    CALL GEI_GEO(xGEI,xGEO)
-	endif
-	if (sysaxes .EQ. 6) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL MAG_GEO(xMAG,xGEO)
-	endif
-	if (sysaxes .EQ. 7) then
-	    xMAG(1)=xIN1
-	    xMAG(2)=xIN2
-	    xMAG(3)=xIN3
-	    CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-	endif
-	if (sysaxes .EQ. 8) then
-	    xMAG(1)=xIN1
-	    lati=xIN2
-	    longi=xIN3
-	    CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-	    CALL GDZ_GEO(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
-	endif
-c
-c make inputs according to magn. field model chosen
-c
-        if (kext .eq. 1) then
-c Input for MEAD
-	    if (maginput(1).le.3.d0) Activ=1
-	    if (maginput(1).gt.3.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=2
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.30.d0) Activ=3
-	    if (maginput(1).ge.30.d0) Activ=4
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) then
 	       Bl=baddata
 	       BxGEO(1)=baddata
 	       BxGEO(2)=baddata
 	       BxGEO(3)=baddata
 	       RETURN
 	    endif
-	endif
-        if (kext .eq. 2) then
-c Input for TSYG87s
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.20.d0) Activ=3
-	    if (maginput(1).ge.20.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=4
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=5
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=6
-	    if (maginput(1).ge.47.d0) Activ=7
-	    if (maginput(1).ge.53.d0) Activ=8
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 3) then
-c Input for TSYG87l
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0) Activ=6
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-        endif
-        if (kext .eq. 4) then
-c Input for Tsy89
-	    if (maginput(1).lt.7.d0) Activ=1
-	    if (maginput(1).ge.7.d0 .and.
-     &      maginput(1).lt.17.d0) Activ=2
-	    if (maginput(1).ge.17.d0 .and.
-     &      maginput(1).lt.27.d0) Activ=3
-	    if (maginput(1).ge.27.d0 .and.
-     &      maginput(1).lt.37.d0) Activ=4
-	    if (maginput(1).ge.37.d0 .and.
-     &      maginput(1).lt.47.d0) Activ=5
-	    if (maginput(1).ge.47.d0 .and.
-     &      maginput(1).lt.57.d0) Activ=6
-	    if (maginput(1).ge.57.d0) Activ=7
-c
-	    if (maginput(1).lt.0.d0 .or.
-     &      maginput(1).gt.90.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 6) then
-c Input for OP dyn
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (density.lt.5.d0 .or. density.gt.50.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (speed.lt.300.d0 .or. speed.gt.500.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 7) then
-c Input for Tsy96
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-c
-	    if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 8) then
-c Input for Ostapenko97
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    BzIMF_nt=maginput(7)
-	    fkp=maginput(1)*1.d0/10.d0
-	endif
-        if (kext .eq. 9) then
-c Input for Tsy01
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G1_tsy01=maginput(8)
-	    G2_tsy01=maginput(9)
-c
-	    if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	    if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-	endif
-        if (kext .eq. 10) then
-c Input for Tsy01 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    G2_tsy01=maginput(9)
-	    G3_tsy01=maginput(10)
-	endif
-c
-        if (kext .eq. 11) then
-c Input for Tsy04 storm
-	    dst_nt=maginput(2)
-	    Pdyn_nPa=maginput(5)
-	    ByIMF_nt=maginput(6)
-	    BzIMF_nt=maginput(7)
-	    W1_tsy04=maginput(11)
-	    W2_tsy04=maginput(12)
-	    W3_tsy04=maginput(13)
-	    W4_tsy04=maginput(14)
-	    W5_tsy04=maginput(15)
-	    W6_tsy04=maginput(16)
-	endif
-c
-        if (kext .eq. 12) then
-c Input for Alexeev 2000
-            a2000_iyear=iyearsat
-	    firstJanuary=JULDAY(a2000_iyear,01,01)
-	    currentdoy=firstJanuary+idoy-1
-	    CALL CALDAT(currentdoy,a2000_iyear,
-     &      a2000_imonth,a2000_iday)
-	    a2000_ut=UT
-            density=maginput(3)
-	    speed=maginput(4)
-	    dst_nt=maginput(2)
-	    BzIMF_nt=maginput(7)
-	    Al=maginput(17)
-	endif
-c
+c	   	
         CALL CHAMP(xGEO,BxGEO,Bl,Ifail)
 	IF (Ifail.LT.0) THEN
 	   BxGEO(1)=baddata
@@ -4109,7 +934,7 @@ c
 	   Bl=baddata
 	ENDIF
 	END
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION GET_MLT(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4121,7 +946,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c
+c  
       call GET_MLT1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)))
 
@@ -4141,7 +966,7 @@ c declare inputs
 	INTEGER*4    iyr
 	integer*4    idoy
 	real*8     UT
-	real*8     xGEO(3)
+	real*8     xGEO
 c
 c Declare internal variables
         REAL*8     dyear
@@ -4149,7 +974,7 @@ c Declare internal variables
 	REAL*8     xMAG(3),xSUN(3),rM,MLAT,Mlon1
 	REAL*8     xTMP(3)
 c
-c Declare output variables
+c Declare output variables	
         REAL*8     MLT
 C
         DATA  xSUN /1.d0,0.d0,0.d0/
@@ -4158,11 +983,6 @@ C
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,ut,psi)
 C
-        if (xGEO(1) .eq. 0.D0 .AND. xGEO(2) .eq. 0.D0 .AND.
-     &      xGEO(3) .eq. 0.D0) then
-          MLT=baddata
-          return
-        endif
         CALL geo_mag(xGEO,xMAG)
         CALL car_sph(xMAG,rM,MLAT,Mlon1)
         CALL GSM_GEO(xSUN,xTMP)
@@ -4173,7 +993,7 @@ C
         IF (MLT.LT.0.d0) MLT = MLT + 24.d0
 
         END
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION GET_HEMI(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4185,7 +1005,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
-c
+c  
       call GET_HEMI1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)))
@@ -4195,14 +1015,405 @@ c
       RETURN
       END
 c
-c Wrapper and proceduce to access many coordinate transformation form the
+      integer function int_field_select ( kint )
+      integer*4 kint
+
+	IF (kint .lt. 0) THEN
+	   kint=0
+	   WRITE(6,*)
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)'Invalid internal field specification'
+	   WRITE(6,*)'Selecting IGRF'
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)
+	ENDIF
+	if (kint .gt. 3) THEN
+	   kint=0
+	   WRITE(6,*)
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)'Invalid internal field specification'
+	   WRITE(6,*)'Selecting IGRF'
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)
+	ENDIF
+
+	int_field_select = kint
+
+	return
+	end
+	
+	integer*4 function ext_field_select ( kext )
+
+        integer*4 kext
+
+	IF (kext .lt. 0) THEN
+	   k_ext=5
+	   WRITE(6,*)
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)'Invalid external field specification'
+	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)
+	ENDIF
+	if (kext .gt. 12) THEN
+	   k_ext=5
+	   WRITE(6,*)
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)'Invalid external field specification'
+	   WRITE(6,*)'Selecting Olson-Pfitzer (quiet)'
+	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+	   WRITE(6,*)
+	ENDIF
+
+	ext_field_select = kext
+
+	return
+	end
+
+	subroutine init_fields ( kint, iyearsat, idoy, ut, opt2 )
+	INTEGER*4    firstJanuary,lastDecember,Julday,currentdoy
+	INTEGER*4    kint,opt2,iyearsat,iyear
+	integer*4    idoy
+	real*8     UT,dec_year
+        REAL*8 tilt,psi
+	COMMON /dip_ang/tilt
+        REAL*8     pi,rad
+        common /rconst/rad,pi
+
+	iyear = 1800
+
+	if (kint .eq. 2) CALL JensenANDCain1960
+	if (kint .eq. 3) CALL GSFC1266
+c	   write(6,*)real(isat)*100./real(ntime), '% done'
+c	
+           if (kint .le. 1) then
+              if (opt2 .eq. 0) then	
+	        if (iyearsat .ne. iyear) then
+	           iyear=iyearsat
+	           dec_year=iyear+0.5d0
+	           CALL INIT_DTD(dec_year)
+	        endif
+	      else
+	        if (iyearsat .ne. iyear .or.
+     &          MOD(idoy*1.d0,opt2*1.d0) .eq. 0) THEN
+	           iyear=iyearsat
+		   firstJanuary=JULDAY(iyear,01,01)
+		   lastDecember=JULDAY(iyear,12,31)
+		   currentdoy=(idoy/opt2)*opt2
+		   if (currentdoy .eq. 0) currentdoy=1
+	           dec_year=iyear+currentdoy*1.d0/
+     &             ((lastDecember-firstJanuary+1)*1.d0)
+	           CALL INIT_DTD(dec_year)
+                endif
+	      endif
+	   endif
+c
+           if ( ut.ge.0.0 ) CALL INIT_GSM(iyearsat,idoy,UT,psi)
+           tilt = psi/rad
+	   
+	return
+	end
+
+	subroutine get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+
+	integer*4 sysaxes
+	real*8 xIN1, xIN2, xIN3
+	real*8 alti, lati, longi, xGEO(3)
+	real*8 xGSM(3), xGSE(3), xSM(3), xGEI(3), xMAG(3)
+	
+	   if (sysaxes .EQ. 0) then
+	       alti=xIN1
+	       lati=xIN2
+	       longi=xIN3
+  	       CALL GDZ_GEO(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
+	   endif
+	   if (sysaxes .EQ. 1) then
+	       xGEO(1)=xIN1
+	       xGEO(2)=xIN2
+	       xGEO(3)=xIN3
+	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
+	   endif
+	   if (sysaxes .EQ. 2) then
+	       xGSM(1)=xIN1
+	       xGSM(2)=xIN2
+	       xGSM(3)=xIN3
+	       CALL GSM_GEO(xGSM,xGEO)
+	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
+	   endif
+	   if (sysaxes .EQ. 3) then
+	       xGSE(1)=xIN1
+	       xGSE(2)=xIN2
+	       xGSE(3)=xIN3
+	       CALL GSE_GEO(xGSE,xGEO)
+	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
+	   endif
+	   if (sysaxes .EQ. 4) then
+	       xSM(1)=xIN1
+	       xSM(2)=xIN2
+	       xSM(3)=xIN3
+	       CALL SM_GEO(xSM,xGEO)
+	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
+	   endif
+	   if (sysaxes .EQ. 5) then
+	       xGEI(1)=xIN1
+	       xGEI(2)=xIN2
+	       xGEI(3)=xIN3
+	       CALL GEI_GEO(xGEI,xGEO)
+	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
+	   endif
+	   if (sysaxes .EQ. 6) then
+	       xMAG(1)=xIN1
+	       xMAG(2)=xIN2
+	       xMAG(3)=xIN3
+	       CALL MAG_GEO(xMAG,xGEO)
+	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
+	   endif
+	   if (sysaxes .EQ. 7) then
+	       xMAG(1)=xIN1
+	       xMAG(2)=xIN2
+	       xMAG(3)=xIN3
+	       CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
+	       CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
+	   endif
+	   if (sysaxes .EQ. 8) then
+	       xMAG(1)=xIN1
+	       lati=xIN2
+	       longi=xIN3
+	       CALL RLL_GDZ(xMAG(1),lati,longi,alti)
+  	       CALL GDZ_GEO(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
+	   endif
+	   
+	   return
+	   end
+
+	 subroutine set_magfield_inputs ( kext, maginput, ifail )
+	COMMON /index/activ
+	integer*4 activ
+        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
+     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
+     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
+	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
+	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
+        real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
+	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
+	REAL*8      a2000_ut
+	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
+	 
+	 integer*4 kext, ifail
+	 real*8 maginput(25)
+c                      1: Kp
+c                      2: Dst
+c                      3: dens
+c                      4: velo
+c                      5: Pdyn
+c                      6: ByIMF
+c                      7: BzIMF
+c                      8: G1
+c                      9: G2
+c                     10: G3
+c	   
+c make inputs according to magn. field model chosen
+c
+c     set fail flag 'on' by default
+         ifail = -1
+c     clear it if all tests for respective selection are ok
+c
+c            'none'
+           if (kext .eq. 0) then
+	       ifail = 0
+	       return
+	   endif
+c            'Olsen-Pfitzer' = default
+           if (kext .eq. 5) then
+	       ifail = 0
+	       return
+	   endif
+
+           if (kext .eq. 1) then
+c Input for MEAD
+	       if (maginput(1).le.3.d0) Activ=1
+	       if (maginput(1).gt.3.d0 .and. 
+     &         maginput(1).lt.20.d0) Activ=2
+	       if (maginput(1).ge.20.d0 .and. 
+     &         maginput(1).lt.30.d0) Activ=3
+	       if (maginput(1).ge.30.d0) Activ=4
+c
+	       if (maginput(1).lt.0.d0 .or. 
+     &         maginput(1).gt.90.d0) return
+	       ifail = 0
+	       return
+	   endif
+           if (kext .eq. 2) then
+c Input for TSYG87s
+	       if (maginput(1).lt.7.d0) Activ=1
+	       if (maginput(1).ge.7.d0 .and. 
+     &         maginput(1).lt.17.d0) Activ=2
+	       if (maginput(1).ge.17.d0 .and. 
+     &         maginput(1).lt.20.d0) Activ=3
+	       if (maginput(1).ge.20.d0 .and. 
+     &         maginput(1).lt.27.d0) Activ=4
+	       if (maginput(1).ge.27.d0 .and. 
+     &         maginput(1).lt.37.d0) Activ=5
+	       if (maginput(1).ge.37.d0 .and. 
+     &         maginput(1).lt.47.d0) Activ=6
+	       if (maginput(1).ge.47.d0) Activ=7
+	       if (maginput(1).ge.53.d0) Activ=8
+c
+	       if (maginput(1).lt.0.d0 .or. 
+     &         maginput(1).gt.90.d0) return
+	       ifail = 0
+	       return
+	   endif
+           if (kext .eq. 3) then
+c Input for TSYG87l
+	       if (maginput(1).lt.7.d0) Activ=1
+	       if (maginput(1).ge.7.d0 .and. 
+     &         maginput(1).lt.17.d0) Activ=2
+	       if (maginput(1).ge.17.d0 .and. 
+     &         maginput(1).lt.27.d0) Activ=3
+	       if (maginput(1).ge.27.d0 .and. 
+     &         maginput(1).lt.37.d0) Activ=4
+	       if (maginput(1).ge.37.d0 .and. 
+     &         maginput(1).lt.47.d0) Activ=5
+	       if (maginput(1).ge.47.d0) Activ=6
+c
+	       if (maginput(1).lt.0.d0 .or. 
+     &         maginput(1).gt.90.d0) return
+	       ifail = 0
+	       return
+           endif
+           if (kext .eq. 4) then
+c Input for Tsy89
+	       if (maginput(1).lt.7.d0) Activ=1
+	       if (maginput(1).ge.7.d0 .and. 
+     &         maginput(1).lt.17.d0) Activ=2
+	       if (maginput(1).ge.17.d0 .and. 
+     &         maginput(1).lt.27.d0) Activ=3
+	       if (maginput(1).ge.27.d0 .and. 
+     &         maginput(1).lt.37.d0) Activ=4
+	       if (maginput(1).ge.37.d0 .and. 
+     &         maginput(1).lt.47.d0) Activ=5
+	       if (maginput(1).ge.47.d0 .and. 
+     &         maginput(1).lt.57.d0) Activ=6
+	       if (maginput(1).ge.57.d0) Activ=7
+c
+	       if (maginput(1).lt.0.d0 .or. 
+     &         maginput(1).gt.90.d0) return
+	       ifail = 0
+	       return
+	    endif
+           if (kext .eq. 6) then
+c Input for OP dyn
+               density=maginput(3)
+	       speed=maginput(4)
+	       dst_nt=maginput(2)
+c
+	       if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) return
+	       if (density.lt.5.d0 .or. density.gt.50.d0) return
+	       if (speed.lt.300.d0 .or. speed.gt.500.d0) return
+	       ifail = 0
+	       return
+	   endif
+           if (kext .eq. 7) then
+c Input for Tsy96
+	       dst_nt=maginput(2)
+	       Pdyn_nPa=maginput(5)
+	       ByIMF_nt=maginput(6)
+	       BzIMF_nt=maginput(7)
+c
+	       if (dst_nt.lt.-100.d0 .or. dst_nt.gt.20.d0) return
+	       if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.10.d0) return
+	       if (ByIMF_nt.lt.-10.d0 .or. ByIMF_nt.gt.10.d0) return
+	       if (BzIMF_nt.lt.-10.d0 .or. BzIMF_nt.gt.10.d0) return
+	       ifail = 0
+	       return
+	   endif
+           if (kext .eq. 8) then
+c Input for Ostapenko97
+	       dst_nt=maginput(2)
+	       Pdyn_nPa=maginput(5)
+	       BzIMF_nt=maginput(7)
+	       fkp=maginput(1)*1.d0/10.d0
+	       ifail = 0
+	       return
+	   endif
+           if (kext .eq. 9) then
+c Input for Tsy01
+	       dst_nt=maginput(2)
+	       Pdyn_nPa=maginput(5)
+	       ByIMF_nt=maginput(6)
+	       BzIMF_nt=maginput(7)
+	       G1_tsy01=maginput(8)
+	       G2_tsy01=maginput(9)
+c
+	       if (dst_nt.lt.-50.d0 .or. dst_nt.gt.20.d0) return
+	       if (Pdyn_nPa.lt.0.5d0 .or. Pdyn_nPa.gt.5.d0) return
+	       if (ByIMF_nt.lt.-5.d0 .or. ByIMF_nt.gt.5.d0) return
+	       if (BzIMF_nt.lt.-5.d0 .or. BzIMF_nt.gt.5.d0) return
+	       if (G1_tsy01.lt.0.d0 .or. G1_tsy01.gt.10.d0) return
+	       if (G2_tsy01.lt.0.d0 .or. G2_tsy01.gt.10.d0) return
+	       ifail = 0
+	       return
+	   endif
+           if (kext .eq. 10) then
+c Input for Tsy01 storm
+	       dst_nt=maginput(2)
+	       Pdyn_nPa=maginput(5)
+	       ByIMF_nt=maginput(6)
+	       BzIMF_nt=maginput(7)
+	       G2_tsy01=maginput(9)
+	       G3_tsy01=maginput(10)
+	       ifail = 0
+	       return
+	   endif
+c
+           if (kext .eq. 11) then
+c Input for Tsy04 storm
+	       dst_nt=maginput(2)
+	       Pdyn_nPa=maginput(5)
+	       ByIMF_nt=maginput(6)
+	       BzIMF_nt=maginput(7)
+	       W1_tsy04=maginput(11)
+	       W2_tsy04=maginput(12)
+	       W3_tsy04=maginput(13)
+	       W4_tsy04=maginput(14)
+	       W5_tsy04=maginput(15)
+	       W6_tsy04=maginput(16)
+	       ifail = 0
+	       return
+	   endif
+c
+           if (kext .eq. 12) then
+c Input for Alexeev 2000
+               a2000_iyear=iyearsat
+	       firstJanuary=JULDAY(a2000_iyear,01,01)
+	       currentdoy=firstJanuary+idoy-1
+	       CALL CALDAT(currentdoy,a2000_iyear,
+     &         a2000_imonth,a2000_iday)
+	       a2000_ut=UT
+               density=maginput(3)
+	       speed=maginput(4)
+	       dst_nt=maginput(2)
+	       BzIMF_nt=maginput(7)
+	       Al=maginput(17)
+	       ifail = 0
+	       return
+	   endif
+
+       print *, ' invalid kext'
+
+       return
+       end
+
+c Wrapper and procedure to access many coordinate transformation form the 
 c ONERA library
 c
 c =======================================================================
 c GEO2GSM
 c
 c Routine to transform Cartesian GEO to cartesian GSM coordinates
-c
+c 
 c  INPUTS: iyr = integer year
 c          idoy = integer day of year
 c          secs = UT in seconds
@@ -4221,7 +1432,7 @@ c =======================================================================
 c GSM2GEO
 c
 c Routine to transform Cartesian GSM to cartesian GEO coordinates
-c
+c 
 c  INPUTS: iyr = integer year
 c          idoy = integer day of year
 c          secs = UT in seconds
@@ -4241,7 +1452,7 @@ c =======================================================================
 c GDZ2GEO
 c
 c Routine to transform GEODEZIC coordinates to cartesian GEO coordinates
-c
+c 
 c  INPUTS: lati = latitude (degres)
 c          longi = longitude (degres)
 c          alti = altitude (km)
@@ -4260,8 +1471,8 @@ c
 c =======================================================================
 c GEO2GDZ
 c
-c Routine to transform cartesian GEO coordinates to GEODEZIC coordinates
-c
+c Routine to transform cartesian GEO coordinates to GEODEZIC coordinates 
+c 
 c INPUTS: xx = xGEO (Re)
 c          yy = yGEO (Re)
 c          zz = zGEO (Re)
@@ -4279,9 +1490,9 @@ c           /f_value)                             ;function returns a float.
 c
 c =======================================================================
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION coord_trans(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4303,9 +1514,9 @@ c  subroutine coord_trans1: 7 arguments
       END
 c
 
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION coord_trans_vec(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4328,9 +1539,9 @@ c  subroutine coord_trans_vec1: 8 arguments
       END
 c
 
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION geo2gsm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4357,15 +1568,15 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSM(3)
-
+	
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GSM(xGEO,xGSM)
         end
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION gsm2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4392,17 +1603,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSM(3)
-
-
+	
+	
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSM_GEO(xGSM,xGEO)
         end
 
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION geo2gse(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4429,16 +1640,16 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSE(3)
-
+	
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GSE(xGEO,xGSE)
         end
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION gse2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4465,8 +1676,8 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGSE(3)
-
-
+	
+	
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
@@ -4475,9 +1686,9 @@ c
 
 
 
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION gdz2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4498,9 +1709,9 @@ c  subroutine gdz2geo: 6 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION geo2gdz(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4521,9 +1732,9 @@ c  subroutine geo_gdz: 6 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION geo2gei(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4550,17 +1761,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGEI(3)
-
+	
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GEI(xGEO,xGEI)
         end
-
-C-----------------------------------------------------------------------------
+	
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION gei2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4587,17 +1798,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xGEI(3)
-
+	
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEI_GEO(xGEI,xGEO)
         end
-
-C-----------------------------------------------------------------------------
+	
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION geo2sm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4624,17 +1835,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xSM(3)
-
+	
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_SM(xGEO,xSM)
         end
-
-C-----------------------------------------------------------------------------
+	
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION sm2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4661,17 +1872,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGEO(3),xSM(3)
-
+	
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL SM_GEO(xSM,xGEO)
         end
-
-C-----------------------------------------------------------------------------
+	
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION gsm2sm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4698,17 +1909,17 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGSM(3),xSM(3)
-
+	
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSM_SM(xGSM,xSM)
         end
-
-C-----------------------------------------------------------------------------
+	
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION sm2gsm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4735,16 +1946,16 @@ c
 	INTEGER*4 iyr,idoy
 	REAL*8    secs,psi,dyear
 	REAL*8    xGSM(3),xSM(3)
-
+	
 	dyear=iyr+0.5d0
 	psi=0.d0
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL SM_GSM(xSM,xGSM)
         end
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION geo2mag(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4770,15 +1981,15 @@ c
 	INTEGER*4 iyr
 	REAL*8    dyear
 	REAL*8    xGEO(3),xMAG(3)
-
+	
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL GEO_MAG(xGEO,xMAG)
         end
-
-C-----------------------------------------------------------------------------
+	
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION mag2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4804,14 +2015,14 @@ c
 	INTEGER*4 iyr
 	REAL*8    dyear
 	REAL*8    xGEO(3),xMAG(3)
-
+	
 	dyear=iyr+0.5d0
         CALL INIT_DTD(dyear)
         CALL MAG_GEO(xMAG,xGEO)
         end
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION sph2car(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4824,7 +2035,7 @@ c  Call subroutine geo2gsm1, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine geo2gsm: 6 arguments
-      call SPH_CAR(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
+      call SPH_CAR(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)), 
      &  %VAL(argv(4)))
 
       sph2car = 9.9
@@ -4832,9 +2043,9 @@ c  subroutine geo2gsm: 6 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION car2sph(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4847,17 +2058,17 @@ c  Call subroutine geo2gsm1, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine geo2gsm: 6 arguments
-      call CAR_SPH(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
+      call CAR_SPH(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)), 
      & %VAL(argv(4)))
 
       car2sph = 9.9
 
       RETURN
       END
-c
-C-----------------------------------------------------------------------------
+c	
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION rll2gdz(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4870,16 +2081,16 @@ c  Call subroutine geo2gsm1, converting the IDL parameters to standard FORTRAN
 c  passed by reference arguments.
 c
 c  subroutine geo2gsm: 6 arguments
-      call RLL_GDZ(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
+      call RLL_GDZ(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)), 
      & %VAL(argv(4)))
 
       rll2gdz = 9.9
 
       RETURN
       END
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION gse2hee(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4900,9 +2111,9 @@ c  subroutine gse2hee1: 5 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION hee2gse(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4923,9 +2134,9 @@ c  subroutine hee2gse1: 5 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION hae2hee(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4946,9 +2157,9 @@ c  subroutine hae2hee1: 5 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION hee2hae(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4969,9 +2180,9 @@ c  subroutine hee2hae1: 5 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION hae2heeq(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -4992,9 +2203,9 @@ c  subroutine hae2heeq1: 5 arguments
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 C Wrapper and procedure for ONERA library
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION heeq2hae(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -5022,8 +2233,8 @@ c
 ! CREATION: S. Bourdarie - September 2005
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call fly_in_nasa_aeap1 (IN AE8_AP8.f) from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call fly_in_nasa_aeap1 (IN AE8_AP8.f) from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5037,7 +2248,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
 !
-      call fly_in_nasa_aeap1(%VAL(argv(1)), %VAL(argv(2)),
+      call fly_in_nasa_aeap1(%VAL(argv(1)), %VAL(argv(2)), 
      * %VAL(argv(3)),%VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),
      * %VAL(argv(7)),  %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)),
      * %VAL(argv(11)),  %VAL(argv(12)),  %VAL(argv(13)))
@@ -5053,8 +2264,8 @@ c
 ! CREATION: S. Bourdarie - March 2008
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call get_AE8_AP8_flux (IN AE8_AP8.f) from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call get_AE8_AP8_flux (IN AE8_AP8.f) from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5068,7 +2279,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
 !
-      call get_AE8_AP8_flux(%VAL(argv(1)), %VAL(argv(2)),
+      call get_AE8_AP8_flux(%VAL(argv(1)), %VAL(argv(2)), 
      * %VAL(argv(3)),%VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),
      * %VAL(argv(7)), %VAL(argv(8)))
 
@@ -5084,8 +2295,8 @@ c
 ! CREATION: S. Bourdarie - May 2006
 ! MODIFICATION: S. Bourdarie - March 2007 (add multi channel calculcations) - V4.1
 !
-! DESCRIPTION: Wrapper to call fly_in_afrl_crres1 (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call fly_in_afrl_crres1 (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5104,7 +2315,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call fly_in_afrl_crres1(%VAL(argv(1)), %VAL(argv(2)),
+      call fly_in_afrl_crres1(%VAL(argv(1)), %VAL(argv(2)), 
      * %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
@@ -5121,8 +2332,8 @@ c
 !
 ! CREATION: S. Bourdarie - March 2008
 !
-! DESCRIPTION: Wrapper to call get_crres_flux (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call get_crres_flux (IN AFRL_CRRES_models.f) from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5141,7 +2352,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call get_crres_flux(%VAL(argv(1)), %VAL(argv(2)),
+      call get_crres_flux(%VAL(argv(1)), %VAL(argv(2)), 
      * %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)))
@@ -5158,8 +2369,8 @@ c
 ! CREATION: S. Bourdarie - December 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call fly_in_ige1 from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call fly_in_ige1 from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5226,8 +2437,8 @@ c
 ! CREATION: S. Bourdarie - January 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call SPG4_TLE1 from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call SPG4_TLE1 from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5246,7 +2457,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call SGP4_TLE1(%VAL(argv(1)), %VAL(argv(2)),
+      call SGP4_TLE1(%VAL(argv(1)), %VAL(argv(2)), 
      * %VAL(argv(3)),
      * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
      * %VAL(argv(8)))
@@ -5262,8 +2473,8 @@ c
 ! CREATION: S. Bourdarie - January 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call SPG4_ORB1 from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call SPG4_ORB1 from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5297,8 +2508,8 @@ c
 ! CREATION: S. Bourdarie - January 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call rv2coe (in sgp4ext.f) from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call rv2coe (in sgp4ext.f) from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5330,8 +2541,8 @@ c
 ! CREATION: S. Bourdarie - March 2007
 ! MODIFICATION: None
 !
-! DESCRIPTION: Wrapper to call DATE_AND_TIME2DECY from IDL, converts the IDL parameters to
-!              standard FORTRAN passed by reference arguments.
+! DESCRIPTION: Wrapper to call DATE_AND_TIME2DECY from IDL, converts the IDL parameters to 
+!              standard FORTRAN passed by reference arguments. 
 !
 ! INPUT: argc-> number of argument (long integer)
 !        argv -> reference argument
@@ -5347,7 +2558,7 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
                                        ! Because argc is passed by VALUE.
 c
 
-      call DATE_AND_TIME2DECY(%VAL(argv(1)), %VAL(argv(2)),
+      call DATE_AND_TIME2DECY(%VAL(argv(1)), %VAL(argv(2)), 
      * %VAL(argv(3)),
      * %VAL(argv(4)),%VAL(argv(5)), %VAL(argv(6)), %VAL(argv(7)))
 
@@ -5356,9 +2567,9 @@ c
       RETURN
       END
 c
-C-----------------------------------------------------------------------------
-C IDL Wrappers
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
+C IDL Wrappers 
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION msis86_idl(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -5382,13 +2593,12 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'
-      INTEGER*4 ISW,ntime,whichAp,DOY(ntime_max),I,J
+      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(ntime_max),ALT(ntime_max),LAT(ntime_max),LONG(ntime_max)
-      REAL*8 F107A(ntime_max),F107(ntime_max),AP(7,ntime_max)
-      REAL*8 Dens(8,ntime_max),Temp(2,ntime_max),APin(7),D(8),T(2)
-c
+      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
+      REAL*8 F107A(100000),F107(100000),AP(7,100000)
+      REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
+c       
       COMMON/CSWI/ISW
       DO I=1,25
          SV(I)=1.D0
@@ -5420,10 +2630,10 @@ c
 	 ENDDO
       ENDDO
       END
-
-C-----------------------------------------------------------------------------
-C IDL Wrappers
-C-----------------------------------------------------------------------------
+      
+C----------------------------------------------------------------------------- 
+C IDL Wrappers 
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION msise90_idl(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -5447,13 +2657,12 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'
-      INTEGER*4 ISW,ntime,whichAp,DOY(ntime_max),I,J
+      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(ntime_max),ALT(ntime_max),LAT(ntime_max),LONG(ntime_max)
-      REAL*8 F107A(ntime_max),F107(ntime_max),AP(7,ntime_max)
-      REAL*8 Dens(8,ntime_max),Temp(2,ntime_max),APin(7),D(8),T(2)
-c
+      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
+      REAL*8 F107A(100000),F107(100000),AP(7,100000)
+      REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
+c       
       COMMON/CSWI/ISW
       DO I=1,25
          SV(I)=1.D0
@@ -5476,9 +2685,9 @@ c
 	 ENDDO
       ENDDO
       END
-C-----------------------------------------------------------------------------
-C IDL Wrappers
-C-----------------------------------------------------------------------------
+C----------------------------------------------------------------------------- 
+C IDL Wrappers 
+C----------------------------------------------------------------------------- 
 
       REAL*4 FUNCTION nrlmsise00_idl(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
@@ -5502,13 +2711,12 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'
-      INTEGER*4 ISW,ntime,whichAp,DOY(ntime_max),I,J
+      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(ntime_max),ALT(ntime_max),LAT(ntime_max),LONG(ntime_max)
-      REAL*8 F107A(ntime_max),F107(ntime_max),AP(7,ntime_max)
-      REAL*8 Dens(9,ntime_max),Temp(2,ntime_max),APin(7),D(8),T(2)
-c
+      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
+      REAL*8 F107A(100000),F107(100000),AP(7,100000)
+      REAL*8 Dens(9,100000),Temp(2,100000),APin(7),D(8),T(2)
+c       
       COMMON/CSWI/ISW
       DO I=1,25
          SV(I)=1.D0
@@ -5531,5 +2739,130 @@ c
 	 ENDDO
       ENDDO
       END
+      
+      
+c --------------------------------------------------------------------
+c Alternate version without useless 100k time/position array
+        SUBROUTINE make_lstar_shell_splitting2(Nipa,kext,options,
+     & sysaxes,iyearsat,idoy,UT,xIN1,xIN2,xIN3,
+     &  alpha,maginput,Lm,Lstar,BMirror,BLOCAL,BMIN,XJ,MLT)
+c
+	IMPLICIT NONE
+	INCLUDE 'variables.inc'
+C
+c declare inputs
+        INTEGER*4    kext,k_ext,k_l,options(5),Nalp,Nipa
+	PARAMETER (Nalp=25)
+        INTEGER*4    sysaxes
+	INTEGER*4    iyearsat
+	integer*4    idoy
+	real*8     UT
+	real*8     xIN1,xIN2,xIN3
+	real*8     alpha(Nalp)
+	real*8     maginput(25)
+c
+c
+c Declare internal variables
+	INTEGER*4    iyear,IPA,kint,ifail
+        INTEGER*4    Ilflag,t_resol,r_resol
+	REAL*8     mlon,BL,BMIR(25),Bmin_tmp
+	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT,Mlon1
+	REAL*8     xGEOp(3,25)
+	real*8     alti,lati,longi
+c
+c Declare output variables	
+        REAL*8     Bmirror(Nalp),BMIN,Blocal
+	REAL*8     XJ(Nalp),MLT
+        REAL*8     Lm(Nalp),Lstar(Nalp)
+C
+	COMMON /magmod/k_ext,k_l,kint
+        COMMON /flag_L/Ilflag
+        DATA  xSUN /1.d0,0.d0,0.d0/
+      integer*4 int_field_select, ext_field_select
+C
+	Ilflag=0
+	k_ext=kext
+	if (options(3).lt.0 .or. options(3).gt.9) options(3)=0
+	t_resol=options(3)+1
+	r_resol=options(4)+1
+	k_l=options(1)
+	kint = int_field_select ( options(5) )
+	k_ext = ext_field_select ( kext )
+c
+        CALL INITIZE
+	
+	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+	
+	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6    alti, lati, longi, xGEO )
+	    
+	call set_magfield_inputs ( kext, maginput, ifail )
+	
+	if ( ifail.lt.0 ) then
+	    DO IPA=1,Nipa
+	       Lm(IPA)=baddata
+	       Lstar(IPA)=baddata
+	       XJ(IPA)=baddata
+	       Bmirror(IPA)=baddata
+	    ENDDO
+	    BMIN=baddata
+	    GOTO 99
+         endif
+c
+c      load the GDZ and GSM coordinates in unused end of maginput
+	 maginput(20) = alti
+         maginput(21) = lati
+	 maginput(22) = longi
+         CALL GEO_GSM(xGEO,maginput(23))
 
+c      collect the B components for return in maginput() array
+        CALL CHAMP(xGEO,maginput(17),maginput(16),Ifail)
+	IF (Ifail.LT.0) THEN
+	   maginput(17)=baddata
+	   maginput(18)=baddata
+	   maginput(19)=baddata
+	   maginput(16)=baddata
+	ENDIF
+c
+c Compute Bmin assuming 90° PA at S/C
+	   k_l=0
+           IPA=1
+c             all returned values except Bmin are subsequently overwritten
+c            this call is required to return a valid Bmin value, as it is
+c            not guaranteed that input pitch angles will produce valid results
+           CALL calcul_Lstar_opt(t_resol,r_resol,xGeo
+     &         ,Lm(IPA),Lstar(IPA),XJ(IPA)
+     &         ,Bmirror(IPA),BMIN)
+	   k_l=options(1)
+c            for the specified location and array of pitch angles,
+c              return 'Blocal' for the specified location
+c              return Bmir() array for bmirror values for each pitch angle
+c              return xGeop() array for location of mirror points ""  ""
+           CALL find_bm_nalpha(xGEO,nipa,alpha,Blocal,BMIR,xGEOp)
+           DO IPA=1,Nipa
+	     IF (Bmir(ipa).NE.baddata) THEN
+	       Ilflag=0
+c    for each mirror point location in xGEOp, calc several values
+               CALL calcul_Lstar_opt(t_resol,r_resol,xGEOp(1,ipa)
+     &         ,Lm(IPA),Lstar(IPA),XJ(IPA)
+c        bmirror is the blocal at the xGEOp mirror point,
+c         (should be identical to the BMIR() array returned by find_bm_nalpha)
+     &         ,Bmirror(IPA),BMIN_tmp)
+             ELSE
+	       Lm(IPA)=baddata
+	       Lstar(IPA)=baddata
+	       XJ(IPA)=baddata
+	       Bmirror(IPA)=baddata
+	     ENDIF
+           ENDDO
+99         continue
+           CALL geo_mag(xGEO,xMAG)
+           CALL car_sph(xMAG,rM,MLAT,Mlon1)
+           CALL GSM_GEO(xSUN,xGEO)
+           CALL geo_mag(xGEO,xMAG)
+           CALL car_sph(xMAG,rM,MLAT,Mlon)
+           MLT = (Mlon1 - Mlon)/15.d0 + 12.d0
+           IF (MLT.GE.24.d0) MLT = MLT - 24.d0
+           IF (MLT.LT.0.d0) MLT = MLT + 24.d0
 
+	END
