@@ -23,6 +23,25 @@ C
      &         lati,longi,alti,Lm,Lstar,leI0,B0,Bmin)
 C
        IMPLICIT NONE
+C
+       INTEGER*4  t_resol,r_resol
+       REAL*8     xx0(3)
+       REAL*8     lati,longi,alti
+       REAL*8     B0,Bmin
+       REAL*8     Lm,Lstar
+       REAL*8     leI0
+C
+       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
+C
+       call calcul_Lstar_opt(t_resol,r_resol,
+     &         xx0,Lm,Lstar,leI0,B0,Bmin)
+
+       RETURN
+       END
+       SUBROUTINE calcul_Lstar_opt(t_resol,r_resol,
+     &         xx0,Lm,Lstar,leI0,B0,Bmin)
+C
+       IMPLICIT NONE
        INCLUDE 'variables.inc'
 C
        INTEGER*4  Nreb_def,Nder_def,Ntet_def
@@ -44,7 +63,7 @@ C
        REAL*8     XY,YY
        REAL*8     aa,bb
 C
-       REAL*8     pi,rad,tt
+       REAL*8     tt
        REAL*8     tet(10*Nder_def),phi(10*Nder_def)
        REAL*8     tetl,tet1,dtet
        REAL*8     somme,BrR2
@@ -56,13 +75,13 @@ C
        COMMON /calotte/tet
        COMMON /flag_L/Ilflag
        COMMON /magmod/k_ext,k_l,kint
+       REAL*8     pi,rad
+       common /rconst/rad,pi
 C
 C
        Nder=Nder_def*r_resol
        Nreb=Nreb_def
        Ntet=Ntet_def*t_resol
-       pi = 4.D0*ATAN(1.D0)
-       rad = pi/180.D0
        dtet = pi/Ntet
 C
        Nrebmax = 20*Nreb
@@ -70,8 +89,6 @@ C
        Lm = baddata
        Lstar = baddata
        leI0 = baddata
-C
-       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
 C
        CALL GEO_SM(xx0,xx)
        rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))
@@ -92,6 +109,7 @@ C
        dsreb = Lb/Nreb
 C
 C calcul du sens du depart
+c"calculation of the direction of the departure"
 C
        CALL sksyst(-dsreb,xx0,x1,Bl,Ifail)
        IF (Ifail.LT.0) THEN
@@ -127,6 +145,7 @@ c         write(6,*)'L McIlwain eq ',B0,leI0,Lm
        ENDIF
 C
 C calcul de la ligne de champ et de I
+c "calculation of the field line and I"
 C
        Bmin = B0
        leI = 0.D0
@@ -174,10 +193,12 @@ C
 C calcul de L Mc Ilwain (Mc Ilwain-Hilton)
 C
        XY = leI*leI*leI*B0/Bo
+C->Lm B0 constant###       XY = leI*leI*leI*B0/(31165.3)
        YY = 1.D0 + 1.35047D0*XY**(1.D0/3.D0)
      &      + 0.465376D0*XY**(2.D0/3.D0)
      &      + 0.0475455D0*XY
        Lm = (Bo*YY/B0)**(1.D0/3.D0)
+C->Lm B0 constant###       Lm = ((31165.3)*YY/B0)**(1.D0/3.D0)
 c       write(6,*)'L McIlwain ',B0,leI0,Lm
 C
 C calcul de Bmin
@@ -215,6 +236,8 @@ C
 C derive
 C
 C
+c "calculation of the point of the field line on the surface 
+c    of the earth of the northern slope(?)"
 C calcul du point sur la ligne de champ a la surface de la terre du
 C cote nord
 C
@@ -246,6 +269,8 @@ C
        tet(1) = ACOS(x2(3)/rr)
        phi(1) = ATAN2(x2(2),x2(1))
 C
+c "and one turns" -> "one shifts on surface in phi and one seeks teta 
+c    to have the constant IO and BO"
 C et on tourne -> on se decale sur la surface en phi et on cherche teta
 C pour avoir leI0 et B0 constants
 C
@@ -301,7 +326,7 @@ C
 c	 write(6,*)J,Bl,B0,leI*ABS(dsreb)
         ENDDO
 103     CONTINUE
-c Pourquoi?
+c Pourquoi?  "why?"
         IF (rr2.LT.1.D0) THEN
          leI = baddata
 	ENDIF
@@ -432,6 +457,7 @@ c       write(6,*)(tet(I),I=1,Nder)
 c       read(5,*)
 C
 C calcul de somme de BdS sur la calotte nord
+c "calculation of sum of BdS on the northern cap"
 C
        IF (rr32 .LT. 1.03d0) THEN
          Ilflag = 0
@@ -541,6 +567,49 @@ c        write(6,*)x2(1),x2(2),x2(3),Bl
 c        read(5,*)
 C
         RETURN
+        END
+        SUBROUTINE sksyst2(h,xx,x2,Bl,Ifail)
+C
+        IMPLICIT NONE
+C
+        INTEGER*4  II,JJ,Ifail
+        REAL*8 xx(3),x2(3)
+        REAL*8 B(3),Bl
+        REAL*8 h, c1, c2, c3
+        REAL*8 xw, xf(3)
+C
+C-----------------------------------------------------------------------
+C
+c        write(6,*)'sksyst'
+c        write(6,*)xx(1),xx(2),xx(3),h
+        CALL CHAMP(XX,B,Bl,Ifail)
+c        write(6,*)xx,B,Bl,Ifail
+        IF (Ifail.LT.0) RETURN
+	C1 = 1.D0
+	C2 = 0.5D0
+	DO JJ=1,3
+          C3 = h/Bl
+	  IF (JJ.eq.3) C2 = 1.D0
+          DO II=1,3
+c            write(6,*)'b',B(1),B(2),B(3),Bl
+            xw = C3*B(II)
+            x2(II) = xx(II)+xw*C2
+            XF(II) = XF(II)+xw*C1
+          ENDDO
+          CALL CHAMP(X2,B,Bl,Ifail)
+c          write(6,*)xx,B,Bl,Ifail
+          IF (Ifail.LT.0) RETURN
+	  C1 = 2.D0
+        ENDDO
+        C3 = h/Bl
+        DO II=1,3
+c          write(6,*)'b',B(1),B(2),B(3),Bl
+          xw = C3*B(II)
+          x2(II) = xx(II) + xf(ii)/6.D0
+        ENDDO
+        CALL CHAMP(X2,B,Bl,Ifail)
+c        write(6,*)xx,B,Bl,Ifail
+        IF (Ifail.LT.0) RETURN
         END
 
 
