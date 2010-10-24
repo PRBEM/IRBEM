@@ -21,6 +21,22 @@ C
      &         lati,longi,alti,Bmin,posit)
 C
        IMPLICIT NONE
+       REAL*8     lati,longi,alti
+       REAL*8     Bmin
+       REAL*8     posit(3)
+       REAL*8     xx0(3)
+       
+       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
+       
+       call loc_equator_opt(xx0,Bmin,posit)
+
+       RETURN
+       END
+
+       SUBROUTINE loc_equator_opt(
+     &         xx0,Bmin,posit)
+C
+       IMPLICIT NONE
        INCLUDE 'variables.inc'
 C
        INTEGER*4  Nreb,Ntet
@@ -39,22 +55,20 @@ C
        REAL*8     Lb
        REAL*8     aa,bb
 C
-       REAL*8     pi,rad,tt
+       REAL*8     tt
        REAL*8     dtet
 C
        REAL*8     posit(3)
 C
        COMMON /magmod/k_ext,k_l,kint
+       REAL*8     pi,rad
+       common /rconst/rad,pi
 C
 C
-       pi = 4.D0*ATAN(1.D0)
-       rad = pi/180.D0
        dtet = pi/Ntet
 C
        Nrebmax = 10*Nreb
 C
-       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
-C           
        CALL GEO_SM(xx0,xx)
        rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))
        tt = ACOS(xx(3)/rr)

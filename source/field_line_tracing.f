@@ -27,15 +27,54 @@ C     Legacy wrapper w/ R0=1.0
        PARAMETER (Nreb = 150, Ntet = 720)
        INTEGER*4  Nposit
        REAL*8     lati,longi,alti,R0
+       REAL*8     Lm,leI0,Bmin,xx0(3)
+       REAL*8     posit(3,20*Nreb),Bposit(20*Nreb)
+
+       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
+C
+       call field_line_tracing_opt2(xx0,1.D0,
+     & Lm,leI0,Bposit,Bmin,posit,Nposit)
+
+       RETURN
+       END
+       SUBROUTINE field_line_tracing2(
+     &         lati,longi,alti,R0,Lm,leI0,Bposit,Bmin,posit,Nposit)
+C
+C    modified from field_line_tracing to add R0 parameter: radius (Re) of
+C    reference surface
+       IMPLICIT NONE
+       INTEGER*4  Nreb,Ntet
+       PARAMETER (Nreb = 150, Ntet = 720)
+       INTEGER*4  Nposit
+       REAL*8     lati,longi,alti,R0
+       REAL*8     Lm,leI0,Bmin,xx0(3)
+       REAL*8     posit(3,20*Nreb),Bposit(20*Nreb)
+
+       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
+C
+       call field_line_tracing_opt2(xx0,R0,
+     & Lm,leI0,Bposit,Bmin,posit,Nposit)
+
+       RETURN
+       END
+       
+       SUBROUTINE field_line_tracing_opt(
+     &         xx0,Lm,leI0,Bposit,Bmin,posit,Nposit)
+       IMPLICIT NONE
+       INTEGER*4  Nreb,Ntet
+       PARAMETER (Nreb = 150, Ntet = 720)
+       INTEGER*4  Nposit
+       REAL*8     xx0(3),R0
        REAL*8     Lm,leI0,Bmin
        REAL*8     posit(3,20*Nreb),Bposit(20*Nreb)
 
-       call field_line_tracing2(lati,longi,alti,1.D0,
+       call field_line_tracing_opt2(xx0,1.D0,
      & Lm,leI0,Bposit,Bmin,posit,Nposit)
-       end
+       RETURN
+       END
 
-       SUBROUTINE field_line_tracing2(
-     &         lati,longi,alti,R0,Lm,leI0,Bposit,Bmin,posit,Nposit)
+       SUBROUTINE field_line_tracing_opt2(
+     &         xx0,R0,Lm,leI0,Bposit,Bmin,posit,Nposit)
 C
 C    modified from field_line_tracing to add R0 parameter: radius (Re) of
 C    reference surface
@@ -44,7 +83,7 @@ C    reference surface
 C
        INTEGER*4  Nreb,Ntet
 c       PARAMETER (Nreb = 50, Ntet = 720)
-      PARAMETER (Nreb = 150, Ntet = 720)
+       PARAMETER (Nreb = 150, Ntet = 720)
 C
        INTEGER*4  k_ext,k_l,kint
        INTEGER*4  Nrebmax
@@ -62,7 +101,7 @@ C
        REAL*8     XY,YY
        REAL*8     aa,bb
 C
-       REAL*8     pi,rad,tt
+       REAL*8     tt
        REAL*8     tetl,tet1,dtet
        REAL*8     somme
 C
@@ -76,16 +115,12 @@ C
        COMMON /magmod/k_ext,k_l,kint
 C
 C
-       pi = 4.D0*ATAN(1.D0)
-       rad = pi/180.D0
        R02 = R0*R0
 C
        Nrebmax = 20*Nreb
 C
        Lm = baddata
        leI0 = 0.D0
-C
-       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
 C
        CALL GEO_SM(xx0,xx)
        rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))

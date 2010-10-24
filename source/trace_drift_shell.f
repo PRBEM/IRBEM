@@ -22,6 +22,29 @@ C
      &         lati,longi,alti,Lm,Lstar,leI0,Bposit,Bmin,posit,Nposit)
 C
        IMPLICIT NONE
+       REAL*8     xx0(3)
+       REAL*8     lati,longi,alti
+       REAL*8     Bmin
+       INTEGER*4  Nreb,Nder,Ntet
+       PARAMETER (Nreb = 50, Nder = 48, Ntet = 720)
+C
+       INTEGER*4  Nposit(Nder)
+       REAL*8     Lm,Lstar,Lb
+       REAL*8     leI0
+       REAL*8     posit(3,20*Nreb,Nder),Bposit(20*Nreb,Nder)
+C
+       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
+C
+       call trace_drift_shell_opt(
+     &         xx0,Lm,Lstar,leI0,Bposit,Bmin,posit,Nposit)
+C
+       RETURN
+       END
+       
+       SUBROUTINE trace_drift_shell_opt(
+     &         xx0,Lm,Lstar,leI0,Bposit,Bmin,posit,Nposit)
+C
+       IMPLICIT NONE
        INCLUDE 'variables.inc'
 C
        INTEGER*4  Nreb,Nder,Ntet
@@ -43,7 +66,7 @@ C
        REAL*8     XY,YY
        REAL*8     aa,bb
 C
-       REAL*8     pi,rad,tt
+       REAL*8     tt
        REAL*8     tet(Nder),phi(Nder)
        REAL*8     tetl,tet1,dtet
        REAL*8     somme,BrR2
@@ -56,10 +79,10 @@ C
        COMMON /calotte2/tet
        COMMON /flag_L/Ilflag
        COMMON /magmod/k_ext,k_l,kint
+       REAL*8     pi,rad
+       common /rconst/rad,pi
 C
 C
-       pi = 4.D0*ATAN(1.D0)
-       rad = pi/180.D0
        dtet = pi/Ntet
 C
        Nrebmax = 20*Nreb
@@ -67,8 +90,6 @@ C
        Lm = baddata
        Lstar = baddata
        leI0 = 0.D0
-C
-       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
 C
        CALL GEO_SM(xx0,xx)
        rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))
