@@ -22,6 +22,27 @@ C
      &         lati,longi,alti,dsreb,posit,Nposit)
 C
        IMPLICIT NONE
+       
+       INTEGER*4  Nreb
+       PARAMETER (Nreb = 150)
+       REAL*8     xx0(3)
+       REAL*8     lati,longi,alti
+       REAL*8     dsreb
+       INTEGER*4  Nposit
+       REAL*8     posit(3,20*Nreb)
+
+       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
+C
+       call field_line_tracing_towards_Earth_opt(
+     &         xx0,dsreb,posit,Nposit)
+
+       RETURN
+       END
+
+       SUBROUTINE field_line_tracing_towards_Earth_opt(
+     &         xx0,dsreb,posit,Nposit)
+C
+       IMPLICIT NONE
        INCLUDE 'variables.inc'
 C
        INTEGER*4  Nreb
@@ -41,8 +62,6 @@ C
        REAL*8     posit(3,20*Nreb)
 C
        Nrebmax = 1000
-C
-       CALL GDZ_GEO(lati,longi,alti,xx0(1),xx0(2),xx0(3))
 C
        CALL CHAMP(xx0,B,B0,Ifail)
        IF (Ifail.LT.0) THEN
@@ -94,5 +113,6 @@ c        write(6,*)J,x1(1),x1(2),x1(3),Bl
        ENDDO
 201    CONTINUE
        Nposit=ind
+       RETURN
        END
 C
