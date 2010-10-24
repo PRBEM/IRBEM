@@ -2008,7 +2008,7 @@ c        INCLUDE 'debug7.for'
            ! ------------ wgs-72 constants ------------
            mu     = 398600.8D0            ! in km3 / s2
            radiusearthkm = 6378.135D0     ! km
-           xke    = 60.0D0 / dsqrt(radiusearthkm**3/mu);
+           xke    = 60.0D0 / dsqrt(radiusearthkm**3/mu)
            tumin  = 1.0D0 / xke
            j2     =   0.001082616D0
            j3     =  -0.00000253881D0

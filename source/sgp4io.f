@@ -113,7 +113,7 @@
         VKmPerSec     =  RadiusEarthKm * xke / 60.0D0
 
         CALL getgravconst( whichconst, tumin, radiusearthkm, xke, j2, 
-     &       j3, j4, j3oj2 );
+     &       j3, j4, j3oj2 )
 
 c        make sure the main program opens this file, otherwise do so here
 c        ! store results in a temporary file of record
