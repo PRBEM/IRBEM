@@ -104,6 +104,8 @@ C
       COMMON /magmod/k_ext,k_l,kint
       COMMON /flag_L/Ilflag
       COMMON /dip_ang/tilt
+        REAL*8     pi,rad
+        common /rconst/rad,pi
       DATA  xSUN /1.d0,0.d0,0.d0/
 C
       Ilflag=0
@@ -149,74 +151,14 @@ c
       idoy_dip=0
       UT_dip=0.d0
       CALL INIT_GSM(iyear_dip,idoy_dip,UT_dip,psi)
-      tilt = psi/(4.D0*ATAN(1.D0)/180.d0)
+      tilt = psi/rad
       DO isat = 1,ntime
-c	   write(6,*)real(isat)*100./real(ntime), '% done'
-c
-      if (sysaxes .EQ. 0) then
-         alti=xIN1(isat)
-         lati=xIN2(isat)
-         longi=xIN3(isat)
-      endif
-      if (sysaxes .EQ. 1) then
-         xGEO(1)=xIN1(isat)
-         xGEO(2)=xIN2(isat)
-         xGEO(3)=xIN3(isat)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 2) then
-         xGSM(1)=xIN1(isat)
-         xGSM(2)=xIN2(isat)
-         xGSM(3)=xIN3(isat)
-         CALL INIT_GSM(iyear(isat),idoy(isat),UT(isat),psi)
-         CALL GSM_GEO(xGSM,xGEO)
-         CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 3) then
-         xGSE(1)=xIN1(isat)
-         xGSE(2)=xIN2(isat)
-         xGSE(3)=xIN3(isat)
-         CALL INIT_GSM(iyear(isat),idoy(isat),UT(isat),psi)
-         CALL GSE_GEO(xGSE,xGEO)
-           CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 4) then
-           xSM(1)=xIN1(isat)
-           xSM(2)=xIN2(isat)
-           xSM(3)=xIN3(isat)
-           CALL INIT_GSM(iyear(isat),idoy(isat),UT(isat),psi)
-           CALL SM_GEO(xSM,xGEO)
-           CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 5) then
-           xGEI(1)=xIN1(isat)
-           xGEI(2)=xIN2(isat)
-           xGEI(3)=xIN3(isat)
-           CALL INIT_GSM(iyear(isat),idoy(isat),UT(isat),psi)
-           CALL GEI_GEO(xGEI,xGEO)
-           CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 6) then
-           xMAG(1)=xIN1(isat)
-           xMAG(2)=xIN2(isat)
-           xMAG(3)=xIN3(isat)
-           CALL MAG_GEO(xMAG,xGEO)
-           CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 7) then
-           xMAG(1)=xIN1(isat)
-           xMAG(2)=xIN2(isat)
-           xMAG(3)=xIN3(isat)
-           CALL SPH_CAR(xMAG(1),xMAG(2),xMAG(3),xGEO)
-           CALL GEO_GDZ(xGEO(1),xGEO(2),xGEO(3),lati,longi,alti)
-      endif
-      if (sysaxes .EQ. 8) then
-           xMAG(1)=xIN1(isat)
-           lati=xIN2(isat)
-           longi=xIN3(isat)
-           CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-      endif
-      CALL calcul_Lstar(t_resol,r_resol,lati,longi,alti
+
+	    call get_coordinates ( sysaxes, 
+     6        xIN1(isat), xIN2(isat), xIN3(isat), 
+     6        alti, lati, longi, xGEO )
+
+      CALL calcul_Lstar_opt(t_resol,r_resol,xGEO
      &     ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
 C           BBo(isat)=BLOCAL(isat)/BMIN(isat)  ! removed to use McIlwain Gmagmo for AP/AE
       if (Lm(isat) .le. 0.D0 .and. Lm(isat) .ne. -1.D31)
