@@ -17656,12 +17656,7 @@ c Compute Bmin at all locations first.
            DO IPA=1,Nipa
               options(1)=0
               if (alpha(IPA).ne.90.0d0) then
-                 xIN(1) = xIN1(isat)
-                 xIN(2) = xIN2(isat)
-                 xIN(3) = xIN3(isat)
-                 call coord_trans1(sysaxes,sysaxesOUT,iyearsat(isat),
-     &                idoy(isat),UT(isat),xIN,xOUT)
-                 CALL find_bm(xOUT(2),xOUT(3),xOUT(1),alpha(IPA),BL,
+                 CALL find_bm_nalpha(xIN,1,alpha(IPA),BL,
      &                BMIR,xGEO)
                  call make_lstar1(ntime_tmp,kext,options,sysaxesIN,
      &                iyearsat,idoy,UT,xGEO(1),xGEO(2),xGEO(3),
@@ -17763,8 +17758,7 @@ c
       REAL*8     XJ(ntime_max),Lm(ntime_max)
 c
 c Declare internal variables
-      INTEGER*4  isat,DayIndexL,DayIndexR,i,iflag,iyear,kint
-      INTEGER*4  firstJanuary,lastDecember,currentdoy,JULDAY
+      INTEGER*4  isat,DayIndexL,DayIndexR,i,iflag,kint
       REAL*8     Lmax(12,2100),Imax(12,2100)
       REAL*8     Lupper(12,1001),Iupper(12,1001)
       REAL*8     Lm4(12,100),A0(12,100),A1(12,100),A2(12,100),A3(12,100)
@@ -17774,8 +17768,10 @@ c Declare internal variables
       REAL*8     slope,origin,XJL,XJR,LupperL,LupperR,Lstar1,Lstar2
       REAL*8     LstarL,LstarR,LnXJ,XJatLossCone
       REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
-      REAL*8     pi,dec_year
+      REAL*8     dec_year
       REAL*8     DeltaT
+        REAL*8     pi,rad
+        common /rconst/rad,pi
 c
 c Declare output variables
       REAL*8     Lstar(ntime_max)
@@ -17783,6 +17779,7 @@ C
       COMMON/LAndI2LstarCom/Lmax,Imax,Lupper,Iupper,Lm4,A0,A1,A2,A3,A4,
      &Lm5,A50,A51,A52,A53,A54,A55
       COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
+      integer*4 int_field_select, ext_field_select
 c
 c     This method to compute L* is only available for IGRF + Olson-Pfitzer quiet
       if (options(5) .ne. 0) options(5)=0  ! force internal field to be IGRF
@@ -18099,56 +18096,17 @@ c
 c
 c if required by user compute Phi instead of L*
       if (options(1) .EQ. 2) then
-        pi=4.D0*atan(1.D0)
-        iyear=1800
-	kint=options(5)
-	IF (kint .lt. 0) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
-	if (kint .gt. 3) THEN
-	   kint=0
-	   WRITE(6,*)
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)'Invalid internal field specification'
-	   WRITE(6,*)'Selecting IGRF'
-	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-	   WRITE(6,*)
-	ENDIF
+	kint = int_field_select ( options(5) )
 c
         CALL INITIZE
-	if (kint .eq. 2) CALL JensenANDCain1960
-	if (kint .eq. 3) CALL GSFC1266
+
         DO isat = 1,ntime
 c	   write(6,*)real(isat)*100./real(ntime), '% done'
 c
-           if (kint .le. 1) then
-              if (options(2) .eq. 0) then
-	        if (iyearsat(isat) .ne. iyear) then
-	           iyear=iyearsat(isat)
-	           dec_year=iyear+0.5d0
-	           CALL INIT_DTD(dec_year)
-	        endif
-	      else
-	        if (iyearsat(isat) .ne. iyear .or.
-     &          MOD(idoy(isat)*1.d0,options(2)*1.d0) .eq. 0) THEN
-	           iyear=iyearsat(isat)
-		   firstJanuary=JULDAY(iyear,01,01)
-		   lastDecember=JULDAY(iyear,12,31)
-		   currentdoy=(idoy(isat)/options(2))*options(2)
-		   if (currentdoy .eq. 0) currentdoy=1
-	           dec_year=iyear+currentdoy*1.d0/
-     &             ((lastDecember-firstJanuary+1)*1.d0)
-	           CALL INIT_DTD(dec_year)
-                endif
-	      endif
-	   endif
-	   if (Lstar(isat) .NE. baddata) Lstar(isat)=2.d0*pi*Bo/Lstar(isat)
+           call init_fields (kint,iyearsat(isat),idoy(isat),
+     &          -1.D0,options(2))
+           if (Lstar(isat) .NE. baddata) 
+     &          Lstar(isat)=2.d0*pi*Bo/Lstar(isat)
 	enddo
       endif
 
