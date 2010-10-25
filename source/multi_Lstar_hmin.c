@@ -72,7 +72,7 @@ void print_usage() {
 
 
 #define FILENAME_LEN (2048)
-void main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 
   /* internal variables */
   char infilename[FILENAME_LEN],outfilename[FILENAME_LEN];
@@ -90,7 +90,7 @@ void main(int argc, char *argv[]) {
 
   /* time-fixed arguments to drift_bounce_orbit2_1 */
   int32_t kext, options[5], sysaxes;
-  double maginput[25],R0,Blocal[1000*25],posit[3*1000*25);
+  double maginput[25],R0,Blocal[1000*25],posit[3*1000*25];
   int32_t ind[25];
 
 
@@ -109,7 +109,7 @@ void main(int argc, char *argv[]) {
       cleanup(-1);
     }
 
-    if ((strlen(argv[1])>=FILENAME_LEN) || (strlen(argv[2]>=FILENAME_LEN))) {
+    if ((strlen(argv[1])>=FILENAME_LEN) || (strlen(argv[2])>=FILENAME_LEN)) {
       fprintf(stderr,"%s: maximum file name length is %i\n",__func__,FILENAME_LEN-1);
       cleanup(-1);
     }
@@ -132,11 +132,11 @@ void main(int argc, char *argv[]) {
     /* send GO code to slaves - MPI */
     mpi_op_code = MY_MPI_OP_GO;
     for (mpi_slave = 1; mpi_slave < mpi_size; mpi_slave++) {
-      MPI_Send(&mpi_op_code,1,MPI_INT,mpi_slave,NN_MPI_TAG_OP,MPI_COMM_WORLD);
+      MPI_Send(&mpi_op_code,1,MPI_INT,mpi_slave,MY_MPI_TAG_OP,MPI_COMM_WORLD);
     }
 
     nchunk = ntimes / mpi_size; /* number of points per slave */
-    MPI_Send(&nchunk,1,MPI_INT,mpi_slave,NN_MPI_TAG_COMMON,MPI_COMM_WORLD);
+    MPI_Send(&nchunk,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
 
   } else {
     /* wait for GO op code or abort */
@@ -200,23 +200,23 @@ void main(int argc, char *argv[]) {
     first_step = 0;
     for (mpi_slave = 1; mpi_slave < mpi_size; mpi_slave++) {
       /* send GO code to slaves - MPI */
-      MPI_Send(&mpi_op_code,1,MPI_INT,mpi_slave,NN_MPI_TAG_OP,MPI_COMM_WORLD);
+      MPI_Send(&mpi_op_code,1,MPI_INT,mpi_slave,MY_MPI_TAG_OP,MPI_COMM_WORLD);
 
       /* send COMMON data */
-      MPI_Send(&kext,1,MPI_INT,mpi_slave,NN_MPI_TAG_COMMON,MPI_COMM_WORLD);
-      MPI_Send(options,5,MPI_INT,mpi_slave,NN_MPI_TAG_COMMON,MPI_COMM_WORLD);
-      MPI_Send(&sysaxes,1,MPI_INT,mpi_slave,NN_MPI_TAG_COMMON,MPI_COMM_WORLD);
-      MPI_Send(maginput,25,MPI_DOUBLE,mpi_slave,NN_MPI_TAG_COMMON,MPI_COMM_WORLD);
-      MPI_Send(&R0,1,MPI_DOUBLE,mpi_slave,NN_MPI_TAG_COMMON,MPI_COMM_WORLD);
+      MPI_Send(&kext,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
+      MPI_Send(options,5,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
+      MPI_Send(&sysaxes,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
+      MPI_Send(maginput,25,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
+      MPI_Send(&R0,1,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
 
       /* send VARINPUT data */
-      MPI_Send(iyear+first_step,nchunk,MPI_INT,mpi_slave,NN_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
-      MPI_Send(idoy+first_step,nchunk,MPI_INT,mpi_slave,NN_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
-      MPI_Send(UT+first_step,nchunk,MPI_DOUBLE,mpi_slave,NN_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
-      MPI_Send(x1+first_step,nchunk,MPI_DOUBLE,mpi_slave,NN_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
-      MPI_Send(x2+first_step,nchunk,MPI_DOUBLE,mpi_slave,NN_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
-      MPI_Send(x3+first_step,nchunk,MPI_DOUBLE,mpi_slave,NN_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
-      MPI_Send(alpha+first_step,nchunk,MPI_DOUBLE,mpi_slave,NN_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      MPI_Send(iyear+first_step,nchunk,MPI_INT,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      MPI_Send(idoy+first_step,nchunk,MPI_INT,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      MPI_Send(UT+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      MPI_Send(x1+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      MPI_Send(x2+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      MPI_Send(x3+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      MPI_Send(alpha+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
 
       first_step += nchunk;
     }
@@ -285,13 +285,13 @@ void main(int argc, char *argv[]) {
     fclose(outfilep);
   } else {
     /* send results via MPI, OUTPUT channel */
-    MPI_Send(Lm,ntimes,MPI_DOUBLE,0,NN_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
-    MPI_Send(Lstar,ntimes,MPI_DOUBLE,0,NN_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
-    MPI_Send(Bmin,ntimes,MPI_DOUBLE,0,NN_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
-    MPI_Send(Bmir,ntimes,MPI_DOUBLE,0,NN_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
-    MPI_Send(J,ntimes,MPI_DOUBLE,0,NN_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
-    MPI_Send(hmin,ntimes,MPI_DOUBLE,0,NN_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
-    MPI_Send(hmin_lon,ntimes,MPI_DOUBLE,0,NN_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    MPI_Send(Lm,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    MPI_Send(Lstar,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    MPI_Send(Bmin,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    MPI_Send(Bmir,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    MPI_Send(J,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    MPI_Send(hmin,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    MPI_Send(hmin_lon,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
   }
 
 
@@ -312,4 +312,5 @@ void main(int argc, char *argv[]) {
 
   /* finalize */
   MPI_Finalize();
+  return(0);
 }
