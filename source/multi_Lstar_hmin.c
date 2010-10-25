@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     }
     /* read arguments */
     printf("%s: reading %d args\n",__func__,argc); /* debug */
-    if ((argc != 3) && (! strcmp(argv[1],"--help"))) {
+    if (argc != 3) {
       fprintf(stderr,"%s: wrong syntax\n",__func__);
       print_usage();
       cleanup(-1);
