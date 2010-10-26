@@ -1,6 +1,6 @@
 /*
 An MPI program to genereate multiple Lstar/hmin values
-From time/loc parameters from a file
+From time/loc parameters from a binary file
  */
 
 #include <stdlib.h>
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
   long int first_step,istep;
   FILE *infilep,*outfilep;
   int32_t ntimes,nchunk;
-  int mpi_master, mpi_slave, mpi_size=1, mpi_op_code;
+  int mpi_master, mpi_slave, mpi_size=1, mpi_op_code,mpi_rank=0;
   MPI_Status status;
 
   /* time variable arguments to drift_bounce_orbit_2_1 */
@@ -116,8 +116,10 @@ int main(int argc, char *argv[]) {
 
     strcpy(infilename,argv[1]);
     strcpy(outfilename,argv[2]);
+    printf("Master: infilename = <%s>, outfilename = <%s>\n",infilename,outfilename);
     
     MPI_Comm_size (MPI_COMM_WORLD, &mpi_size);	/* get number of processes */  
+    printf("Master: %i processes\n",mpi_size);
 
     if (!(infilep = fopen(infilename,"rb"))) {
       perror("main:Unable to create file");
@@ -128,19 +130,26 @@ int main(int argc, char *argv[]) {
     /* load data, allocate large arrays */
     
     fread(&ntimes, sizeof(ntimes), 1, infilep); /* number of samples */
+    printf("Master: ntimes=%i\n",ntimes);
 
     /* send GO code to slaves - MPI */
     mpi_op_code = MY_MPI_OP_GO;
+    nchunk = ntimes / mpi_size; /* number of points per slave */
     for (mpi_slave = 1; mpi_slave < mpi_size; mpi_slave++) {
+      printf("Master: Sending GO code to slave %i\n",mpi_slave);
       MPI_Send(&mpi_op_code,1,MPI_INT,mpi_slave,MY_MPI_TAG_OP,MPI_COMM_WORLD);
+      printf("Master: Sending nchunk=%i to slave %i\n",nchunk,mpi_slave);
+      MPI_Send(&nchunk,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
     }
 
-    nchunk = ntimes / mpi_size; /* number of points per slave */
-    MPI_Send(&nchunk,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
 
   } else {
+    MPI_Comm_rank (MPI_COMM_WORLD, &mpi_rank);	/* get slave process id */  
+
     /* wait for GO op code or abort */
+    printf("Slave %i: waiting for op code\n",mpi_rank);
     MPI_Recv(&mpi_op_code,1,MPI_INT,0,MY_MPI_TAG_OP,MPI_COMM_WORLD,&status);
+    printf("Slave %i: received op code %i\n",mpi_rank,mpi_op_code);
     if (mpi_op_code != MY_MPI_OP_GO) { /* early abort */
       MPI_Finalize();
       exit(-1);
@@ -148,6 +157,7 @@ int main(int argc, char *argv[]) {
 
     /* get ntimes via MPI */
     MPI_Recv(&ntimes,1,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
+    printf("Slave %i: received ntimes %i\n",mpi_rank,ntimes);
 
   }
   
@@ -172,12 +182,16 @@ int main(int argc, char *argv[]) {
   if (mpi_master) {
     /* read common parameters: kext, options, sysaxes, maginput, R0 */
     fread(&kext, sizeof(kext), 1, infilep);
+    printf("Master: kext=%i\n",kext);
     fread(options, sizeof(*options), 5, infilep);
     fread(&sysaxes, sizeof(sysaxes), 1, infilep);
+    printf("Master: sysaxes=%i\n",sysaxes);
     fread(maginput, sizeof(*maginput), 25, infilep);
     fread(&R0, sizeof(R0), 1, infilep);
+    printf("Master: R0=%g\n",R0);
     
     /* read time series params */
+    printf("Master: Reading VARINPUT data\n");
     fread(iyear, sizeof(*iyear), ntimes, infilep);
     fread(idoy, sizeof(*idoy), ntimes, infilep);
     fread(UT, sizeof(*UT), ntimes, infilep);
@@ -186,6 +200,7 @@ int main(int argc, char *argv[]) {
     fread(x3, sizeof(*x3), ntimes, infilep);
     fread(alpha, sizeof(*alpha), ntimes, infilep);
     fclose(infilep);
+    printf("Master: Done reading from %s\n",infilename);
     
     /* prep out file */
     
@@ -195,14 +210,17 @@ int main(int argc, char *argv[]) {
       cleanup(-1);
     }
 
+    printf("Master: Dispatching to %i slaves\n",mpi_size-1);
     /* send GO op code, break up job & send to slaves */
     mpi_op_code = MY_MPI_OP_GO;
     first_step = 0;
     for (mpi_slave = 1; mpi_slave < mpi_size; mpi_slave++) {
       /* send GO code to slaves - MPI */
+      printf("Master: Sending GO code to slave %i\n",mpi_slave);
       MPI_Send(&mpi_op_code,1,MPI_INT,mpi_slave,MY_MPI_TAG_OP,MPI_COMM_WORLD);
 
       /* send COMMON data */
+      printf("Master: Sending COMMON data to slave %i\n",mpi_slave);
       MPI_Send(&kext,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
       MPI_Send(options,5,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
       MPI_Send(&sysaxes,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
@@ -210,6 +228,7 @@ int main(int argc, char *argv[]) {
       MPI_Send(&R0,1,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
 
       /* send VARINPUT data */
+      printf("Master: Sending VARINPUT data to slave %i, first_step=%i, nchunk=%i\n",mpi_slave,first_step,nchunk);
       MPI_Send(iyear+first_step,nchunk,MPI_INT,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
       MPI_Send(idoy+first_step,nchunk,MPI_INT,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
       MPI_Send(UT+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
@@ -219,11 +238,15 @@ int main(int argc, char *argv[]) {
       MPI_Send(alpha+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
 
       first_step += nchunk;
+      printf("Master: Done sending VARINPUT data to slave %i, new first_step=%i\n",mpi_slave,first_step);
     }
+    printf("Master: Keeping %i for myself (vs %i for slaves)\n",ntimes-first_step,nchunk);
 
   } else {
     /* wait for GO op code or abort */
+    printf("Slave %i: waiting for op code\n",mpi_rank);
     MPI_Recv(&mpi_op_code,1,MPI_INT,0,MY_MPI_TAG_OP,MPI_COMM_WORLD,&status);
+    printf("Slave %i: received op code %i\n",mpi_rank,mpi_op_code);
     if (mpi_op_code != MY_MPI_OP_GO) { /* early abort */
       MPI_Finalize();
       exit(-1);
@@ -231,10 +254,13 @@ int main(int argc, char *argv[]) {
 
     /* receive common params */
     MPI_Recv(&kext,1,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
+    printf("Slave %i: received kext=%i\n",mpi_rank,kext);
     MPI_Recv(options,5,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     MPI_Recv(&sysaxes,1,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
+    printf("Slave %i: received sysaxes=%i\n",mpi_rank,sysaxes);
     MPI_Recv(maginput,25,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     MPI_Recv(&R0,1,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
+    printf("Slave %i: received R0=%g\n",mpi_rank,R0);
 
     /* receive time series params */
     MPI_Recv(iyear,ntimes,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
@@ -245,13 +271,16 @@ int main(int argc, char *argv[]) {
     MPI_Recv(x3,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     MPI_Recv(alpha,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
 
+    printf("Slave %i: done receiving run parameters\n",mpi_rank);
+
     first_step = 0; /* slaves always to 0 to ntimes-1 */
   }
     
   /* run loop */
 
-  for (istep = first_step; istep < ntimes; istep++) {
+  printf("Master/Slave %i: running %i cases, %i to %i\n",mpi_rank,ntimes-first_step,first_step,ntimes);
 
+  for (istep = first_step; istep < ntimes; istep++) {
     drift_bounce_orbit2_1_(&kext,options,&sysaxes, iyear+istep,idoy+istep,UT+istep,x1+istep,x2+istep,x3+istep,alpha+istep,
 			   maginput,&R0,Lm+istep,Lstar+istep,Blocal,Bmin+istep,Bmir+istep,J+istep,posit,ind,hmin+istep,hmin_lon+istep);
   }
@@ -262,6 +291,7 @@ int main(int argc, char *argv[]) {
 
     first_step = 0;
     for (mpi_slave = 1; mpi_slave < mpi_size; mpi_slave++) {
+      printf("Master: receiving %i results from %i, first_step = %i\n",nchunk,mpi_slave,first_step);
       MPI_Recv(Lm+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD,&status);
       MPI_Recv(Lstar+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD,&status);
       MPI_Recv(Bmin+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD,&status);
@@ -270,9 +300,11 @@ int main(int argc, char *argv[]) {
       MPI_Recv(hmin+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD,&status);
       MPI_Recv(hmin_lon+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD,&status);
       first_step += nchunk;
+      printf("Master: received %i results from %i, new first_step=%i\n",nchunk,mpi_slave,first_step);
     }
 
     /* write */
+    printf("Master: writing data to%s\n",outfilename);
     fwrite(&ntimes,sizeof(ntimes),1,outfilep);
     fwrite(Lm,sizeof(*Lm),ntimes,outfilep);
     fwrite(Lstar,sizeof(*Lm),ntimes,outfilep);
@@ -283,8 +315,10 @@ int main(int argc, char *argv[]) {
     fwrite(hmin_lon,sizeof(*Lm),ntimes,outfilep);
 
     fclose(outfilep);
+    printf("Master: Done\n");
   } else {
     /* send results via MPI, OUTPUT channel */
+    printf("Slave %i: sending results\n",mpi_rank);
     MPI_Send(Lm,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
     MPI_Send(Lstar,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
     MPI_Send(Bmin,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
@@ -292,6 +326,7 @@ int main(int argc, char *argv[]) {
     MPI_Send(J,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
     MPI_Send(hmin,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
     MPI_Send(hmin_lon,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_OUTPUT,MPI_COMM_WORLD);
+    printf("Slave %i: Done\n",mpi_rank);
   }
 
 
