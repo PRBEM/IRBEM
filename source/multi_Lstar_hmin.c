@@ -72,10 +72,14 @@ void print_usage() {
 
 
 #define FILENAME_LEN (2048)
+#define HEADER_LEN (100)
+#define HEADER_MAGIC ("multi_Lstar_hmin")
 int main(int argc, char *argv[]) {
 
   /* internal variables */
   char infilename[FILENAME_LEN],outfilename[FILENAME_LEN];
+  char header[HEADER_LEN];
+  int maginput_varies=0,maginput_size=0;
   long int first_step,istep;
   FILE *infilep,*outfilep;
   int32_t ntimes,nchunk;
@@ -84,13 +88,13 @@ int main(int argc, char *argv[]) {
 
   /* time variable arguments to drift_bounce_orbit_2_1 */
   int32_t *iyear,*idoy; /* inputs */
-  double *UT,*x1,*x2,*x3,*alpha; /* inputs */
+  double *UT,*x1,*x2,*x3,*alpha, *maginput; /* inputs */
   double *Lm,*Lstar,*Bmin,*Bmir,*J,*hmin,*hmin_lon; /* outputs */
   /* note: returned values Blocal, posit, and ind are ignored */
 
   /* time-fixed arguments to drift_bounce_orbit2_1 */
   int32_t kext, options[5], sysaxes;
-  double maginput[25],R0,Blocal[1000*25],posit[3*1000*25];
+  double R0,Blocal[1000*25],posit[3*1000*25];
   int32_t ind[25];
 
 
@@ -126,6 +130,16 @@ int main(int argc, char *argv[]) {
       fprintf(stderr,"%s: file name: %s\n",__func__,infilename);
       cleanup(-1);
     }
+
+    /* check header */
+    fread(header, 1, HEADER_LEN, infilep); /* header */
+    if (strncmp(header,HEADER_MAGIC,strlen(HEADER_MAGIC))!=0) {
+      fclose(infilep);
+      perror("main:Header does not start with magic string");
+      fprintf(stderr,"%s: magic=<%s> file name: %s\n",__func__,HEADER_MAGIC,infilename);
+      cleanup(-1);
+    }
+    maginput_varies = header[HEADER_LEN] & 1;
     
     /* load data, allocate large arrays */
     
@@ -138,6 +152,8 @@ int main(int argc, char *argv[]) {
     for (mpi_slave = 1; mpi_slave < mpi_size; mpi_slave++) {
       printf("Master: Sending GO code to slave %i\n",mpi_slave);
       MPI_Send(&mpi_op_code,1,MPI_INT,mpi_slave,MY_MPI_TAG_OP,MPI_COMM_WORLD);
+      printf("Master: Sending maginput_varies=%i to slave %i\n",maginput_varies,mpi_slave);
+      MPI_Send(&maginput_varies,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
       printf("Master: Sending nchunk=%i to slave %i\n",nchunk,mpi_slave);
       MPI_Send(&nchunk,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
     }
@@ -155,12 +171,17 @@ int main(int argc, char *argv[]) {
       exit(-1);
     }
 
+    /* get maginput_varies via MPI */
+    MPI_Recv(&maginput_varies,1,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
+    printf("Slave %i: received maginput_varies %i\n",mpi_rank,maginput_varies);
     /* get ntimes via MPI */
     MPI_Recv(&ntimes,1,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     printf("Slave %i: received ntimes %i\n",mpi_rank,ntimes);
 
   }
   
+  maginput_size = (maginput_varies?ntimes:1)*25;
+    
   /* allocate time series of parameters */
   iyear = malloc(ntimes*sizeof(*iyear));
   idoy = malloc(ntimes*sizeof(*idoy));
@@ -169,29 +190,31 @@ int main(int argc, char *argv[]) {
   x2 = malloc(ntimes*sizeof(*x2));
   x3 = malloc(ntimes*sizeof(*x3));
   alpha = malloc(ntimes*sizeof(*alpha));
+  maginput = malloc(maginput_size*sizeof(*maginput));
 
   /* allocate output variables */
   Lm = malloc(ntimes*sizeof(*Lm));
   Lstar = malloc(ntimes*sizeof(*Lstar));
   Bmin = malloc(ntimes*sizeof(*Bmin));
+  Bmir = malloc(ntimes*sizeof(*Bmir));
   J = malloc(ntimes*sizeof(*J));
   hmin = malloc(ntimes*sizeof(*hmin));
   hmin_lon = malloc(ntimes*sizeof(*hmin_lon));
 
   
   if (mpi_master) {
-    /* read common parameters: kext, options, sysaxes, maginput, R0 */
+    /* read common parameters: kext, options, sysaxes, R0 */
     fread(&kext, sizeof(kext), 1, infilep);
     printf("Master: kext=%i\n",kext);
     fread(options, sizeof(*options), 5, infilep);
     fread(&sysaxes, sizeof(sysaxes), 1, infilep);
     printf("Master: sysaxes=%i\n",sysaxes);
-    fread(maginput, sizeof(*maginput), 25, infilep);
     fread(&R0, sizeof(R0), 1, infilep);
     printf("Master: R0=%g\n",R0);
     
     /* read time series params */
     printf("Master: Reading VARINPUT data\n");
+    fread(maginput, sizeof(*maginput), maginput_size, infilep);
     fread(iyear, sizeof(*iyear), ntimes, infilep);
     fread(idoy, sizeof(*idoy), ntimes, infilep);
     fread(UT, sizeof(*UT), ntimes, infilep);
@@ -224,11 +247,15 @@ int main(int argc, char *argv[]) {
       MPI_Send(&kext,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
       MPI_Send(options,5,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
       MPI_Send(&sysaxes,1,MPI_INT,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
-      MPI_Send(maginput,25,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
       MPI_Send(&R0,1,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_COMMON,MPI_COMM_WORLD);
 
       /* send VARINPUT data */
       printf("Master: Sending VARINPUT data to slave %i, first_step=%i, nchunk=%i\n",mpi_slave,first_step,nchunk);
+      if (maginput_varies) {
+	MPI_Send(maginput+first_step*25,nchunk*25,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      } else {
+	MPI_Send(maginput,25,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
+      }
       MPI_Send(iyear+first_step,nchunk,MPI_INT,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
       MPI_Send(idoy+first_step,nchunk,MPI_INT,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
       MPI_Send(UT+first_step,nchunk,MPI_DOUBLE,mpi_slave,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD);
@@ -258,18 +285,18 @@ int main(int argc, char *argv[]) {
     MPI_Recv(options,5,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     MPI_Recv(&sysaxes,1,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     printf("Slave %i: received sysaxes=%i\n",mpi_rank,sysaxes);
-    MPI_Recv(maginput,25,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     MPI_Recv(&R0,1,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
     printf("Slave %i: received R0=%g\n",mpi_rank,R0);
 
     /* receive time series params */
-    MPI_Recv(iyear,ntimes,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
-    MPI_Recv(idoy,ntimes,MPI_INT,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
-    MPI_Recv(UT,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
-    MPI_Recv(x1,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
-    MPI_Recv(x2,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
-    MPI_Recv(x3,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
-    MPI_Recv(alpha,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_COMMON,MPI_COMM_WORLD,&status);
+    MPI_Recv(maginput,maginput_size,MPI_DOUBLE,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
+    MPI_Recv(iyear,ntimes,MPI_INT,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
+    MPI_Recv(idoy,ntimes,MPI_INT,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
+    MPI_Recv(UT,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
+    MPI_Recv(x1,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
+    MPI_Recv(x2,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
+    MPI_Recv(x3,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
+    MPI_Recv(alpha,ntimes,MPI_DOUBLE,0,MY_MPI_TAG_VARINPUT,MPI_COMM_WORLD,&status);
 
     printf("Slave %i: done receiving run parameters\n",mpi_rank);
 
@@ -278,12 +305,16 @@ int main(int argc, char *argv[]) {
     
   /* run loop */
 
-  printf("Master/Slave %i: running %i cases, %i to %i\n",mpi_rank,ntimes-first_step,first_step,ntimes);
+  printf("Master/Slave %i: running %i cases, %i to %i\n",mpi_rank,ntimes-first_step,first_step,ntimes-1);
 
   for (istep = first_step; istep < ntimes; istep++) {
+    printf("Master/Slave %i: Running case %i / %i\n",mpi_rank,istep,ntimes);
     drift_bounce_orbit2_1_(&kext,options,&sysaxes, iyear+istep,idoy+istep,UT+istep,x1+istep,x2+istep,x3+istep,alpha+istep,
-			   maginput,&R0,Lm+istep,Lstar+istep,Blocal,Bmin+istep,Bmir+istep,J+istep,posit,ind,hmin+istep,hmin_lon+istep);
+			   maginput+istep*25*maginput_varies, 
+			   &R0,Lm+istep,Lstar+istep,Blocal,Bmin+istep,Bmir+istep,J+istep,posit,ind,hmin+istep,hmin_lon+istep);
   }
+
+  printf("Master/Slave %i: Done running %i cases\n",mpi_rank,ntimes-first_step);
 
   /* collect */
   if (mpi_master) {
@@ -338,9 +369,11 @@ int main(int argc, char *argv[]) {
   free(x2);
   free(x3);
   free(alpha);
+  free(maginput);
   free(Lm);
   free(Lstar);
   free(Bmin);
+  free(Bmir);
   free(J);
   free(hmin);
   free(hmin_lon);
