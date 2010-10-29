@@ -243,7 +243,7 @@ C     Parameters
       
 C     Input Variables
       INTEGER*4 t_resol,r_resol
-      REAL*8     lati,longi,alti,R0
+      REAL*8     R0
       
 C     Internal Variables
       INTEGER*4  Nder,Nreb,Ntet
@@ -262,7 +262,6 @@ C     Internal Variables
       REAL*8     leI,leI1
       REAL*8     XY,YY
       REAL*8     aa,bb
-      REAL*8     tmp_lati,tmp_longi,tmp_alti
       
 C     
       REAL*8     tt
@@ -302,8 +301,8 @@ C
 C     
 C
 c     initialize hmin,hmin_lon to starting point
-      hmin = alti
-      hmin_lon = longi
+      hmin = baddata
+      call check_hmin(xx0(1),xx0(2),xx0(3),hmin,hmin_lon)
 
       CALL GEO_SM(xx0,xx)
       rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))
@@ -825,6 +824,7 @@ c     finish trace to Bm: Bm between x1 and x2
       subroutine check_hmin(x,y,z,hmin,hmin_lon)
       ! check alt/lat/lon at x,y,z and replace hmin,hmin_lon if needed
       IMPLICIT NONE
+      INCLUDE 'variables.inc'
       ! inputs - x,y,z GEO
       real*8 x,y,z
       
@@ -835,7 +835,7 @@ c     finish trace to Bm: Bm between x1 and x2
       real*8 lati,longi,alti
 
       call geo_gdz(x,y,z,lati,longi,alti)
-      if (alti .lt. hmin) then
+      if ((hmin.eq.baddata).or.(alti .lt. hmin)) then
          hmin = alti
          hmin_lon = longi
       endif
