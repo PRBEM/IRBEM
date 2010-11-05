@@ -178,7 +178,7 @@ C
 C calcul de Bmirror point
 C
        DO i=1,1000
-         CALL sksyst(dsreb/1000.d0,xmin,x1,Bl,Ifail)
+         CALL sksyst(dsreb/1000.d0,xmin(1,ii),x1,Bl,Ifail)
          IF (Ifail.LT.0) THEN
 	    Bmir(ii)=baddata
             xmin(1,ii) = baddata
@@ -206,5 +206,6 @@ C
 C
 100    CONTINUE
 C
+       RETURN
        END
 C
