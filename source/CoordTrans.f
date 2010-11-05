@@ -1149,6 +1149,8 @@ c
 	REAL*8    secs,psi
 	REAL*8    xIN(3),xOUT(3),xTMP(3),alti
 
+        call initize ! sets rad, pi used by various routines
+
         if (sysaxesIN.EQ.sysaxesOUT) then
 c	   write(6,*)'sysaxesIN = sysaxesOUT!'
 	   do i=1,3
