@@ -20,11 +20,17 @@
 <folderInfo id="photran.managedbuild.config.gnu.fortran.exe.debug.1750980157." name="/" resourcePath="">
 <toolChain id="photran.managedbuild.toolchain.gnu.fortran.exe.debug.6658207" name="GCC Tool Chain" superClass="photran.managedbuild.toolchain.gnu.fortran.exe.debug">
 <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="photran.managedbuild.target.gnu.platform.exe.debug.1026575963" name="Debug Platform" osList="solaris,linux,hpux,aix,qnx" superClass="photran.managedbuild.target.gnu.platform.exe.debug"/>
-<builder buildPath="${workspace_loc:/IRBEM-LIB/Debug}" id="photran.managedbuild.target.gnu.builder.exe.debug.580130788" managedBuildOn="true" name="Gnu Make.Debug" superClass="photran.managedbuild.target.gnu.builder.exe.debug"/>
-<tool id="photran.managedbuild.tool.gnu.c.compiler.exe.debug.941704788" name="GCC C Compiler" superClass="photran.managedbuild.tool.gnu.c.compiler.exe.debug"/>
-<tool id="photran.managedbuild.tool.gnu.fortran.compiler.exe.debug.1369688274" name="GNU Fortran Compiler" superClass="photran.managedbuild.tool.gnu.fortran.compiler.exe.debug"/>
+<builder arguments="OS=linux64 ENV=intel32" buildPath="${workspace_loc:/IRBEM-LIB}" command="make" id="photran.managedbuild.target.gnu.builder.exe.debug.580130788" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make" superClass="photran.managedbuild.target.gnu.builder.exe.debug"/>
+<tool id="photran.managedbuild.tool.gnu.c.compiler.exe.debug.941704788" name="GCC C Compiler" superClass="photran.managedbuild.tool.gnu.c.compiler.exe.debug">
+<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1156285467" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+</tool>
+<tool id="photran.managedbuild.tool.gnu.fortran.compiler.exe.debug.1369688274" name="GNU Fortran Compiler" superClass="photran.managedbuild.tool.gnu.fortran.compiler.exe.debug">
+<inputType id="photran.managedbuild.tool.gnu.fortran.compiler.input.1691505108" superClass="photran.managedbuild.tool.gnu.fortran.compiler.input"/>
+</tool>
 <tool id="photran.managedbuild.tool.gnu.fortran.linker.exe.debug.158224454" name="GNU Fortran Linker" superClass="photran.managedbuild.tool.gnu.fortran.linker.exe.debug"/>
-<tool id="photran.managedbuild.tool.gnu.assembler.exe.debug.1107504562" name="GCC Assembler" superClass="photran.managedbuild.tool.gnu.assembler.exe.debug"/>
+<tool id="photran.managedbuild.tool.gnu.assembler.exe.debug.1107504562" name="GCC Assembler" superClass="photran.managedbuild.tool.gnu.assembler.exe.debug">
+<inputType id="cdt.managedbuild.tool.gnu.assembler.input.896687215" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+</tool>
 </toolChain>
 </folderInfo>
 </configuration>
@@ -279,6 +285,51 @@
 </scannerConfigBuildInfo>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+<buildTargets>
+<target name="install" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>INSTALLDIR=/d/bourdari/lib</buildArguments>
+<buildTarget>install</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments/>
+<buildTarget>clean</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="64bits" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>OS=linux64 ENV=intel64</buildArguments>
+<buildTarget>all</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="link_alldev" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>-f owndev2link</buildArguments>
+<buildTarget>all</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="clean_links" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>-f owndev2link</buildArguments>
+<buildTarget>clean</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+</buildTargets>
+</storageModule>
 </cconfiguration>
 <cconfiguration id="photran.managedbuild.config.gnu.fortran.exe.release.92456698">
 <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="photran.managedbuild.config.gnu.fortran.exe.release.92456698" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -297,11 +348,17 @@
 <folderInfo id="photran.managedbuild.config.gnu.fortran.exe.release.92456698." name="/" resourcePath="">
 <toolChain id="photran.managedbuild.toolchain.gnu.fortran.exe.release.1219061608" name="GCC Tool Chain" superClass="photran.managedbuild.toolchain.gnu.fortran.exe.release">
 <targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="photran.managedbuild.target.gnu.platform.fortran.exe.release.1429030906" name="Release Platform" osList="solaris,linux,hpux,aix,qnx" superClass="photran.managedbuild.target.gnu.platform.fortran.exe.release"/>
-<builder buildPath="${workspace_loc:/IRBEM-LIB/Release}" id="photran.managedbuild.target.gnu.builder.exe.release.860390729" managedBuildOn="true" name="Gnu Make.Release" superClass="photran.managedbuild.target.gnu.builder.exe.release"/>
-<tool id="photran.managedbuild.tool.gnu.c.compiler.exe.release.1155812068" name="GCC C Compiler" superClass="photran.managedbuild.tool.gnu.c.compiler.exe.release"/>
-<tool id="photran.managedbuild.tool.gnu.fortran.compiler.exe.release.2058890225" name="GNU Fortran Compiler" superClass="photran.managedbuild.tool.gnu.fortran.compiler.exe.release"/>
+<builder arguments="OS=linux64 ENV=intel32" buildPath="${workspace_loc:/IRBEM-LIB}" command="make" id="photran.managedbuild.target.gnu.builder.exe.release.860390729" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make" superClass="photran.managedbuild.target.gnu.builder.exe.release"/>
+<tool id="photran.managedbuild.tool.gnu.c.compiler.exe.release.1155812068" name="GCC C Compiler" superClass="photran.managedbuild.tool.gnu.c.compiler.exe.release">
+<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1110719907" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+</tool>
+<tool id="photran.managedbuild.tool.gnu.fortran.compiler.exe.release.2058890225" name="GNU Fortran Compiler" superClass="photran.managedbuild.tool.gnu.fortran.compiler.exe.release">
+<inputType id="photran.managedbuild.tool.gnu.fortran.compiler.input.801891390" superClass="photran.managedbuild.tool.gnu.fortran.compiler.input"/>
+</tool>
 <tool id="photran.managedbuild.tool.gnu.fortran.linker.exe.release.305771811" name="GNU Fortran Linker" superClass="photran.managedbuild.tool.gnu.fortran.linker.exe.release"/>
-<tool id="photran.managedbuild.tool.gnu.assembler.exe.release.1100777291" name="GCC Assembler" superClass="photran.managedbuild.tool.gnu.assembler.exe.release"/>
+<tool id="photran.managedbuild.tool.gnu.assembler.exe.release.1100777291" name="GCC Assembler" superClass="photran.managedbuild.tool.gnu.assembler.exe.release">
+<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1322291844" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+</tool>
 </toolChain>
 </folderInfo>
 </configuration>
@@ -554,6 +611,52 @@
 </scannerInfoProvider>
 </profile>
 </scannerConfigBuildInfo>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+<buildTargets>
+<target name="install" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>INSTALLDIR=/d/bourdari/lib</buildArguments>
+<buildTarget>install</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments/>
+<buildTarget>clean</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="64bits" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>OS=linux64 ENV=intel64</buildArguments>
+<buildTarget>all</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="link_alldev" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>-f owndev2link</buildArguments>
+<buildTarget>all</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+<target name="clean_links" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+<buildCommand>make</buildCommand>
+<buildArguments>-f owndev2link</buildArguments>
+<buildTarget>clean</buildTarget>
+<stopOnError>true</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+<runAllBuilders>true</runAllBuilders>
+</target>
+</buildTargets>
 </storageModule>
 </cconfiguration>
 </storageModule>
