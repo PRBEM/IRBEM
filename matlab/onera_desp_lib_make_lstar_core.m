@@ -92,15 +92,25 @@ if ntime>Nmax,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmax:ntime,
         ii = i:min(i+Nmax-1,ntime);
-        [Lm(ii,:),Lstar(ii,:),Bmirror(ii,:),Bmin(ii),J(ii,:),MLT(ii)] = ...
-            onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),alpha,maginput(ii,:));
+        if splitting,
+            [Lm(ii,:),Lstar(ii,:),Bmirror(ii,:),Bmin(ii),J(ii,:),MLT(ii)] = ...
+                onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),alpha,maginput(ii,:));
+        else
+            [Lm(ii,:),Lstar(ii,:),Bmirror(ii,:),Bmin(ii),J(ii,:),MLT(ii)] = ...
+                onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),maginput(ii,:));
+        end
     end
 elseif nipa>Nmaxpa,
     % break up the calculation into chunks the libarary can handle
     for i = 1:Nmaxpa:nipa,
         ii = i:min(i+Nmaxpa-1,nipa);
-        [Lm(:,ii),Lstar(:,ii),Bmirror(:,ii),Bmin_tmp,J(:,ii),MLT_tmp] = ...
-            onera_desp_lib_make_lstar_shell_splitting(kext,options,sysaxes,matlabd,x1,x2,x3,alpha(ii),maginput);
+        if splitting,
+            [Lm(:,ii),Lstar(:,ii),Bmirror(:,ii),Bmin_tmp,J(:,ii),MLT_tmp] = ...
+                onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd,x1,x2,x3,alpha(ii),maginput);
+        else
+            [Lm(:,ii),Lstar(:,ii),Bmirror(:,ii),Bmin_tmp,J(:,ii),MLT_tmp] = ...
+                onera_desp_lib_make_lstar_core(func_name,kext,options,sysaxes,matlabd,x1,x2,x3,maginput);
+        end
         nanMLT = ~isfinite(MLT);
         MLT(nanMLT) = MLT_tmp(nanMLT);
         nanBmin = ~isfinite(Bmin);
