@@ -9196,8 +9196,213 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from FORTRAN:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA">call GET_IRBEM_NTIME_MAX1(ntime_max1)</font> 
+    <br />
+    &nbsp;<font face="ARIAL, HELVETICA">------------------------------------------------------------</font><a name="SHIELDOSE2"></a> 
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">SHIELDOSE2</font></font> 
+    </h2>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
+    </h3>
     <p>
-
+        <font face="ARIAL, HELVETICA">SHIELDOSE2 [Seltzer, 1994] is a computer code for 
+        space-shielding radiation dose calculations. It determines the absorbed dose as a 
+        function of depth in aluminium shielding material of spacecraft, given the electron 
+        and proton fluences encountered in orbit. The code makes use of precalculated, 
+        mono-energetic depth-dose data for an isotropic, broad-beam fluence of radiation 
+        incident on uniform aluminium plane media. Such data are particularly suitable for 
+        routine dose predictions in situations where the geometrical and compositional 
+        complexities of the spacecraft are not known. Furthermore, the restriction to these 
+        rather simple geometries has allowed for the development of accurate electron and 
+        electron-bremsstrahlung data sets based on detailed transport calculations rather 
+        than on more approximate methods.<BR>
+        SHIELDOSE2 calculates, for arbitrary proton and electron incident spectra, 
+        the dose absorbed in small volumes of different detector materials for the 
+        following aluminium shield geometries:
+        <ol>
+        <li>
+        in a semi-infinite plane medium, as a function of depth; irradiation is from one side only (the assumed infinite backing effectively insures this).
+        </li>
+        <li>
+        at the transmission surface of a plane slab, as a function of slab thickness; irradiation is from one side only.
+        </li>
+        <li>
+        at the centre of a solid sphere, as a function of sphere radius; irradiation is from all directions.     </p>
+        </li>
+        </ol>
+    <p>
+    </p>
+    <p>
+        <font face="ARIAL, HELVETICA"></font>
+    </p>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
+    </h3>
+    <p>
+        <font face="ARIAL, HELVETICA"><b>IDET:</b> long integer to set the index of the detector type:
+        <ol>
+        <li> Al detector </li>
+        <li> Graphite detector </li>
+        <li> Si detector </li>
+        <li> Air detector </li>
+        <li> Bone detector </li>
+        <li> Calcium Fluoride detector </li>
+        <li> Gallium Arsenide detector </li>
+        <li> Lithium Fluoride detector </li>
+        <li> Silicon Dioxide detector </li>
+        <li> Tissue detector </li>
+        <li> Water detector </li>
+        </ol>
+        </font>
+        <font face="ARIAL, HELVETICA"><b>INUC:</b> long integer to indicate the nuclear interaction to account for:
+        <ol>
+        <li> No nuclear attenuation fro protons in Al </li>
+        <li> Nuclear attenuation, local charged-secondary energy deposition </li>
+        <li> Nuclear attenuation, local charged-secondary energy deposition, and approx exponential distribution of neutron dose </li>
+        </ol>
+        </font> 
+        <font face="ARIAL, HELVETICA"><b>IMAX:</b> long integer to set the number of shielding depth (max allowed=71). It is recommended to set this number close to maximum allowed value to compute accurate doses in semi-infinite aluminium medium and at center of aluminium spheres.
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>IUNT:</b> long integer to set the shielding depth unit
+        <ol>
+        <li> Mils </li>
+        <li> g/cm<sup>2</sup> </li>
+        <li> mm </li>
+        </ol>
+        </font>
+        <font face="ARIAL, HELVETICA"><b>Zin:</b> double array(71) of thickness in unit of IUNT. Below is provided a reasonable thickness array in g/cm<sup>2</sup> with IMAX=70<br>
+  data Zin /1.000E-06,2.000E-06,5.000E-06,1.000E-05,2.000E-05,5.000E-05,1.000E-04,2.000E-04,&<br>
+            5.000E-04,1.000E-03,1.000E-01,2.000E-01,5.000E-01,7.000E-01,1.000E+00,1.250E+00,&<br>
+            1.500E+00,1.750E+00,2.000E+00,2.500E+00,3.000E+00,3.500E+00,4.000E+00,4.500E+00,&<br>
+            5.000E+00,6.000E+00,7.000E+00,8.000E+00,9.000E+00,1.000E+01,1.100E+01,1.200E+01,&<br>
+            1.300E+01,1.400E+01,1.500E+01,1.600E+01,1.700E+01,1.800E+01,1.900E+01,2.000E+01,&<br>
+            2.100E+01,2.200E+01,2.300E+01,2.400E+01,2.500E+01,2.600E+01,2.700E+01,2.800E+01,&<br>
+            2.900E+01,3.000E+01,3.100E+01,3.200E+01,3.300E+01,3.400E+01,3.500E+01,3.600E+01,&<br>
+            3.700E+01,3.800E+01,3.900E+01,4.000E+01,4.100E+01,4.200E+01,4.300E+01,4.400E+01,&<br>
+            4.500E+01,4.600E+01,4.700E+01,4.800E+01,4.900E+01,5.000E+01,0.000E+00/
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EminS:</b> min energy of solar protons spectrum (double) [MeV]
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EmaxS:</b> max energy of solar protons spectrum (double) [MeV]
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EminP:</b> min energy of trapped protons spectrum (double) [MeV]
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EmaxP:</b> max energy of trapped protons spectrum (double) [MeV]
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>NPTSP:</b> number of spectrum points which divides proton spectra for integration. A value of 1001 is recommended (long integer).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EminE:</b> min energy of trapped electrons spectrum (double) [MeV]
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EmaxE:</b> max energy of trapped electrons spectrum (double) [MeV]
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>NPTSE:</b> Number of spectrum points which divides electron spectra for integration. A value of 1001 is recommended (long integer).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>JSMAX:</b> Number of points in falling spectrum of solar protons, max allowed=301 (long integer).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>JPMAX:</b> Number of points in falling spectrum of trapped protons, max allowed=301 (long integer).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>JEMAX:</b> Number of points in falling spectrum of trapped electrons, max allowed=301 (long integer).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EUNIT:</b> Conversion factor from /energy to /MeV; e.g. EUNIT = 1000 if flux is /keV (double).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>DURATN:</b> Mission duration in multiples of unit time [s] (double).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>ESin:</b> Energy array(301) of solar proton spectrum [MeV] (double).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>SFLUXin:</b> Solar flare flux array(301) for solar protons [in /energy/cm<sup>2</sup>] (double).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EPin:</b> Energy array(301) of trapped proton spectrum [MeV] (double).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>PFLUXin:</b> Incident omnidirectional flux array(301) for trapped protons [in /energy/cm<sup>2</sup>/s] (double).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EEin:</b> Energy array(301) of trapped electron spectrum [MeV] (double).
+        </font>
+        <br><br>
+        <font face="ARIAL, HELVETICA"><b>EFLUXin:</b> Incident omnidirectional flux array(301) for trapped electrons [in /energy/cm<sup>2</sup>/s] (double).
+        </font>
+        <br><br>
+    </p>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
+    </h3>
+    <p>
+        <font face="ARIAL, HELVETICA"><b>SolDose:</b>&nbsp;Dose profile array (71,3) for solar protons [rads] (double)
+        <ol>
+        <li> Dose at transmission surface of finite aluminium slab shields</li>
+        <li> Dose in semi-infinite aluminium medium</li>
+        <li> 1/2 Dose at center of aluminium spheres</li>
+        </ol>
+        </font><br />
+    </p>
+    <p>
+        <font face="ARIAL, HELVETICA"><b>ProtDose:</b>&nbsp;Dose profile array (71,3) for trapped protons [rads] (double)
+        <ol>
+        <li> Dose at transmission surface of finite aluminium slab shields</li>
+        <li> Dose in semi-infinite aluminium medium</li>
+        <li> 1/2 Dose at center of aluminium spheres</li>
+        </ol>
+        </font><br />
+    </p>
+    <p>
+        <font face="ARIAL, HELVETICA"><b>ElecDose:</b>&nbsp;Dose profile array (71,3) for trapped electrons [rads] (double)
+        <ol>
+        <li> Dose at transmission surface of finite aluminium slab shields</li>
+        <li> Dose in semi-infinite aluminium medium</li>
+        <li> 1/2 Dose at center of aluminium spheres</li>
+        </ol>
+        </font><br />
+    </p>
+    <p>
+        <font face="ARIAL, HELVETICA"><b>BremDose:</b>&nbsp;Dose profile array (71,3) for Bremsstrahlung [rads] (double)
+        <ol>
+        <li> Dose at transmission surface of finite aluminium slab shields</li>
+        <li> Dose in semi-infinite aluminium medium</li>
+        <li> 1/2 Dose at center of aluminium spheres</li>
+        </ol>
+        </font><br />
+    </p>
+    <p>
+        <font face="ARIAL, HELVETICA"><b>TotDose:</b>&nbsp;Total dose profile array (71,3) [rads] (double) 
+        <ol>
+        <li> Dose at transmission surface of finite aluminium slab shields</li>
+        <li> Dose in semi-infinite aluminium medium</li>
+        <li> 1/2 Dose at center of aluminium spheres</li>
+        </ol>
+        </font><br />
+    </p>
+    <p>
+    </p>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
+    </h3>
+    <p>
+        <font face="Arial">TBD</font>&nbsp;<br />
+    </p>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from IDL:</font></font> 
+    </h3>
+    <p>
+        <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'shieldose2idl_', IDET,INUC,IMAX,IUNT,Zin,EMINS,EMAXS,EMINP,EMAXP,NPTSP,EMINE,EMAXE,NPTSE,JSMAX,JPMAX,JEMAX,EUNIT,DURATN,ESin,SFLUXin,EPin,PFLUXin,EEin,EFLUXin,SolDose,ProtDose,ElecDose,BremDose,TotDose,/f_value)</font> 
+    </p>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from FORTRAN:</font></font> 
+    </h3>
+    <p>
+        <font face="ARIAL, HELVETICA">CALL shieldose2(IDET,INUC,IMAX,IUNT,Zin,EMINS,EMAXS,EMINP,EMAXP,NPTSP,EMINE,EMAXE,NPTSE,JSMAX,JPMAX,JEMAX,EUNIT,DURATN,ESin,SFLUXin,EPin,PFLUXin,EEin,EFLUXin,SolDose,ProtDose,ElecDose,BremDose,TotDose)</font><br />
+    </p>
+    &nbsp; 
 </body>
 </html>
 
