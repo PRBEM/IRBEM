@@ -283,3 +283,17 @@ void msis86_(int *ntime,int *whichAp,
 		int *DOY,double *UT,double *ALT,double *LAT,double *LON,
 		double *F107A,double *F107,double *AP,double *Dens,double *Temp);
 
+void shieldose2_(int *IDET, int *INUC, 
+		 int *IMAX, int *IUNT,
+		 double *Zin, double *EMINS, double *EMAXS,
+		 double *EMINP, double *EMAXP, int *NPTSP,
+		 double *EMINE, double *EMAXE, int *NPTSE,
+		 int *JSMAX, int *JPMAX, int *JEMAX,
+		 double *EUNIT, double *DURATN,
+		 double *ESin, double *SFLUXin,
+		 double *EPin, double *PFLUXin,
+		 double *EEin, double *EFLUXin,
+		 double *SolDose, double *ProtDose,
+		 double *ElecDose, double *BremDose,
+		 double *TotDose);
+
