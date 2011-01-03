@@ -93,7 +93,8 @@ NPTSE = max([JEMAX,NPTS]);
 
 onera_desp_lib_load;
 
-ProtDose = repmat(nan,IMAX,3);
+IMAXI = 71;
+ProtDose = repmat(nan,IMAXI,3);
 ElecDose = ProtDose;
 BremDose = ProtDose;
 SolDose = ProtDose;
@@ -115,6 +116,12 @@ ProtDose = get(ProtDosePtr,'value');
 ElecDose = get(ElecDosePtr,'value');
 BremDose = get(BremDosePtr,'value');
 TotDose = get(TotDosePtr,'value');
+
+SolDose = SolDose(1:IMAX,:);
+ProtDose = ProtDose(1:IMAX,:);
+ElecDose = ElecDose(1:IMAX,:);
+BremDose = BremDose(1:IMAX,:);
+TotDose = TotDose(1:IMAX,:);
 
 if perYear,
     yearseconds = 365*24*60*60;
