@@ -880,78 +880,111 @@ c
 c
 c --------------------------------------------------------------------
 c
-        SUBROUTINE GET_FIELD1(kext,options,sysaxes,iyearsat,idoy,UT,
-     &  xIN1,xIN2,xIN3,maginput,BxGEO,Bl)
-c
-	IMPLICIT NONE
-	INCLUDE 'variables.inc'
-C
-c declare inputs
-        INTEGER*4    kext,k_ext,k_l,kint,options(5)
-        INTEGER*4    sysaxes
-	INTEGER*4    iyearsat
-	integer*4    idoy
-	real*8     UT
-	real*8     xIN1,xIN2,xIN3
-	real*8     maginput(25)
-c
-c Declare internal variables
-	INTEGER*4    isat,iyear,ifail
-	REAL*8     xGEO(3)
-	real*8     alti,lati,longi
-c
-c Declare output variables	
-        REAL*8     BxGEO(3),Bl
-C
-	COMMON /magmod/k_ext,k_l,kint
+      SUBROUTINE GET_FIELD1(kext,options,sysaxes,iyearsat,idoy,UT,
+     &     xIN1,xIN2,xIN3,maginput,BxGEO,Bl)
+c     
+      IMPLICIT NONE
+      INCLUDE 'variables.inc'
+C     
+c     declare inputs
+      INTEGER*4    kext,k_ext,k_l,kint,options(5)
+      INTEGER*4    sysaxes
+      INTEGER*4    iyearsat
+      integer*4    idoy
+      real*8     UT
+      real*8     xIN1,xIN2,xIN3
+      real*8     maginput(25)
+c     
+c     Declare internal variables
+      INTEGER*4    isat,iyear,ifail
+      REAL*8     xGEO(3)
+      real*8     alti,lati,longi
+c     
+c     Declare output variables	
+      REAL*8     BxGEO(3),Bl
+C     
+      COMMON /magmod/k_ext,k_l,kint
       integer*4 int_field_select, ext_field_select
-C
-	kint = int_field_select ( options(5) )
-	k_ext = ext_field_select ( kext )
-c
-        CALL INITIZE
-	
-	call init_fields ( kint, iyearsat, idoy, ut, options(2) )
-	
-	call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
-     6    alti, lati, longi, xGEO )
-	    
-	call set_magfield_inputs ( kext, maginput, ifail )
-	
-	if ( ifail.lt.0 ) then
-	       Bl=baddata
-	       BxGEO(1)=baddata
-	       BxGEO(2)=baddata
-	       BxGEO(3)=baddata
-	       RETURN
-	    endif
-c	   	
-        CALL CHAMP(xGEO,BxGEO,Bl,Ifail)
-	IF (Ifail.LT.0) THEN
-	   BxGEO(1)=baddata
-	   BxGEO(2)=baddata
-	   BxGEO(3)=baddata
-	   Bl=baddata
-	ENDIF
-	END
-C----------------------------------------------------------------------------- 
+C     
+      kint = int_field_select ( options(5) )
+      k_ext = ext_field_select ( kext )
+c     
+      CALL INITIZE
+      
+      call init_fields ( kint, iyearsat, idoy, ut, options(2) )
+      
+      call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6     alti, lati, longi, xGEO )
+      
+      call set_magfield_inputs ( kext, maginput, ifail )
+      
+      if ( ifail.lt.0 ) then
+         Bl=baddata
+         BxGEO(1)=baddata
+         BxGEO(2)=baddata
+         BxGEO(3)=baddata
+         RETURN
+      endif
+c     
+      CALL CHAMP(xGEO,BxGEO,Bl,Ifail)
+      IF (Ifail.LT.0) THEN
+         BxGEO(1)=baddata
+         BxGEO(2)=baddata
+         BxGEO(3)=baddata
+         Bl=baddata
+      ENDIF
+      END
+C-----------------------------------------------------------------------------
 
-      REAL*4 FUNCTION GET_MLT(argc, argv)   ! Called by IDL
+      SUBROUTINE GET_FIELD_MULTI(ntime,kext,options,sysaxes,iyearsat,
+     &     idoy,UT,xIN1,xIN2,xIN3,maginput,BxGEO,Bl)
+C     Call get_field1 many times (ntime, in fact, up to ntime = ntime_max)
+c     
+      IMPLICIT NONE
+      INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
+C     
+c     declare inputs
+      INTEGER*4    ntime
+      INTEGER*4    kext,options(5)
+      INTEGER*4    sysaxes
+      INTEGER*4    iyearsat(ntime_max)
+      integer*4    idoy(ntime_max)
+      real*8     UT(ntime_max)
+      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+      real*8     maginput(25,ntime_max)
+      
+c     Declare output variables	
+      REAL*8     BxGEO(3,ntime_max),Bl(ntime_max)
+C     
+c     Declare internal variables
+      integer*4 isat
+      INTEGER*4 k_ext,k_l,kint,ifail
+      
+      do isat = 1,ntime
+         call GET_FIELD1(kext,options,sysaxes,iyearsat(isat),
+     &        idoy(isat),UT(isat), xIN1(isat),xIN2(isat),
+     &        xIN3(isat),maginput(1,isat),BxGEO(1,isat),Bl(isat))
+         
+      enddo
+      end
+      
+      REAL*4 FUNCTION GET_MLT(argc, argv) ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
-
-       j = loc(argc)                    ! Obtains the number of arguments (argc)
-                                       ! Because argc is passed by VALUE.
-
-c  Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
-c  passed by reference arguments.
-c
-c  
+c     INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
+      
+      j = loc(argc)             ! Obtains the number of arguments (argc)
+                                ! Because argc is passed by VALUE.
+      
+c     Call subroutine make_Lstar, converting the IDL parameters to standard FORTRAN
+c     passed by reference arguments.
+c     
+c     
       call GET_MLT1(%VAL(argv(1)), %VAL(argv(2)), %VAL(argv(3)),
-     * %VAL(argv(4)),  %VAL(argv(5)))
-
+     *     %VAL(argv(4)),  %VAL(argv(5)))
+      
       GET_MLT = 9.9
-
+      
       RETURN
       END
 c

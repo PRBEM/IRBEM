@@ -165,6 +165,15 @@ void get_field1_(int *kext, int *options,
 		 double *Bgeo,
 		 double *B);
 
+void get_field_multi_(int *ntime, int *kext, int *options,
+		      int *sysaxes,
+		      int *iyear,int *idoy,
+		      double *UT,double *x1,
+		      double *x2,double *x3,
+		      double *maginput,
+		      double *Bgeo,
+		      double *B);
+
 void find_mirror_point1_(int *kext, 
 			 int *options,
 			 int *sysaxes,
@@ -198,6 +207,26 @@ void get_hemi1_(int *kext,
 		double *x2,double *x3,
 		double *maginput,
 		int *xHEMI);
+
+void get_hemi_multi_(int *ntime,int *kext, 
+		int *options,
+		int *sysaxes,
+		int *iyear,int *idoy,
+		double *UT,double *x1,
+		double *x2,double *x3,
+		double *maginput,
+		int *xHEMI);
+
+void get_bderivs_(int *ntime,int *kext, 
+		  int *options,
+		  int *sysaxes,
+		  double *dX,
+		  int *iyear,int *idoy,
+		  double *UT,double *x1,
+		  double *x2,double *x3,
+		  double *maginput,
+		  double *Bgeo,double *Bmag,
+		  double *gradBmag, double *diffB);
 
 void find_magequator1_(int *kext, 
 			 int *options,

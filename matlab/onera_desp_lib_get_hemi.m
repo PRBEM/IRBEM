@@ -81,28 +81,26 @@ if length(matlabd)==1,
     matlabd = repmat(matlabd,ntime,1);
 end
 
-[iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
-hemi = repmat(nan,ntime,1);
-hemiPtr = libpointer('int32Ptr',1);
-for i = 1:ntime,
-    calllib('onera_desp_lib','get_hemi1_',kext,options,sysaxes,iyear(i),idoy(i),UT(i),x1(i),x2(i),x3(i),maginput(i,:),...
-        hemiPtr);
-    % have to do this next bit because Ptr's aren't really pointers
-    hemi(i) = get(hemiPtr,'value');
+Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
+if ntime > Nmax, % break up into multiple calls
+    hemi = nan(ntime,1);
+    for i = 1:Nmax:ntime,
+        ii = i:min(i+Nmax-1,ntime);
+        hemi(ii) = onera_desp_lib_get_hemi(kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),maginput(ii,:));
+    end
+    return
 end
 
-% the flag value is actually -1d31
-hemi(hemi<-1e30) = nan;
+if ntime<Nmax, % pad maginput b/c of impending transpose
+    maginput = [maginput;nan(Nmax-ntime,25)];
+end
 
-% old code usign get_field
-% sysaxes = onera_desp_lib_sysaxes(sysaxes);
-% sysaxesGEO = onera_desp_lib_sysaxes('GEO');
-% xGEO = onera_desp_lib_coord_trans([x1(:) x2(:) x3(:)],[sysaxes sysaxesGEO],matlabd);
-% [Bgeo,B] = onera_desp_lib_get_field(kext,options,sysaxesGEO,matlabd,xGEO(:,1),xGEO(:,2),xGEO(:,3),maginput);
-% xGEO2 = xGEO+1e-4*Bgeo./repmat(B,1,3); % take a 0.0001 Re step along field line
-% [Bgeo2,B2] = onera_desp_lib_get_field(kext,options,sysaxesGEO,matlabd,xGEO2(:,1),xGEO2(:,2),xGEO2(:,3),maginput);
-% hemi = nan(size(B));
-% hemi(B2>B) = 1;
-% hemi(B2<B) = -1;
+[iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
+hemi = zeros(ntime,1,'int32');
+hemiPtr = libpointer('int32Ptr',hemi);
+calllib('onera_desp_lib','get_hemi_multi_',ntime,kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,maginput',...
+    hemiPtr);
+% have to do this next bit because Ptr's aren't really pointers
+hemi = double(get(hemiPtr,'value'));
 
-
+hemi(hemi==0) = nan; % flag value

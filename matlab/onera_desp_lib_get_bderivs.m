@@ -1,4 +1,4 @@
-function [Bgeo,B] = onera_desp_lib_get_field(kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
+function [Bgeo,B,gradBmag,diffB] = onera_desp_lib_get_bderivs(kext,options,sysaxes,matlabd,x1,x2,x3,maginput,varargin)
 %***************************************************************************************************
 % Copyright 2006, T.P. O'Brien
 %
@@ -19,9 +19,14 @@ function [Bgeo,B] = onera_desp_lib_get_field(kext,options,sysaxes,matlabd,x1,x2,
 %
 %***************************************************************************************************
 %
-% function [Bgeo,B] = onera_desp_lib_get_field(kext,options,sysaxes,matlabd,x1,x2,x3,maginput)
-% returns magnetic field in geographic coordinates and total field (nT)
+% [Bgeo,B,gradBmag,diffB] = onera_desp_lib_get_bderivs(kext,options,sysaxes,matlabd,x1,x2,x3,maginput,...)
+% returns field and derivatives (nT)
 % Bgeo is length(x1) x 3, B is length(x1) x 1
+% gradBmag is length(x1) x 3
+% diffB is length(x1) x 3 x 3 diffB(:,i,j) = dB(:,i)/dx(j)
+% all outputs are in Cartesian GEO
+% keyword arguments (after maginput, which can be [] for default)
+%  ...,'dX',dX,... set the step size for the numerical derivative, RE (default is 1E-3)
 % kext - specified the external field model
 % For the kext argument, see helps for onera_desp_lib_kext
 % options - controls the field tracing
@@ -59,6 +64,18 @@ if nargin < 8,
     maginput = [];
 end
 
+dX = 1E-3;
+
+i = 1;
+while i <= length(varargin),
+    switch(upper(varargin{i})),
+        case 'DX',
+            i = i+1;
+            dX = varargin{i};
+    end
+    i = i+1;
+end
+
 matlabd = datenum(matlabd);
 
 onera_desp_lib_load;
@@ -84,9 +101,11 @@ Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
 if ntime > Nmax, % break up into multiple calls
     Bgeo = nan(ntime,3);
     B = nan(ntime,1);
+    gradBmag = nan(ntime,3);
+    diffB = nan(ntime,3,3);
     for i = 1:Nmax:ntime,
         ii = i:min(i+Nmax-1,ntime);
-        [Bgeo(ii,:),B(ii)] = onera_desp_lib_get_field(kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),maginput(ii,:));
+        [Bgeo(ii,:),B(ii),gradBmag(ii,:),diffB(ii,:,:)] = onera_desp_lib_get_field(kext,options,sysaxes,matlabd(ii),x1(ii),x2(ii),x3(ii),maginput(ii,:),'dX',dX);
     end
     return
 end
@@ -96,17 +115,25 @@ if ntime<Nmax, % pad maginput b/c of impending transpose
 end
 
 [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
-Bgeo = repmat(nan,Nmax,3)'; % transpose b/c fortran has it 3xntime, pad b/c of transpose
-B = repmat(nan,ntime,1);
-BgeoPtr = libpointer('doublePtr',Bgeo);
-BPtr = libpointer('doublePtr',B);
-calllib('onera_desp_lib','get_field_multi_',ntime,kext,options,sysaxes,iyear,idoy,UT,x1,x2,x3,maginput',...
-    BgeoPtr,BPtr);
+BgeoPtr = libpointer('doublePtr',nan(Nmax,3));
+BPtr = libpointer('doublePtr',nan(Nmax,1));
+gradBmagPtr = libpointer('doublePtr',nan(Nmax,3));
+diffBPtr = libpointer('doublePtr',nan(Nmax,3*3)); % 3-D doesn't work with calllib
+calllib('onera_desp_lib','get_bderivs_',ntime,kext,options,sysaxes,dX,iyear,idoy,UT,x1,x2,x3,maginput',...
+    BgeoPtr,BPtr,gradBmagPtr,diffBPtr);
 % have to do this next bit because Ptr's aren't really pointers
-Bgeo = get(BgeoPtr,'value')';
-Bgeo = Bgeo(1:ntime,:); % remove pad
+Bgeo = get(BgeoPtr,'value');
+Bgeo = Bgeo(1:ntime,:);
 B = get(BPtr,'value');
+B = B(1:ntime);
+gradBmag = get(gradBmagPtr,'value');
+gradBmag = gradBmag(1:ntime,:);
+diffB = get(diffBPtr,'value');
+diffB = reshape(diffB(1:ntime,:),[ntime,3,3]);
+diffB = permute(diffB,[1 3 2]); % transpose last 2 dimensions
 
 % the flag value is actually -1d31
 B(B<-1e30) = nan;
 Bgeo(Bgeo<-1e30) = nan;
+gradBmag(gradBmag<-1e30) = nan;
+diffB(diffB<-1e30) = nan;

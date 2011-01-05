@@ -24,59 +24,94 @@ c      if the new B is larger, then in Northern Hemisphere (xHEMI=+1), else (xHE
       IMPLICIT NONE
       INCLUDE 'variables.inc'
 C     
+      COMMON /magmod/k_ext,k_l,kint
 c     declare inputs
-      INTEGER*4    kext,k_ext,k_l,kint,options(5)
-      INTEGER*4    sysaxes,sysGEO
+      INTEGER*4    kext,options(5)
+      INTEGER*4    sysaxes
       INTEGER*4    iyearsat
       integer*4    idoy
       real*8     UT
       real*8     xIN1,xIN2,xIN3
+      real*8     maginput(25)
+
 c     declare outputs
       integer*4     xHEMI
 
 c     declare internal variables
-      integer*4    i
-      real*8     xGEO(3),xIN(3)
-      real*8     maginput(25)
-      REAL*8     BxGEO(3),Bl
-      REAL*8     BxGEO2(3),B2
+      integer*4  i,k_ext,k_l,kint,ifail
+      real*8     xGEO(3)
+      real*8     alti,lati,longi
+      REAL*8     BxGEO(3),B1,B2
+      integer*4 int_field_select, ext_field_select ! functions to call
+C     
+      kint = int_field_select ( options(5) )
+      k_ext = ext_field_select ( kext )
+c     
+      CALL INITIZE
       
-      sysGEO = 1 ! GEO
-      call get_field1(kext,options,sysaxes,iyearsat,idoy,UT,
-     *     xIN1,xIN2,xIN3,maginput,BxGEO,Bl)
+      call init_fields ( kint, iyearsat, idoy, ut, options(2) )
       
-      if (sysaxes.eq.sysGEO) then ! no need to convert
-        xGEO(1) = xIN1
-        xGEO(2) = xIN2
-        xGEO(3) = xIN3
-      else ! need to convert to GEO to do step
-         xIN(1) = xIN1
-         xIN(2) = xIN2
-         xIN(3) = xIN3
-         call coord_trans1(sysaxes,sysGEO,iyearsat,idoy,UT,xIN,xGEO)
+      call get_coordinates ( sysaxes, xIN1, xIN2, xIN3, 
+     6     alti, lati, longi, xGEO )
+      
+      call set_magfield_inputs ( kext, maginput, ifail )
+      
+      xHEMI = 0                 ! default, indicates a failure
+      
+      if ( ifail.lt.0 ) then
+         RETURN
       endif
-
-!      Bl = Bl*1000.0            ! scale so that dX is 0.001 Re
+c     
+      CALL CHAMP(xGEO,BxGEO,B1,Ifail)
+      IF ((Ifail.LT.0).or.(B1.eq.baddata)) THEN
+         return
+      ENDIF
+      
       do i=1,3
-         xGEO(i) = xGEO(i)+BxGEO(i)/Bl/1e3
+         xGEO(i) = xGEO(i)+BxGEO(i)/B1/1e3 ! scale so that dX is 0.001 Re
       enddo
-
-      call get_field1(kext,options,sysGEO,iyearsat,idoy,UT,
-     *     xGEO(1),xGEO(2),xGEO(3),maginput,BxGEO2,B2)
-
-      if (B2 .EQ. baddata) then
-         xHEMI = 0
+      
+      CALL CHAMP(xGEO,BxGEO,B2,Ifail)
+      IF ((Ifail.LT.0).or.(B2.eq.baddata)) THEN
          return
-      endif
-      if (Bl .EQ. baddata) then
-         xHEMI = 0
-         return
-      endif
-c
-      if (B2.GT.Bl) then
+      ENDIF
+      
+      if (B2.GT.B1) then
          xHEMI = +1
       else
          xHEMI = -1
       endif
+      
       END
       
+
+      SUBROUTINE GET_HEMI_MULTI(ntime,kext,options,sysaxes,iyearsat,
+     & idoy,UT,xIN1,xIN2,xIN3,maginput,xHEMI)
+c     calls get_hemi1 multiple times (ntime, <= ntime_max)
+      IMPLICIT NONE
+      INCLUDE 'variables.inc'
+      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
+
+c     declare inputs
+      INTEGER*4    ntime,kext,options(5)
+      INTEGER*4    sysaxes
+      INTEGER*4    iyearsat(ntime_max)
+      integer*4    idoy(ntime_max)
+      real*8     UT(ntime_max)
+      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+      real*8     maginput(25,ntime_max)
+
+c     declare outputs
+      integer*4     xHEMI(ntime_max)
+
+c     declare internal variables
+      integer*4  isat
+
+      do isat = 1,ntime
+         call GET_HEMI1(kext,options,sysaxes,
+     &    iyearsat(isat),idoy(isat),UT(isat),
+     &    xIN1(isat),xIN2(isat),xIN3(isat),
+     &    maginput(1,isat),xHEMI(isat))
+      enddo
+
+      end
