@@ -115,21 +115,21 @@ if ntime<Nmax, % pad maginput b/c of impending transpose
 end
 
 [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
-BgeoPtr = libpointer('doublePtr',nan(Nmax,3));
+BgeoPtr = libpointer('doublePtr',nan(3,Nmax));
 BPtr = libpointer('doublePtr',nan(Nmax,1));
-gradBmagPtr = libpointer('doublePtr',nan(Nmax,3));
-diffBPtr = libpointer('doublePtr',nan(Nmax,3*3)); % 3-D doesn't work with calllib
+gradBmagPtr = libpointer('doublePtr',nan(3,Nmax));
+diffBPtr = libpointer('doublePtr',nan(3*3,Nmax)); % 3-D doesn't work with calllib
 calllib('onera_desp_lib','get_bderivs_',ntime,kext,options,sysaxes,dX,iyear,idoy,UT,x1,x2,x3,maginput',...
     BgeoPtr,BPtr,gradBmagPtr,diffBPtr);
 % have to do this next bit because Ptr's aren't really pointers
 Bgeo = get(BgeoPtr,'value');
-Bgeo = Bgeo(1:ntime,:);
+Bgeo = Bgeo(:,1:ntime)';
 B = get(BPtr,'value');
 B = B(1:ntime);
 gradBmag = get(gradBmagPtr,'value');
-gradBmag = gradBmag(1:ntime,:);
+gradBmag = gradBmag(:,1:ntime)';
 diffB = get(diffBPtr,'value');
-diffB = reshape(diffB(1:ntime,:),[ntime,3,3]);
+diffB = reshape(diffB(:,1:ntime)',[ntime,3,3]);
 diffB = permute(diffB,[1 3 2]); % transpose last 2 dimensions
 
 % the flag value is actually -1d31

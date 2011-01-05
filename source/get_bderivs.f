@@ -23,12 +23,11 @@
 C     computes derivatives of B (vector and magnitude)
 C     inputs: ntime through maginput have the usual meaning, except dX
 C     REAL*8 dX is the step size, in RE for the numerical derivatives (recommend 1E-3?)
-C     outputs: (NOTE: array sizes are ntime_max FIRST!!! unlike get_field)
-C     real*8 Bgeo(ntime_max,3) - components of B in GEO, nT
+C     real*8 Bgeo(3,ntime_max) - components of B in GEO, nT
 C     real*8 Bmag(ntime_max) - magnitude of B in nT
-C     real*8 gradBmag(ntime_max,3) - gradient of Bmag in GEO, nT/RE
-C     real*8 diffB(ntime_max,3,3) - derivatives of Bgeo in GEO, nT/RE
-C        diffB(t,i,j) = dB_i/dx_j for point t (t=1 to ntime)
+C     real*8 gradBmag(3,ntime_max) - gradient of Bmag in GEO, nT/RE
+C     real*8 diffB(3,3,ntime_max) - derivatives of Bgeo in GEO, nT/RE
+C        diffB(i,j,t) = dB_i/dx_j for point t (t=1 to ntime)
 
       IMPLICIT NONE
       INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
@@ -47,10 +46,10 @@ c     declare inputs
       real*8     maginput(25,ntime_max)
 
 c     declare outputs
-      real*8 Bgeo(ntime_max,3) ! components of B in GEO, nT
+      real*8 Bgeo(3,ntime_max) ! components of B in GEO, nT
       real*8 Bmag(ntime_max) ! magnitude of B in nT
-      real*8 gradBmag(ntime_max,3) ! gradient of Bmag in GEO, nT/RE
-      real*8 diffB(ntime_max,3,3) ! derivatives of Bgeo in GEO, nT/RE
+      real*8 gradBmag(3,ntime_max) ! gradient of Bmag in GEO, nT/RE
+      real*8 diffB(3,3,ntime_max) ! derivatives of Bgeo in GEO, nT/RE
 
 c     declare internal variables
       integer*4  isat
@@ -70,10 +69,10 @@ c
          ! initialize outputs to baddata
          Bmag(isat) = baddata
          do i=1,3
-            Bgeo(isat,i) = baddata
-            gradBmag(isat,i) = baddata
+            Bgeo(i,isat) = baddata
+            gradBmag(i,isat) = baddata
             do j=1,3
-               diffB(isat,i,j) = baddata
+               diffB(i,j,isat) = baddata
             enddo
          enddo
 
@@ -97,7 +96,7 @@ c
 C copy start point to outputs
          Bmag(isat) = B1
          do i = 1,3
-            Bgeo(isat,i) = B1GEO(i)
+            Bgeo(i,isat) = B1GEO(i)
          enddo
 
          do j=1,3
@@ -111,9 +110,9 @@ C displace in dimension j
                goto 1000
             ENDIF
 c     compute derivatives
-            gradBmag(isat,j) = (Btmp-B1)/dX
+            gradBmag(j,isat) = (Btmp-B1)/dX
             do i = 1,3
-               diffB(isat,i,j) = (BtmpGEO(i)-B1GEO(i))/dX
+               diffB(i,j,isat) = (BtmpGEO(i)-B1GEO(i))/dX
             enddo
          enddo ! end of j loop
             
