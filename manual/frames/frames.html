@@ -920,13 +920,23 @@
     </h2>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
+      This function is deprecated. Use <a href=#GET_FIELD_MULTI>GET_FIELD_MULTI</a> instead.
+
+      <br>
+
+        <hr><a name="GET_FIELD_MULTI"></a> 
+    </p>
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">GET_FIELD_MULTI</font></font> 
+    </h2>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
+    </h3>
     <font face="ARIAL, HELVETICA">This function computes the GEO vector of the magnetic
     field at input location for a set of internal/external magnetic field to be selected.</font>&nbsp;<br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
 
-      <b>kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, maginput</b> <p>
+      <b>ntime, kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, maginput</b> <p>
 
       See <a href=#COMMON_ARGUMENTS>Common Argument Definitions</a>
 
@@ -950,16 +960,73 @@
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from IDL:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'get_field_', kext,options,sysaxes,iyear,idoy,ut,
+    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'get_field_multi_idl',ntime,kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput,Bgeo, Bl,&nbsp; /f_value)</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from FORTRAN:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">call GET_FIELD1(kext,options,sysaxes,iyear,idoy,ut,
+    <font face="ARIAL, HELVETICA">call GET_FIELD_MULTI(ntime,kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput,Bgeo,Bl)</font> 
     <p>
         <br />
+
+        <hr><a name="GET_BDERIVS"></a> 
+    </p>
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">GET_BDERIVS</font></font> 
+    </h2>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">This function computes the magnetic field and its 1st-order derivatives
+	at each input location for a set of internal/external magnetic field to be selected.</font>&nbsp;<br />
+    &nbsp; 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
+    </h3>
+
+      <b>ntime, kext, options, sysaxes, dX, iyear, idoy, UT, x1, x2, x3, maginput</b> <p>
+
+      See <a href=#COMMON_ARGUMENTS>Common Argument Definitions</a>
+
+<p>
+
+	<b>dX:</b> dX is the step size, in RE for the numerical derivatives (recommend 1E-3), double scalar.
+
+                <p>
+                <font face="ARIAL, HELVETICA"><b>IMPORTANT:</b> all inputs must be present. For those
+                which are not used a dummy value can be provided.</font> 
+
+    </p>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA"><b>Bgeo:</b> BxGEO,ByGEO and BzGEO of the magnetic field
+    (nT), (array(3,NTIME_MAX) of double)</font> 
+    <br />
+    <font face="ARIAL, HELVETICA"><b>Bmag:</b> magnitude of magnetic field (array(NTIME_MAX) of double) (nT)</font> 
+    <br />
+    <font face="ARIAL, HELVETICA"><b>gradBmag:</b> gradient (GEO) of magnitude of magnetic field (array(3,NTIME_MAX) of double) (nT)</font> 
+    <br />
+    <font face="ARIAL, HELVETICA"><b>diffB:</b> derivatives of magnetic field vector (array(3,3,NTIME_MAX) of double) (nT)<br>
+        diffB(i,j,t) = dB_i/dx_j at t'th location. GEO coordinates. </font> 
+    <br />
+    &nbsp; 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">[Bgeo,B,gradBmag,diffB] = onera_desp_lib_get_bderivs(kext,options,sysaxes,matlabd,x1,x2,x3,maginput,...)</font> 
+    <br />
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from IDL:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'get_bderivs_idl',ntime,kext,options,sysaxes,dX,iyear,idoy,ut,
+    x1,x2,x3, maginput,Bgeo,Bmag,gradBmag,diffB,&nbsp; /f_value)</font> 
+    <br />
+    &nbsp; 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from FORTRAN:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">call GET_BDERIVS(ntime,kext,options,sysaxes,dX,iyear,idoy,ut,
+    x1,x2,x3, maginput,Bgeo,Bmag,gradBmag,diffB)</font> 
+    <p>
+        <br />
+
+
         <hr><a name="TRACE_FIELD_LINE"></a> 
     </p>
     <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">TRACE_FIELD_LINE2</font></font> 
@@ -1111,8 +1178,21 @@
     </h3>
     <font face="ARIAL, HELVETICA">call get_mlt1(iyr,idoy,secs,xGEO,MLT)</font><br />
     <br />
+
+
+
     <hr><a name="GET_HEMI"></a> 
     <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">GET_HEMI</font></font> 
+    </h2>
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
+    </h3>
+      This routine is deprecated. Use <a href = #GET_HEMI_MULTI>GET_HEMI_MULTI</a> instead.
+
+    <br />
+
+
+    <hr><a name="GET_HEMI_MULTI"></a> 
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">GET_HEMI_MULTI</font></font> 
     </h2>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
@@ -1124,7 +1204,7 @@
     </h3>
 
 
-      <b>kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, maginput </b> <p>
+      <b>ntime, kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, maginput </b> <p>
 
       See <a href=#COMMON_ARGUMENTS>Common Argument Definitions</a>
 
@@ -1145,18 +1225,21 @@
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from IDL:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'get_hemi_', kext,options,sysaxes,iyear,idoy,ut,
+    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'get_hemi_multi_idl_',ntime,kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput,xHEMI,&nbsp; /f_value)</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from FORTRAN:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">call GET_HEMI1(kext,options,sysaxes,iyear,idoy,ut, x1,x2,x3,
+    <font face="ARIAL, HELVETICA">call GET_HEMI_MULTI(ntime,kext,options,sysaxes,iyear,idoy,ut, x1,x2,x3,
     maginput,xHEMI)</font> 
     <p>
         <br />
     </p>
     <br />
+
+
+
     <hr><a name="LSTAR_PHI"></a> 
     <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">LSTAR_PHI</font></font> 
     </h2>
@@ -1204,7 +1287,6 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"> out = onera_desp_lib_lstar_phi(which,options,matlabd,in) </font>
-      use "help onera_desp_lib_lstar_phi" for details
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM IDL:</font></font> 
     </h3>
@@ -4964,7 +5046,7 @@
         </font>
         <font face="ARIAL, HELVETICA"><b>INUC:</b> long integer to indicate the nuclear interaction to account for:
         <ol>
-        <li> No nuclear attenuation fro protons in Al </li>
+        <li> No nuclear attenuation for protons in Al </li>
         <li> Nuclear attenuation, local charged-secondary energy deposition </li>
         <li> Nuclear attenuation, local charged-secondary energy deposition, and approx exponential distribution of neutron dose </li>
         </ol>
@@ -5103,9 +5185,6 @@
     <p>
         <font face="Arial">
 	  [ProtDose,ElecDose,BremDose,SolDose,TotDose] = onera_desp_lib_shieldose2(ProtSpect,ElecSpect,SolSpect,Target,...)
-	  <p>
-	  use "help onera_desp_lib_shieldose2" for details. Also, see example in onera_desp_lib_shieldose2_test.m
-	  
 	</font>&nbsp;<br />
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from IDL:</font></font> 
