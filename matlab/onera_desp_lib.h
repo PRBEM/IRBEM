@@ -228,6 +228,11 @@ void get_bderivs_(int *ntime,int *kext,
 		  double *Bgeo,double *Bmag,
 		  double *gradBmag, double *diffB);
 
+void lstar_phi1_(int *ntime,int *whichinv, 
+		  int *options,
+		  int *iyear,int *idoy,
+		 double *Lstar, double *Phi);
+
 void find_magequator1_(int *kext, 
 			 int *options,
 			 int *sysaxes,
