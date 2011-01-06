@@ -161,10 +161,10 @@ c     diffB(i,j,t) = dB_i/dx_j for point t (t=1 to ntime)
 c     outputs:
       real*8 grad_par(ntime_max) ! gradient of Bmag along B nT/RE
       real*8 grad_perp(3,ntime_max) ! gradient of Bmag perpendicular to B nT/RE
-      real*8 grad_drift(3,ntime_max) ! (B x grad_perp)/B^2 1/RE (B part of gradient drift velocity)
-      real*8 curvature(3,ntime_max) ! (bhat dot grad)bhat 1/RE (B part of curvature force)
-      real*8 curv_drift(3,ntime_max) ! (B x curvature)/B^2 1/RE/nT (B part of curvature drift)
-      real*8 curlB(3,ntime_max) ! curl of B (nT/RE) (B part of electrostatic current term)
+      real*8 grad_drift(3,ntime_max) ! (bhat x grad_perp)/B, 1/RE (part of gradient drift velocity)
+      real*8 curvature(3,ntime_max) ! (bhat dot grad)bhat, 1/RE (part of curvature force)
+      real*8 curv_drift(3,ntime_max) ! (bhat x curvature), 1/RE (part of curvature drift)
+      real*8 curlB(3,ntime_max) ! curl of B (nT/RE) (part of electrostatic current term)
       real*8 divB(ntime_max) ! divergence of B (nT/RE) (should be zero!)
 
 
@@ -214,11 +214,11 @@ c     internal variables
 
          ! compute curv_drift
          curv_drift(1,isat) = (bhat(2)*curvature(3,isat) 
-     &        - bhat(3)*curvature(2,isat)) / Bmag(isat)
+     &        - bhat(3)*curvature(2,isat))
          curv_drift(2,isat) = (bhat(3)*curvature(1,isat) 
-     &        - bhat(1)*curvature(3,isat)) / Bmag(isat)
+     &        - bhat(1)*curvature(3,isat))
          curv_drift(3,isat) = (bhat(1)*curvature(2,isat) 
-     &        - bhat(2)*curvature(1,isat)) / Bmag(isat)
+     &        - bhat(2)*curvature(1,isat))
 
          ! compute curl of B
          curlB(1,isat) = diffB(3,2,isat)-diffB(2,3,isat)
