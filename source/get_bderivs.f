@@ -142,3 +142,92 @@ c     compute derivatives
 
 
 
+      SUBROUTINE compute_grad_curv(ntime,Bgeo,Bmag,gradBmag,diffB,
+     & grad_par,grad_perp,grad_drift,curvature,curv_drift,curlB,divB)
+C     computes gradient and curvature terms and curl of B
+
+      IMPLICIT NONE
+      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
+      INCLUDE 'variables.inc'
+
+C     all coordinates are in GEO reference frame
+C     inputs: 
+      integer*4 ntime           ! number of points
+      real*8 Bgeo(3,ntime_max)  ! components of B in GEO, nT
+      real*8 Bmag(ntime_max)    ! magnitude of B in nT
+      real*8 gradBmag(3,ntime_max) ! gradient of Bmag in GEO, nT/RE
+      real*8 diffB(3,3,ntime_max) ! derivatives of Bgeo in GEO, nT/RE
+c     diffB(i,j,t) = dB_i/dx_j for point t (t=1 to ntime)
+c     outputs:
+      real*8 grad_par(ntime_max) ! gradient of Bmag along B nT/RE
+      real*8 grad_perp(3,ntime_max) ! gradient of Bmag perpendicular to B nT/RE
+      real*8 grad_drift(3,ntime_max) ! (B x grad_perp)/B^2 1/RE (B part of gradient drift velocity)
+      real*8 curvature(3,ntime_max) ! (bhat dot grad)bhat 1/RE (B part of curvature force)
+      real*8 curv_drift(3,ntime_max) ! (B x curvature)/B^2 1/RE/nT (B part of curvature drift)
+      real*8 curlB(3,ntime_max) ! curl of B (nT/RE) (B part of electrostatic current term)
+      real*8 divB(ntime_max) ! divergence of B (nT/RE) (should be zero!)
+
+
+c     internal variables
+      integer*4 i,j,k,isat
+      real*8 bhat(3), dbiBk ! unit vector along B and partial db_i/dB_k
+
+      do isat = 1,ntime
+
+         ! compute bhat and grad_par
+         grad_par(i) = 0.0
+         do i = 1,3
+            bhat(i) = Bgeo(i,isat)/Bmag(isat)
+            grad_par(isat) = grad_par(isat) + gradBmag(i,isat)*bhat(i)
+         enddo
+
+         ! compute grad_perp
+         do i = 1,3
+            grad_perp(i,isat) = gradBmag(i,isat)-grad_par(isat)*bhat(i)
+         enddo
+
+         ! compute grad_drift
+         grad_drift(1,isat) = (bhat(2)*grad_perp(3,isat) 
+     &        - bhat(3)*grad_perp(2,isat)) / Bmag(isat)
+         grad_drift(2,isat) = (bhat(3)*grad_perp(1,isat) 
+     &        - bhat(1)*grad_perp(3,isat)) / Bmag(isat)
+         grad_drift(3,isat) = (bhat(1)*grad_perp(2,isat) 
+     &        - bhat(2)*grad_perp(1,isat)) / Bmag(isat)
+
+         ! compute curvature (via chain rule on b = Bgeo/Bmag)
+         do i = 1,3
+            curvature(i,isat) = 0.0
+            do k = 1,3
+               ! compute db_i/dB_k
+               if (i.eq.k) then
+                  dbiBk = Bmag(isat)**2 - Bgeo(i,isat)**2
+               else
+                  dbiBk = -Bgeo(i,isat)*Bgeo(k,isat)
+               endif
+               dbiBk = dbiBk/Bmag(isat)**3
+               do j = 1,3
+                  curvature(i,isat) = curvature(i,isat)
+     &                 +bhat(j)*dbiBk*diffB(k,j,isat)
+               enddo
+            enddo
+         enddo
+
+         ! compute curv_drift
+         curv_drift(1,isat) = (bhat(2)*curvature(3,isat) 
+     &        - bhat(3)*curvature(2,isat)) / Bmag(isat)
+         curv_drift(2,isat) = (bhat(3)*curvature(1,isat) 
+     &        - bhat(1)*curvature(3,isat)) / Bmag(isat)
+         curv_drift(3,isat) = (bhat(1)*curvature(2,isat) 
+     &        - bhat(2)*curvature(1,isat)) / Bmag(isat)
+
+         ! compute curl of B
+         curlB(1,isat) = diffB(3,2,isat)-diffB(2,3,isat)
+         curlB(2,isat) = diffB(1,3,isat)-diffB(3,1,isat)
+         curlB(3,isat) = diffB(2,1,isat)-diffB(1,2,isat)
+
+         ! compute divergence of B
+         divB(isat) = diffB(1,1,isat)+diffB(2,2,isat)+diffB(3,3,isat)
+
+      enddo ! end isat loop
+
+      end
