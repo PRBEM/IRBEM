@@ -136,7 +136,7 @@ WRAPPER_linux64_intel32=32
 LIBNAME_linux64_intel32=linux_x86
 
 FOPTIONS_SHARED_linux64_intel64=-Bdynamic
-FOPTIONS_NONSHARED_linux64_intel64=-c -assume 2underscores
+FOPTIONS_NONSHARED_linux64_intel64=-c
 FC_linux64_intel64=ifort
 PIC_linux64_intel64=-fPIC
 LDOPTIONS_linux64_intel64=-shared
