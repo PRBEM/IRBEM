@@ -50,9 +50,12 @@ C
        IF(kint.EQ.1) THEN
          CALL DTD(xGEO(1),xGEO(2),xGEO(3),Bxint(1),Bxint(2),Bxint(3))
        ENDIF
-       IF(kint.GE.2) THEN
+       IF(kint.GE.2 .and. kint .le. 3) THEN
          CALL get_intfield(xGEO(1),xGEO(2),xGEO(3),
      &                    Bxint(1),Bxint(2),Bxint(3))
+       ENDIF
+       IF(kint .eq. 4) THEN
+         CALL myOwnMagField(xGEO,Bxint)
        ENDIF
 C
        Bxext(1) = 0.D0
@@ -865,7 +868,7 @@ C
 	sind  = SIN(obliq) * SIN(slp)
 	cosd  = SQRT(1.D0 - sind*sind)
         Sdec  = ATAN(sind/cosd) / rad
-        Srasn = 180.D0 
+        Srasn = 180.D0
      &    - ATAN2(sind/(cosd*TAN(obliq)), -COS(slp)/cosd) / rad
 C
 	gst   = gst   * rad
