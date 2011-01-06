@@ -17,6 +17,25 @@
 !    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 !
 
+      REAL*4 FUNCTION GET_BDERIVS_IDL(argc, argv)   ! Called by IDL
+      INCLUDE 'wrappers.inc'
+c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
+
+       j = loc(argc)                    ! Obtains the number of arguments (argc)
+                                       ! Because argc is passed by VALUE.
+
+      call shieldose2(%VAL(argv(1)),%VAL(argv(2)),%VAL(argv(3)),
+     &%VAL(argv(4)),%VAL(argv(5)),%VAL(argv(6)),%VAL(argv(7)),
+     &%VAL(argv(8)),%VAL(argv(9)),%VAL(argv(10)),%VAL(argv(11)),
+     &%VAL(argv(12)),%VAL(argv(13)),%VAL(argv(14)),%VAL(argv(15)),
+     &%VAL(argv(16)))
+
+      GET_BDERIVS_IDL = 9.9
+
+      RETURN
+      END
+
+
       SUBROUTINE GET_Bderivs(ntime,kext,options,sysaxes,dX,
      & iyearsat,
      & idoy,UT,xIN1,xIN2,xIN3,maginput,Bgeo,Bmag,gradBmag,diffB)
@@ -32,7 +51,7 @@ C        diffB(i,j,t) = dB_i/dx_j for point t (t=1 to ntime)
       IMPLICIT NONE
       INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
       INCLUDE 'variables.inc'
-C     
+C
       COMMON /magmod/k_ext,k_l,kint
 
 c     declare inputs
@@ -58,12 +77,12 @@ c     declare internal variables
       real*8     alti,lati,longi
       REAL*8     B1GEO(3),B1,BtmpGEO(3),Btmp
       integer*4 int_field_select, ext_field_select ! functions to call
-C     
+C
       kint = int_field_select ( options(5) )
       k_ext = ext_field_select ( kext )
-c     
+c
       CALL INITIZE
-      
+
       do isat = 1,ntime
 
          ! initialize outputs to baddata
@@ -78,16 +97,16 @@ c
 
          call init_fields(kint,iyearsat(isat),idoy(isat),
      &        ut(isat),options(2))
-         
-         call get_coordinates (sysaxes,xIN1(isat),xIN2(isat),xIN3(isat), 
+
+         call get_coordinates (sysaxes,xIN1(isat),xIN2(isat),xIN3(isat),
      6        alti, lati, longi, xGEO )
-         
+
          call set_magfield_inputs ( kext, maginput(1,isat), ifail)
-         
+
          if ( ifail.lt.0 ) then
             goto 1000
          endif
-c     
+c
          CALL CHAMP(xGEO,B1GEO,B1,Ifail)
          IF ((Ifail.LT.0).or.(B1.eq.baddata)) THEN
             goto 1000
@@ -115,9 +134,9 @@ c     compute derivatives
                diffB(i,j,isat) = (BtmpGEO(i)-B1GEO(i))/dX
             enddo
          enddo ! end of j loop
-            
+
  1000       continue            ! end of isat loop
-         enddo 
+         enddo
 
       end
 
