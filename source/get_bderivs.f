@@ -17,6 +17,25 @@
 !    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 !
 
+      REAL*4 FUNCTION COMPUTE_GRAD_CURV_CURL_IDL(argc, argv) ! Called by IDL
+      INCLUDE 'wrappers.inc'
+c      INTEGER*4 argc, argv(*)   ! Argc and Argv are integers
+      
+      j = loc(argc)             ! Obtains the number of arguments (argc)
+                                ! Because argc is passed by VALUE.
+      
+      call compute_grad_curv_curl(%VAL(argv(1)),%VAL(argv(2)),
+     &     %VAL(argv(3)),
+     &     %VAL(argv(4)),%VAL(argv(5)),%VAL(argv(6)),%VAL(argv(7)),
+     &     %VAL(argv(8)),%VAL(argv(9)),%VAL(argv(10)),%VAL(argv(11)),
+     &     %VAL(argv(12)),%VAL(argv(13)))
+      
+      COMPUTE_GRAD_CURV_CURL_IDL = 9.9
+      
+      RETURN
+      END
+
+
       REAL*4 FUNCTION GET_BDERIVS_IDL(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
 c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
@@ -24,11 +43,11 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
 
-      call shieldose2(%VAL(argv(1)),%VAL(argv(2)),%VAL(argv(3)),
-     &%VAL(argv(4)),%VAL(argv(5)),%VAL(argv(6)),%VAL(argv(7)),
-     &%VAL(argv(8)),%VAL(argv(9)),%VAL(argv(10)),%VAL(argv(11)),
-     &%VAL(argv(12)),%VAL(argv(13)),%VAL(argv(14)),%VAL(argv(15)),
-     &%VAL(argv(16)))
+       call GET_BDERIVS(%VAL(argv(1)),%VAL(argv(2)),%VAL(argv(3)),
+     &      %VAL(argv(4)),%VAL(argv(5)),%VAL(argv(6)),%VAL(argv(7)),
+     &      %VAL(argv(8)),%VAL(argv(9)),%VAL(argv(10)),%VAL(argv(11)),
+     &      %VAL(argv(12)),%VAL(argv(13)),%VAL(argv(14)),%VAL(argv(15)),
+     &      %VAL(argv(16)))
 
       GET_BDERIVS_IDL = 9.9
 
@@ -142,9 +161,10 @@ c     compute derivatives
 
 
 
-      SUBROUTINE compute_grad_curv(ntime,Bgeo,Bmag,gradBmag,diffB,
-     & grad_par,grad_perp,grad_drift,curvature,curv_drift,curlB,divB)
-C     computes gradient and curvature terms and curl of B
+      SUBROUTINE compute_grad_curv_curl(ntime,Bgeo,Bmag,gradBmag,diffB,
+     & grad_par,grad_perp,grad_drift,curvature,Rcurv,curv_drift,
+     & curlB,divB)
+C     computes gradient factors, curvature factors, and curl of B
 
       IMPLICIT NONE
       INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
@@ -163,6 +183,7 @@ c     outputs:
       real*8 grad_perp(3,ntime_max) ! gradient of Bmag perpendicular to B nT/RE
       real*8 grad_drift(3,ntime_max) ! (bhat x grad_perp)/B, 1/RE (part of gradient drift velocity)
       real*8 curvature(3,ntime_max) ! (bhat dot grad)bhat, 1/RE (part of curvature force)
+      real*8 Rcurv(ntime_max) ! 1/|curvature| RE (radius of curvature)
       real*8 curv_drift(3,ntime_max) ! (bhat x curvature), 1/RE (part of curvature drift)
       real*8 curlB(3,ntime_max) ! curl of B (nT/RE) (part of electrostatic current term)
       real*8 divB(ntime_max) ! divergence of B (nT/RE) (should be zero!)
@@ -175,7 +196,7 @@ c     internal variables
       do isat = 1,ntime
 
          ! compute bhat and grad_par
-         grad_par(i) = 0.0
+         grad_par(isat) = 0.0
          do i = 1,3
             bhat(i) = Bgeo(i,isat)/Bmag(isat)
             grad_par(isat) = grad_par(isat) + gradBmag(i,isat)*bhat(i)
@@ -211,7 +232,18 @@ c     internal variables
                enddo
             enddo
          enddo
-
+         
+         ! compute radius of curvature = 1/|curvature|
+         Rcurv(isat) = 0.0
+         do i = 1,3
+            Rcurv(isat) = Rcurv(isat)+curvature(i,isat)**2
+         enddo
+         if (Rcurv(isat).gt.0) then
+            Rcurv(isat) = 1.0/sqrt(Rcurv(isat))
+         else
+            Rcurv(isat) = baddata
+         endif
+         
          ! compute curv_drift
          curv_drift(1,isat) = (bhat(2)*curvature(3,isat) 
      &        - bhat(3)*curvature(2,isat))
@@ -231,3 +263,4 @@ c     internal variables
       enddo ! end isat loop
 
       end
+

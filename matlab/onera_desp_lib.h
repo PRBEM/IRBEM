@@ -228,6 +228,14 @@ void get_bderivs_(int *ntime,int *kext,
 		  double *Bgeo,double *Bmag,
 		  double *gradBmag, double *diffB);
 
+void compute_grad_curv_curl_(int *ntime,
+			     double *Bgeo,double *Bmag,
+			     double *gradBmag, double *diffB,
+			     double *grad_par, double *grad_perp,
+			     double *grad_drift, double *curvature,
+			     double *Rcurv, double *curv_drift,
+			     double *curlB, double *divB);
+
 void lstar_phi1_(int *ntime,int *whichinv, 
 		  int *options,
 		  int *iyear,int *idoy,
