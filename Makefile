@@ -127,8 +127,8 @@ AROPTIONS_linux64=-r
 
 #FOPTIONS_SHARED_linux64_intel32=-Bstatic -traceback -check bounds -check format -check output_conversion -fexceptions -fpe0 -fmath-errno
 #FOPTIONS_SHARED_linux64_intel32=-Bstatic -g -debug extended -fpe0 -O0 -check all -traceback
-FOPTIONS_SHARED_linux64_intel32=-Bstatic
-FOPTIONS_NONSHARED_linux64_intel32=-c -assume 2underscores
+FOPTIONS_SHARED_linux64_intel32=-Bdynamic
+FOPTIONS_NONSHARED_linux64_intel32=-c
 FC_linux64_intel32=ifort
 PIC_linux64_intel32=-fPIC
 LDOPTIONS_linux64_intel32=-shared
