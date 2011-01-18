@@ -112,7 +112,7 @@ c Declare internal variables
         INTEGER*4    t_resol,r_resol,Ilflag,Ilflag_old
 	REAL*8     mlon,mlon1
 	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT
-	real*8     alti,lati,longi
+	real*8     alti,lati,longi,ERA,AQUAD,BQUAD
 c
 c Declare output variables
         REAL*8     BLOCAL(ntime_max),BMIN(ntime_max),XJ(ntime_max)
@@ -121,6 +121,7 @@ c Declare output variables
 C
 	COMMON /magmod/k_ext,k_l,kint
         COMMON /flag_L/Ilflag
+      	COMMON/GENER/ERA,AQUAD,BQUAD
         DATA  xSUN /1.d0,0.d0,0.d0/
       integer*4 int_field_select, ext_field_select
 C
@@ -137,6 +138,7 @@ c
         CALL INITIZE
 
         DO isat = 1,ntime
+
 	    call init_fields ( kint, iyearsat(isat), idoy(isat),
      6          ut(isat), options(2) )
 
@@ -146,6 +148,7 @@ c
 
 	    call set_magfield_inputs ( kext, maginput(1,isat), ifail )
 
+        if (alti .le. 50.) ifail=-10
 	    if ( ifail.lt.0 ) then
 	          Lm(isat)=baddata
 		  Lstar(isat)=baddata
@@ -166,6 +169,9 @@ c
 
 99         continue
 
+        if (ifail .eq. -10) then
+          MLT(isat) = baddata
+        else
            CALL GDZ_GEO(lati,longi,alti
      &     ,xGEO(1),xGEO(2),xGEO(3))
            CALL geo_mag(xGEO,xMAG)
@@ -176,7 +182,7 @@ c
            MLT(isat) = (Mlon1 - Mlon)/15.d0 + 12.d0
            IF (MLT(isat).GE.24.d0) MLT(isat) = MLT(isat) - 24.d0
            IF (MLT(isat).LT.0.d0) MLT(isat) = MLT(isat) + 24.d0
-
+        endif
 	ENDDO
 
 	END
