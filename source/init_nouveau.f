@@ -1477,6 +1477,7 @@ C
         REAL*8 alti,xx,yy,zz,alt0
         REAL*8 D,RHO
         REAL*8 ERA,AQUAD,BQUAD
+        integer*4 i
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
         REAL*8     pi,rad
@@ -1493,17 +1494,26 @@ C
 	ELSE
 	  alti = RHO/D - 1.D0
 C
+      i=0
 10	  CONTINUE
 	  alt0 = alti
 	  lat0 = lati
 	  D = SQRT(AQUAD-(AQUAD-BQUAD)*sin(lat0)*sin(lat0))
 	  lati = ATAN2(zz*(alt0+AQUAD/D/ERA),RHO*(alt0+BQUAD/D/ERA))
 	  alti = RHO/cos(lati) - AQUAD/D/ERA
+	  i=i+1
+	  if (i .gt. 1000) then
+	    alti=0.
+	    lati=0.
+        !write(6,*)'geo2gdz ',i,alti
+	    return
+	  endif
 	  IF (ABS(alti - alt0).GT. precision .OR. ABS(lati -
      &     lat0) .GT. precision) GOTO 10 ! keep looping until BOTH are within precision
           alti = alti*ERA
 	  lati = lati/rad
         ENDIF
+        !write(6,*)'geo2gdz ',i,alti
 	RETURN
 	END
 C
