@@ -58,12 +58,12 @@ if N > Nmax,
     for i = 1:Nmax:ntime,
         ii = (i:min(i+Nmax-1,ntime))';
         tmpout = onera_desp_lib_msis(whichm,date(ii),X(ii,:),sysaxes,F107A(ii),F107(ii),Ap(ii,:));
-        if isempty(tmpout),
+        if isempty(out),
             out = tmpout;
         else
             fldnames = fieldnames(tmpout);
             for ifld = 1:length(fldnames),
-                var = fldnames(ifld);
+                var = fldnames{ifld};
                 if size(var,1)==length(ii),
                     out.(var) = [out.(var);tmpout.(var)];
                 end
