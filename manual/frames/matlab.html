@@ -26,11 +26,12 @@
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><font size=+1>We provide a set of Matlab wrappers for
-        the ONERA/DESP FORTRAN library through the use of a shared library file (.dll on windows,
+        the IRBEM FORTRAN library through the use of a shared library file (.dll on windows,
         .so on Unix). Matlab refers to this type of interface as a "mex file". In addition
         to the shared library file, Matlab requires a C-style header file that includes the
         C-style calling syntax for each FORTRAN function. This .h file is provided with the
-        ONERA/DESP Matlab library.</font></font> 
+        IRBEM Matlab library. For historical reasons, the Matlab routines and files are prefixed
+	with "onera_desp_lib" rather than "irbem".</font></font> 
     </p>
     <p>
     </p>
@@ -41,11 +42,32 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><font size=+1>The ONERA/DESP compile scripts will create
+        <font face="ARIAL, HELVETICA"><font size=+1><a name=WindowsInstallation><b>Easy way for 32-bit windows users:</b>
+
+	  <el>
+	    <li> Manually create your top-level folder "irbem"
+	    <li> Download the <a href = "http://irbem.svn.sourceforge.net/viewvc/irbem/trunk/data/?view=tar">matlab folder tarball</a>, 
+	      and untar/unzip its contents into a folder called "irbem\matlab"
+	    <li> Download the <a href = "http://irbem.svn.sourceforge.net/viewvc/irbem/trunk/matlab/?view=tar">data folder tarball</a>, 
+	      and untar/unzip its contents into a folder called "irbem\data"
+	    <li> Download the <a href = "http://irbem.svn.sourceforge.net/viewvc/irbem/trunk/onera_desp_lib_Win32_x86.dll">32-bit</a>
+	      windows DLL and save it as "irbem\matlab\onera_desp_lib.dll"
+	    <li> Open Matlab 
+	    <li> Under the File menu, click "Set Path"
+	    <li> Add "irbem\matlab" to your Matlab path 
+	    <li> Add "irbem\data" to your Matlab path
+	    <li> Click "Save" to save your new Matlab path for future sessions
+	    <li> Installation is complete
+	  </el>
+
+    </p>
+    <p>
+        <font face="ARIAL, HELVETICA"><font size=+1><b>Hard way for everyone else:</b>
+	  The IRBEM make file (call <i>make help</i> from irbem/trunk) will create
         the shared library file for use with IDL or Matlab. A copy of the shared library is
         created in the "matlab" subdirectory, and is given a name "onera_desp_lib.dll" or
         "onera_desp_lib.so" depending on the platform. Thus, in order to access the library
-        and the wrappers, the user needs only add the "matlab" subdirectory (e.g. "c:\onera_desp\matlab")
+        and the wrappers, the user needs only add the "matlab" subdirectory (e.g. "c:\irbem\matlab")
         to the Matlab path. In order for the library to easily locate the data files that
         it needs, it is also advisable to add the "data" subdirectory to the Matlab path.
         Matlab provides a GUI interface to add folders to the search path from "Set Path"
@@ -53,11 +75,11 @@
         using the Matlab "addpath" command; however, this command does not make the change
         to the path permanent, so that "addpath" will have to be issued once in each new Matlab
         session. The "savepath" function can make the path change permanent, as can the GUI
-        path manager interface. Thus, one could use the following commands, if the ONERA library
-        is located in "c:\onera_desp": 
+        path manager interface. Thus, one could use the following commands, if the IRBEM library
+        is located in "c:\irbem": 
         <br />
         <br />
-        addpath c:\onera_desp\matlab c:\onera_desp\data 
+        addpath c:\irbem\matlab c:\irbem\data 
         <br />
         savepath </font></font>
     </p>
@@ -92,12 +114,6 @@
         repmat function) to be the same size as the other array arguments. 
         <br />
         <br />
-        The Matlab library also provides a single function for doing all coordinate rotations.
-        This function, onera_desp_lib_rotate will perform rotations between any coordinate
-        system supported by the library. It will also compute the most efficient multi-step
-        rotation for those rotations not explicitly implemented in the FORTRAN library. 
-        <br />
-        <br />
         In many cases, the library requires integer inputs that represent different options,
         e.g., kext=5 for the Olson-Pfitzer Quiet external field model. In most cases, the
         Matlab wrapper supports string (keyword) inputs in place of the integer values. This
@@ -116,15 +132,6 @@
         When available from MATLAB a calling sequence is provided for each function (see detailled
         description of each functions). 
         <br />
-        Note that the following function handles all coordinate rotations. In some cases,
-        the FORTRAN library requests the coordinates as separate arguments (e.g., alt, lat,
-        lon). For these functions, the Matlab wrapper expects a single Nx3 matrix, constructed
-        by, e.g., X = [alt(:), lat(:), lon(:)]. Also, some rotations are time invariant and
-        the matlabd argument can be omitted. The helps for onera_desp_lib_rotate provide a
-        list of available rotations. This function will also perform multi-step rotations
-        as needed to move between any set of supported coordinate systems.<br />
-        Y = onera_desp_lib_rotate(X,rotation,matlabd)<br />
-        [Y,psi] = onera_desp_lib_rotate(X,rotation,matlabd) </font></font>
     </p>
     <p>
     </p>
