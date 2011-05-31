@@ -112,7 +112,7 @@ c Declare internal variables
         INTEGER*4    t_resol,r_resol,Ilflag,Ilflag_old
 	REAL*8     mlon,mlon1
 	REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT
-	real*8     alti,lati,longi,ERA,AQUAD,BQUAD
+	real*8     alti,lati,longi
 c
 c Declare output variables
         REAL*8     BLOCAL(ntime_max),BMIN(ntime_max),XJ(ntime_max)
@@ -121,7 +121,6 @@ c Declare output variables
 C
 	COMMON /magmod/k_ext,k_l,kint
         COMMON /flag_L/Ilflag
-      	COMMON/GENER/ERA,AQUAD,BQUAD
         DATA  xSUN /1.d0,0.d0,0.d0/
       integer*4 int_field_select, ext_field_select
 C
@@ -148,7 +147,7 @@ c
 
 	    call set_magfield_inputs ( kext, maginput(1,isat), ifail )
 
-        if (alti .le. 50.) ifail=-10
+c        if (alti .le. 50.) ifail=-10 ! removed by TPO, 5/31/2011 - why would we force fail for alt<50km?
 	    if ( ifail.lt.0 ) then
 	          Lm(isat)=baddata
 		  Lstar(isat)=baddata
@@ -268,8 +267,9 @@ c
 	  call init_fields ( kint, iyearsat(isat), idoy(isat),
      6      ut(isat), options(2) )
 
-	  call get_coordinates ( sysaxes, xIN1, xIN2, xIN3,
-     6      alti, lati, longi, xGEO )
+	    call get_coordinates ( sysaxes,
+     6        xIN1(isat), xIN2(isat), xIN3(isat),
+     6        alti, lati, longi, xGEO )
 
 	  call set_magfield_inputs ( kext, maginput(1,isat), ifail )
 
