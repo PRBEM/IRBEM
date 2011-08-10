@@ -191,6 +191,18 @@ LDOPTIONS_win32_cygwin32=-shared
 WRAPPER_win32_cygwin32=32
 LIBNAME_win32_cygwin32=Win32_x86
 
+SHAREDEXT_win64=dll
+NONSHAREDEXT_win64=a
+AROPTIONS_win64=-r
+
+FOPTIONS_SHARED_win64_cygwin64=-mno-cygwin -I%IDLINC% -Wl,--add-stdcall-alias -fno-second-underscore -w
+FOPTIONS_NONSHARED_win64_cygwin64=-c -mno-cygwin -shared -mno-align-double -fno-second-underscore -w
+FC_win64_cygwin64=g77
+PIC_win64_cygwin64=
+LDOPTIONS_win64_cygwin64=-shared
+WRAPPER_win64_cygwin64=64
+LIBNAME_win64_cygwin64=Win64_x86
+
 #------------------------------------------------------------------------------
 # Macros for Mach.
 #------------------------------------------------------------------------------
@@ -228,6 +240,7 @@ all.linux64.gnu64: all.build
 all.linux64.pgi64: all.build
 all.linux64.gfortran64: all.build
 all.win32.cygwin32: all.build
+all.win64.cygwin64: all.build
 all.mach.gnu32: all.build
 all.sunos.sparc32: all.build
 all.sunos.sparc64: all.build
