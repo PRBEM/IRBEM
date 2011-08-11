@@ -195,8 +195,8 @@ SHAREDEXT_win64=dll
 NONSHAREDEXT_win64=a
 AROPTIONS_win64=-r
 
-FOPTIONS_SHARED_win64_cygwin64=-mno-cygwin -I%IDLINC% -Wl,--add-stdcall-alias -fno-second-underscore -w
-FOPTIONS_NONSHARED_win64_cygwin64=-c -mno-cygwin -shared -mno-align-double -fno-second-underscore -w
+FOPTIONS_SHARED_win64_cygwin64=-mno-cygwin -I%IDLINC% -Wl,--add-stdcall-alias -fno-second-underscore -w -m64
+FOPTIONS_NONSHARED_win64_cygwin64=-c -mno-cygwin -shared -mno-align-double -fno-second-underscore -w -m64
 FC_win64_cygwin64=g77
 PIC_win64_cygwin64=
 LDOPTIONS_win64_cygwin64=-shared
