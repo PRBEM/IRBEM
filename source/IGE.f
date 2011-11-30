@@ -331,7 +331,7 @@ c-------------------------------------------------------------------------------
       INTEGER*4 I
       INTEGER*4 Nmin, mod_year, nsolcyc
       INTEGER*4 year,year_cycle
-      PARAMETER (Nmin = 10)
+      PARAMETER (Nmin = 11)
       REAL*8 tab_min(Nmin)
       REAL*8 last_min,min_sol
 
@@ -346,6 +346,7 @@ c-------------------------------------------------------------------------------
       tab_min(8) = 1976.417d0
       tab_min(9) = 1986.667d0
       tab_min(10) = 1996.333d0
+      tab_min(11) = 2008.92d0
 
       last_min=tab_min(Nmin)
       min_sol=last_min
