@@ -57,6 +57,10 @@ C
        IF(kint .eq. 4) THEN
          CALL myOwnMagField(xGEO,Bxint)
        ENDIF
+       IF(kint .eq. 5) THEN
+         CALL centered_dipole(xGEO(1),xGEO(2),xGEO(3),Bxint(1),Bxint(2)
+     &    ,Bxint(3))
+       ENDIF
 C
        Bxext(1) = 0.D0
        Bxext(2) = 0.D0
