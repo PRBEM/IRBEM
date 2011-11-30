@@ -187,12 +187,9 @@ C
        INTEGER*4  Nreb
        PARAMETER (Nreb = 50)
 C
-       INTEGER*4  k_ext,k_l,kint,Ifail
-       INTEGER*4  Nrebmax
-       REAL*8     rr
+       INTEGER*4  Ifail
+       REAL*8     rr,tt
        REAL*8     xx0(3),xx(3),x1(3),x2(3)
-       REAL*8     xmin(3)
-       REAL*8     lati,longi,alti
        REAL*8     stop_alt
        INTEGER*4  hemi_flag
        REAL*8     B(3),Bl,B0,B1,B3
@@ -200,26 +197,11 @@ C
        
        REAL*8     XFOOT(3),BFOOT(3),BFOOTMAG
 
-       INTEGER*4  I,J,ind
+       INTEGER*4  I,J
        REAL*8     Lb
-       REAL*8     leI0
 C
-       REAL*8     tt
-       REAL*8     cste
-C
-       REAL*8     Bposit,Bmir
-       REAL*8     sn2,sn2max,alpha
        integer*4  IFOUND ! dummy loop result variable
 C
-       COMMON /magmod/k_ext,k_l,kint
-        REAL*8     pi,rad
-        common /rconst/rad,pi
-C
-C
-       Nrebmax = 20*Nreb
-C
-       leI0 = 0.D0
-
 C
        CALL GEO_SM(xx0,xx)
        rr = SQRT(xx(1)*xx(1)+xx(2)*xx(2)+xx(3)*xx(3))
@@ -231,13 +213,20 @@ C
        IF (Ifail.LT.0) THEN
           goto 999
        ENDIF
-       XFOOT(1) = alti
-       XFOOT(2) = lati
-       XFOOT(3) = longi
-       BFOOT(1) = B(1)
-       BFOOT(2) = B(2)
-       BFOOT(3) = B(3)
-       BFOOTMAG = B0
+
+       call geo_gdz(xx0(1),xx0(2),xx0(3),XFOOT(2),XFOOT(3),XFOOT(1)) ! provides lat/lon/alt at x2
+       if (XFOOT(1).LE.stop_alt) then
+            goto 999 ! fail altitude of starting point to low
+       endif
+
+
+       XFOOT(1) = baddata
+       XFOOT(2) = baddata
+       XFOOT(3) = baddata
+       BFOOT(1) = baddata
+       BFOOT(2) = baddata
+       BFOOT(3) = baddata
+       BFOOTMAG = baddata
 
        dsreb = Lb/(Nreb*1.d0) ! step size
 C
@@ -273,14 +262,10 @@ c     dsreb is currently pointing north
 C
 C calcul de la ligne de champ
 C
-       ind=0
        DO I = 1,3
          x1(I)  = xx0(I)
        ENDDO
 C
-       xmin(1)=x1(1)
-       xmin(2)=x1(2)
-       xmin(3)=x1(3)
        Bl = B0 ! reset to starting value
 15     continue ! prepare to do loop
        IFOUND = 0
@@ -294,7 +279,7 @@ c
 c test for completion
 c need to check: alt < stop_alt, and moving to lower alt (higher B)
          call geo_gdz(x2(1),x2(2),x2(3),XFOOT(2),XFOOT(3),XFOOT(1)) ! provides lat/lon/alt at x2
-         if ((B1.LT.Bl).AND.(XFOOT(1).LE.stop_alt)) then
+         if (XFOOT(1).LE.stop_alt) then
             IFOUND = 1
             goto 20 ! done with loop
          endif
