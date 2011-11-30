@@ -1278,6 +1278,7 @@ c
 	   end
 
 	 subroutine set_magfield_inputs ( kext, maginput, ifail )
+	INCLUDE 'variables.inc'
 	COMMON /index/activ
 	integer*4 activ
         COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
@@ -1322,6 +1323,7 @@ c            'Olsen-Pfitzer' = default
 
            if (kext .eq. 1) then
 c Input for MEAD
+           if (maginput(1).eq.baddata) return
 	       if (maginput(1).le.3.d0) Activ=1
 	       if (maginput(1).gt.3.d0 .and.
      &         maginput(1).lt.20.d0) Activ=2
@@ -1336,6 +1338,7 @@ c
 	   endif
            if (kext .eq. 2) then
 c Input for TSYG87s
+           if (maginput(1).eq.baddata) return
 	       if (maginput(1).lt.7.d0) Activ=1
 	       if (maginput(1).ge.7.d0 .and.
      &         maginput(1).lt.17.d0) Activ=2
@@ -1357,6 +1360,7 @@ c
 	   endif
            if (kext .eq. 3) then
 c Input for TSYG87l
+           if (maginput(1).eq.baddata) return
 	       if (maginput(1).lt.7.d0) Activ=1
 	       if (maginput(1).ge.7.d0 .and.
      &         maginput(1).lt.17.d0) Activ=2
@@ -1375,6 +1379,7 @@ c
            endif
            if (kext .eq. 4) then
 c Input for Tsy89
+           if (maginput(1).eq.baddata) return
 	       if (maginput(1).lt.7.d0) Activ=1
 	       if (maginput(1).ge.7.d0 .and.
      &         maginput(1).lt.17.d0) Activ=2
@@ -1395,6 +1400,9 @@ c
 	    endif
            if (kext .eq. 6) then
 c Input for OP dyn
+           if (maginput(2).eq.baddata) return
+           if (maginput(3).eq.baddata) return
+           if (maginput(4).eq.baddata) return
                density=maginput(3)
 	       speed=maginput(4)
 	       dst_nt=maginput(2)
@@ -1407,6 +1415,10 @@ c
 	   endif
            if (kext .eq. 7) then
 c Input for Tsy96
+           if (maginput(2).eq.baddata) return
+           if (maginput(5).eq.baddata) return
+           if (maginput(6).eq.baddata) return
+           if (maginput(7).eq.baddata) return
 	       dst_nt=maginput(2)
 	       Pdyn_nPa=maginput(5)
 	       ByIMF_nt=maginput(6)
@@ -1421,6 +1433,9 @@ c
 	   endif
            if (kext .eq. 8) then
 c Input for Ostapenko97
+           if (maginput(2).eq.baddata) return
+           if (maginput(5).eq.baddata) return
+           if (maginput(7).eq.baddata) return
 	       dst_nt=maginput(2)
 	       Pdyn_nPa=maginput(5)
 	       BzIMF_nt=maginput(7)
@@ -1430,6 +1445,12 @@ c Input for Ostapenko97
 	   endif
            if (kext .eq. 9) then
 c Input for Tsy01
+           if (maginput(2).eq.baddata) return
+           if (maginput(5).eq.baddata) return
+           if (maginput(6).eq.baddata) return
+           if (maginput(7).eq.baddata) return
+           if (maginput(8).eq.baddata) return
+           if (maginput(9).eq.baddata) return
 	       dst_nt=maginput(2)
 	       Pdyn_nPa=maginput(5)
 	       ByIMF_nt=maginput(6)
@@ -1448,6 +1469,13 @@ c
 	   endif
            if (kext .eq. 10) then
 c Input for Tsy01 storm
+           if (maginput(2).eq.baddata) return
+           if (maginput(5).eq.baddata) return
+           if (maginput(6).eq.baddata) return
+           if (maginput(7).eq.baddata) return
+           if (maginput(8).eq.baddata) return
+           if (maginput(9).eq.baddata) return
+           if (maginput(10).eq.baddata) return
 	       dst_nt=maginput(2)
 	       Pdyn_nPa=maginput(5)
 	       ByIMF_nt=maginput(6)
@@ -1460,6 +1488,16 @@ c Input for Tsy01 storm
 c
            if (kext .eq. 11) then
 c Input for Tsy04 storm
+           if (maginput(2).eq.baddata) return
+           if (maginput(5).eq.baddata) return
+           if (maginput(6).eq.baddata) return
+           if (maginput(7).eq.baddata) return
+           if (maginput(11).eq.baddata) return
+           if (maginput(12).eq.baddata) return
+           if (maginput(13).eq.baddata) return
+           if (maginput(14).eq.baddata) return
+           if (maginput(15).eq.baddata) return
+           if (maginput(16).eq.baddata) return
 	       dst_nt=maginput(2)
 	       Pdyn_nPa=maginput(5)
 	       ByIMF_nt=maginput(6)
@@ -1476,6 +1514,11 @@ c Input for Tsy04 storm
 c
            if (kext .eq. 12) then
 c Input for Alexeev 2000
+           if (maginput(2).eq.baddata) return
+           if (maginput(3).eq.baddata) return
+           if (maginput(4).eq.baddata) return
+           if (maginput(7).eq.baddata) return
+           if (maginput(17).eq.baddata) return
                a2000_iyear=iyearsat
 	       firstJanuary=JULDAY(a2000_iyear,01,01)
 	       currentdoy=firstJanuary+idoy-1
