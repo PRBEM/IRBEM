@@ -16,9 +16,9 @@
 !    You should have received a copy of the GNU Lesser General Public License
 !    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 !
-C       
+C
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-C dipole
+C dipole tilte decentre
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
        SUBROUTINE DTD(xGEO,yGEO,zGEO,BxGEO,ByGEO,BzGEO)
@@ -65,3 +65,71 @@ C
 C
        RETURN
        END
+C
+C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C Centered dipole
+C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C
+       SUBROUTINE centered_dipole(xGEO,yGEO,zGEO,BxGEO,ByGEO,BzGEO)
+C
+       IMPLICIT NONE
+C
+       REAL*8 xGEO,yGEO,zGEO
+       REAL*8 Bo
+       REAL*8 BxGEO,ByGEO,BzGEO
+       REAL*8 rr,tt,pp
+       REAL*8 Br,Bt,Bp
+       REAL*8 xc,yc,zc
+       REAL*8 ct,st,cp,sp
+       REAL*8     pi,rad
+       common /rconst/rad,pi
+C
+       COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
+C
+       rr = SQRT(xGEO*xGEO+yGEO*yGEO+zGEO*zGEO)
+       tt = ACOS(zGEO/rr)
+       pp = ATAN2(yGEO,xGEO)
+C
+       Br = -2.D0*Bo*COS(tt)/(rr*rr*rr)
+       Bt = -   Bo*SIN(tt)/(rr*rr*rr)
+       Bp = 0.D0
+C
+       BxGEO = Br*SIN(tt)*COS(pp)
+     &          + Bt*COS(tt)*COS(pp)
+     &          - Bp*SIN(pp)
+       ByGEO = Br*SIN(tt)*SIN(pp)
+     &          + Bt*COS(tt)*SIN(pp)
+     &          + Bp*COS(pp)
+       BzGEO = Br*COS(tt) - Bt*SIN(tt)
+C
+       RETURN
+       END
+C
+C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C   Init centered dipole !!! BE CAREFUL : need to be called after
+C                            INIT_DTD
+C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C
+       SUBROUTINE INIT_CD
+C
+       IMPLICIT NONE
+C
+       REAL*8    xc,yc,zc                  !Re
+       REAL*8    ct,st,cp,sp
+       REAL*8    Bo
+C
+       COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
+C
+C  Centered dipole !
+       xc = 0.d0
+       yc = 0.d0
+       zc = 0.d0
+       ct = 1.d0
+       st = 0.d0
+       cp = 1.d0
+       sp = 0.d0
+C
+       RETURN
+       END
+C
+C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
