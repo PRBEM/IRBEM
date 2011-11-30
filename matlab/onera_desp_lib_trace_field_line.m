@@ -76,11 +76,14 @@ kext = onera_desp_lib_kext(kext);
 options = onera_desp_lib_options(options);
 sysaxes = onera_desp_lib_sysaxes(sysaxes);
 if isempty(maginput),
-    maginput = zeros(1,25);
+    maginput = nan(1,25);
 end
 if size(maginput,2) == 1, % make column vector into row vector
     maginput = maginput';
 end
+
+maginput = onera_desp_lib_maginputs(maginput); % NaN to baddata
+
 
 Nbounce = 1000; % maximum size of bounce array
 Lm = nan;

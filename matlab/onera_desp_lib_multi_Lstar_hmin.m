@@ -28,7 +28,7 @@ if nargin < 11,
 end
 
 if isempty(maginput),
-    maginput = zeros(25,1);
+    maginput = nan(25,1);
 end
 
 if numel(maginput)==25,

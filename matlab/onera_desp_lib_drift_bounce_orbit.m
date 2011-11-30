@@ -88,11 +88,12 @@ if isempty(in_options),
 end
 sysaxes = onera_desp_lib_sysaxes(sysaxes);
 if isempty(maginput),
-    maginput = zeros(1,25);
+    maginput = nan(1,25);
 end
-if size(maginput,2) == 1, % make column vector into row vector
-    maginput = maginput';
+if (size(maginput,1)==25) && (size(maginput,2)~=25), % 25xN
+    maginput = maginput'; % Nx25
 end
+maginput = onera_desp_lib_maginputs(maginput); % NaN to baddata
 
 Nbounce = 1000; % maximum size of bounce array
 Naz = 25; % number of azimuths

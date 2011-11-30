@@ -68,10 +68,10 @@ kext = onera_desp_lib_kext(kext);
 options = onera_desp_lib_options(options);
 sysaxes = onera_desp_lib_sysaxes(sysaxes);
 if isempty(maginput),
-    maginput = zeros(ntime,25);
+    maginput = nan(ntime,25);
 end
-if size(maginput,2) == 1, % make column vector into row vector
-    maginput = maginput';
+if (size(maginput,1)==25) && (size(maginput,2)~=25), % 25xN
+    maginput = maginput'; % Nx25
 end
 if size(maginput,1) ~= ntime,
     maginput = repmat(maginput,ntime,1);
@@ -79,6 +79,8 @@ end
 if length(matlabd)==1,
     matlabd = repmat(matlabd,ntime,1);
 end
+
+maginput = onera_desp_lib_maginputs(maginput); % NaN to baddata
 
 Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
 if ntime > Nmax, % break up into multiple calls

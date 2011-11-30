@@ -1,4 +1,4 @@
-function maginputs = onera_desp_lib_maginputs(Kp,Dst,Nsw,Vsw,Psw,ByGSM,BzGSM,G1,G2,G3,W1,W2,W3,W4,W5,W6,AL)
+function maginputs = onera_desp_lib_maginputs(varargin)
 %***************************************************************************************************
 % Copyright 2006, T.P. O'Brien
 %
@@ -19,7 +19,8 @@ function maginputs = onera_desp_lib_maginputs(Kp,Dst,Nsw,Vsw,Psw,ByGSM,BzGSM,G1,
 %
 %***************************************************************************************************
 %
-% function maginputs = onera_desp_lib_maginputs(Kp,Dst,Nsw,Vsw,Psw,ByGSM,BzGSM,G1,G2,G3,W1,W2,W3,W4,W5,W6,AL);
+% maginputs = onera_desp_lib_maginputs(Kp,Dst,Nsw,Vsw,Psw,ByGSM,BzGSM,G1,G2,G3,W1,W2,W3,W4,W5,W6,AL);
+% maginputs = onera_desp_lib_maginputs(maginputs)
 % produces the correct structure for maginputs
 % from the provided parameters
 % maginput - [length(G1) x 25] provides inputs to dynamic external field models
@@ -44,57 +45,26 @@ function maginputs = onera_desp_lib_maginputs(Kp,Dst,Nsw,Vsw,Psw,ByGSM,BzGSM,G1,
 % maginput(17th element,*) =AL the auroral index
 %
 % maginput(18th element,*) to maginput(25th element,*): for future use
+%
+% NaN's are replaced with the library bad data value, -1e31
+baddata=-1.0E31;
 
-n = max([length(Kp),length(Dst),length(Nsw),length(G1),length(W1),length(AL)]);
-maginputs = zeros(n,25);
-if ~isempty(Kp),
-    maginputs(:,1) = floor(Kp*10);
+if (length(varargin)==1) && (size(varargin{1},2)==25), % first/only arg is maginputs
+    maginputs = varargin{1};
+else % multiple args
+    n = max(arrayfun(@(x)length(x{1}),varargin)); % get length of longest list
+    maginputs = nan(n,25);
+    % special handling for Kp
+    Kp = varargin{1};
+    if ~isempty(Kp),
+        maginputs(:,1) = floor(Kp*10);
+    end
+    % all the rest are straight copies
+    for i = 2:length(varargin),
+        if ~isempty(varargin{i}),
+            maginputs(:,i) = varargin{i}; % broadcasts scalar if needed
+        end
+    end
 end
-if ~isempty(Dst),
-    maginputs(:,2) = Dst;
-end
-if ~isempty(Nsw),
-    maginputs(:,3) = Nsw;
-end
-if ~isempty(Vsw),
-    maginputs(:,4) = Vsw;
-end
-if ~isempty(Psw),
-    maginputs(:,5) = Psw;
-end
-if ~isempty(ByGSM),
-    maginputs(:,6) = ByGSM;
-end
-if ~isempty(BzGSM),
-    maginputs(:,7) = BzGSM;
-end
-if ~isempty(G1),
-    maginputs(:,8) = G1;
-end
-if ~isempty(G2),
-    maginputs(:,9) = G2;
-end
-if ~isempty(G3),
-    maginputs(:,10) = G3;
-end
-if ~isempty(W1),
-    maginputs(:,11) = W1;
-end
-if ~isempty(W2),
-    maginputs(:,12) = W2;
-end
-if ~isempty(W3),
-    maginputs(:,13) = W3;
-end
-if ~isempty(W4),
-    maginputs(:,14) = W4;
-end
-if ~isempty(W5),
-    maginputs(:,15) = W5;
-end
-if ~isempty(W6),
-    maginputs(:,16) = W6;
-end
-if ~isempty(AL),
-    maginputs(:,17) = AL;
-end
+% convert NaN to baddata
+maginputs(~isfinite(maginputs)) = baddata;
