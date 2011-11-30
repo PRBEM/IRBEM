@@ -1116,7 +1116,7 @@ c
 	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 	   WRITE(6,*)
 	ENDIF
-	if (kint .gt. 4) THEN
+	if (kint .gt. 5) THEN
 	   kint=0
 	   WRITE(6,*)
 	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -1175,12 +1175,13 @@ c
 	if (kint .eq. 3) CALL GSFC1266
 c	   write(6,*)real(isat)*100./real(ntime), '% done'
 c
-           if (kint .le. 1 .or. kint .eq. 4) then
+           if (kint .le. 1 .or. kint .eq. 4 .or. kint .eq. 5) then
               if (opt2 .eq. 0) then
 	        if (iyearsat .ne. iyear) then
 	           iyear=iyearsat
 	           dec_year=iyear+0.5d0
 	           CALL INIT_DTD(dec_year)
+		   if (kint .eq. 5) CALL INIT_CD
 	        endif
 	      else
 	        if (iyearsat .ne. iyear .or.
@@ -1659,6 +1660,8 @@ c
 	REAL*8    xGEO(3),xGSM(3)
 
 	dyear=iyr+0.5d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GSM(xGEO,xGSM)
@@ -1695,6 +1698,8 @@ c
 
 
 	dyear=iyr+0.5d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSM_GEO(xGSM,xGEO)
@@ -1732,6 +1737,8 @@ c
 
 	dyear=iyr+0.5d0
 	psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GSE(xGEO,xGSE)
@@ -1768,6 +1775,8 @@ c
 
 
 	dyear=iyr+0.5d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSE_GEO(xGSE,xGEO)
@@ -1853,6 +1862,8 @@ c
 
 	dyear=iyr+0.5d0
 	psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_GEI(xGEO,xGEI)
@@ -1890,6 +1901,8 @@ c
 
 	dyear=iyr+0.5d0
 	psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEI_GEO(xGEI,xGEO)
@@ -1927,6 +1940,8 @@ c
 
 	dyear=iyr+0.5d0
 	psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GEO_SM(xGEO,xSM)
@@ -1964,6 +1979,8 @@ c
 
 	dyear=iyr+0.5d0
 	psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL SM_GEO(xSM,xGEO)
@@ -2001,6 +2018,8 @@ c
 
 	dyear=iyr+0.5d0
 	psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSM_SM(xGSM,xSM)
@@ -2038,6 +2057,8 @@ c
 
 	dyear=iyr+0.5d0
 	psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
         CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL SM_GSM(xSM,xGSM)
