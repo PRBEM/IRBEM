@@ -112,3 +112,7 @@ B = get(BPtr,'value');
 % the flag value is actually -1d31
 B(B<-1e30) = nan;
 Bgeo(Bgeo<-1e30) = nan;
+ibad = B>1e5; % artifact of baddata not being handled correctly
+B(ibad) = nan;
+Bgeo(ibad,:) = nan;
+
