@@ -1473,7 +1473,6 @@ c Input for Tsy01 storm
            if (maginput(5).eq.baddata) return
            if (maginput(6).eq.baddata) return
            if (maginput(7).eq.baddata) return
-           if (maginput(8).eq.baddata) return
            if (maginput(9).eq.baddata) return
            if (maginput(10).eq.baddata) return
 	       dst_nt=maginput(2)
