@@ -183,7 +183,7 @@ elseif isfield(Spect,'E0'),
 else
     Ein = Spect.E;
     FLUXin = Spect.Flux;
-    while ~isempty(FLUXin) && (FLUXin(end)<0),
+    while ~isempty(FLUXin) && (FLUXin(end)<=0),
         FLUXin = FLUXin(1:(end-1));
         Ein = Ein(1:(end-1));
     end
