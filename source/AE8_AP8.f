@@ -150,9 +150,10 @@ c
 c
       idoy_dip=0
       UT_dip=0.d0
-      CALL INIT_GSM(iyear_dip,idoy_dip,UT_dip,psi)
-      tilt = psi/rad
       DO isat = 1,ntime
+         ! need to reinitialize sun for GEI to GEO coordinate transforms
+         CALL INIT_GSM(iyear(isat),idoy(isat),UT(isat),psi) ! compute sun among other things
+         tilt = psi/rad ! in common block dip_ang
 
 	    call get_coordinates ( sysaxes, 
      6        xIN1(isat), xIN2(isat), xIN3(isat), 
