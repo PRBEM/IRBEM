@@ -1,7 +1,7 @@
 % shieldose2_test - test shieldose2 function
 
 %     1     1    70     2
-Target = struct('material','Al','unit','g/cm2');
+Target = struct('material','Si','unit','g/cm2');
 options = {'INUC',1,'NPTS',1001,'perYear',1};
 Target.depth =  [0.000001 0.000002 0.000005 0.00001 0.00002 0.00005 0.0001 0.0002 0.0005 ...
    0.001  0.1  0.2  0.5  0.7  1.0  1.25  1.5  1.75  2.0  2.5 ...
