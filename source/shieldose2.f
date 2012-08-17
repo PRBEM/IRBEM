@@ -1071,9 +1071,9 @@ C          INCLUDES N=1
 C     IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       integer*4 N,NL1,NL2,K
       real*8 DELTA,result,SIGMA,SUM4,SUM2,SIG6
-c      real*8 G(8)
-      real*8 G
-      dimension G(1)
+      real*8 G(*)
+c      real*8 G
+c      dimension G(1)
 
       NL1=N-1
       NL2=N-2
