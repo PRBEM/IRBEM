@@ -28,6 +28,16 @@ if count eq 0 then begin
    !version.ARCH+'.'+ext
 endif 
 
+n = 0L
+result = call_external(lib_name, 'irbem_fortran_version_', n)
+print,''
+print,'Repository version: ', n
+v = BYTARR(80)
+result = call_external(lib_name, 'irbem_fortran_release_', v)
+print,''
+print,'Release version: ', STRTRIM(STRING(v))
+
+
 print,''
 print,'Testing make_lstar ...'
 ntime=1l
@@ -220,7 +230,7 @@ for i=0,Nene-1 do begin
    compare_output,expected_ige_energy(i), Energy(0,i),'Energy = ','(f9.7)'
 endfor
 for i=0,Nene-1 do begin
-   compare_output,expected_ige_flux(i), Mean_flux(i),'Flux = ','(e11.5)'
+   compare_output,expected_ige_flux(i), Mean_flux(i),'Flux = ','(e12.5)'
 endfor
 
 
@@ -261,7 +271,7 @@ for i=0,Nene-1 do begin
    compare_output,expected_meo_gnss_energy(i), Energy(0,i),'Energy = ','(f9.7)'
 endfor
 for i=0,Nene-1 do begin
-   compare_output,expected_meo_gnss_flux(i), Mean_flux(i),'Flux = ','(e11.5)'
+   compare_output,expected_meo_gnss_flux(i), Mean_flux(i),'Flux = ','(e12.5)'
 endfor
 
 end
