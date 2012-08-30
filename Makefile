@@ -103,7 +103,7 @@ LIBNAME_linux32_intel32=linux_x86
 
 FOPTIONS_SHARED_linux32_gnu32=-mno-align-double -fno-second-underscore -w -m32
 FOPTIONS_NONSHARED_linux32_gnu32=-c -mno-align-double -w -m32
-FC_linux32_gnu32=g77
+FC_linux32_gnu32=gfortran
 PIC_linux32_gnu32=-fPIC
 LDOPTIONS_linux32_gnu32=-shared
 WRAPPER_linux32_gnu32=32
@@ -145,7 +145,7 @@ LIBNAME_linux64_intel64=linux_x86_64
 
 FOPTIONS_SHARED_linux64_gnu32=-mno-align-double -fno-second-underscore -w -m32
 FOPTIONS_NONSHARED_linux64_gnu32=-c -mno-align-double -w -m32
-FC_linux64_gnu32=g77
+FC_linux64_gnu32=gfortran
 PIC_linux64_gnu32=-fPIC
 LDOPTIONS_linux64_gnu32=-shared
 WRAPPER_linux64_gnu32=32
@@ -153,7 +153,7 @@ LIBNAME_linux64_gnu32=linux_x86
 
 FOPTIONS_SHARED_linux64_gnu64=-mno-align-double -fno-second-underscore -w -m64
 FOPTIONS_NONSHARED_linux64_gnu64=-c -mno-align-double -w -m64
-FC_linux64_gnu64=g77
+FC_linux64_gnu64=gfortran
 PIC_linux64_gnu64=-fPIC
 LDOPTIONS_linux64_gnu64=-shared
 WRAPPER_linux64_gnu64=64
@@ -185,7 +185,7 @@ AROPTIONS_win32=-r
 
 FOPTIONS_SHARED_win32_cygwin32=-mno-cygwin -I%IDLINC% -Wl,--add-stdcall-alias -fno-second-underscore -w
 FOPTIONS_NONSHARED_win32_cygwin32=-c -mno-cygwin -shared -mno-align-double -fno-second-underscore -w
-FC_win32_cygwin32=g77
+FC_win32_cygwin32=gfortran
 PIC_win32_cygwin32=
 LDOPTIONS_win32_cygwin32=-shared
 WRAPPER_win32_cygwin32=32
@@ -217,7 +217,7 @@ AROPTIONS_win64=-r
 
 FOPTIONS_SHARED_win64_cygwin64=-mno-cygwin -I%IDLINC% -Wl,--add-stdcall-alias -fno-second-underscore -w -m64
 FOPTIONS_NONSHARED_win64_cygwin64=-c -mno-cygwin -shared -mno-align-double -fno-second-underscore -w -m64
-FC_win64_cygwin64=g77
+FC_win64_cygwin64=gfortran
 PIC_win64_cygwin64=
 LDOPTIONS_win64_cygwin64=-shared
 WRAPPER_win64_cygwin64=64
