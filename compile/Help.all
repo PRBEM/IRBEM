@@ -65,8 +65,8 @@ Make Variables
                        ENV=intel32  Compile using Intel Fortran (ifort).
 				  Produce ELF 32-bit MSB dynamic lib.
 
-                       ENV=gnu32    Compile using Gnu Fortran (g77).  This seems to
-                                  be the fortran compiler most commonly found on
+                       ENV=gnu32    Compile using Gnu Fortran (gfortran).  This is
+                                   the GNU fortran compiler most commonly found on
                                   Linux systems. 
 				  Produce ELF 32-bit MSB dynamic lib.
 
@@ -79,13 +79,13 @@ Make Variables
                        ENV=intel32  Compile using Intel Fortran (ifort).
 				  Produce ELF 32-bit MSB dynamic lib.
 
-                       ENV=gnu32    Compile using Gnu Fortran (g77).  This seems to
-                                  be the fortran compiler most commonly found on
+                       ENV=gnu32    Compile using Gnu Fortran (gfortran).  This is
+                                  the GNU fortran compiler most commonly found on
                                   Linux systems. 
 				  Produce ELF 32-bit MSB dynamic lib.
 
-                       ENV=gnu64    Compile using Gnu Fortran (g77).  This seems to
-                                  be the fortran compiler most commonly found on
+                       ENV=gnu64    Compile using Gnu Fortran (gfortran).  This is
+                                  the GNU fortran compiler most commonly found on
                                   Linux systems. 
 				  Produce ELF 64-bit MSB dynamic lib.
 
@@ -95,16 +95,24 @@ Make Variables
                        ENV=gfortran64    Compile using Gnu Fortran (gfortran).
 				  Produce ELF 64-bit MSB dynamic lib.
 
-          OS=win32     For Cygwin on a PC. The possible environments are...
+          OS=win32     For MS-Windows on a PC. The possible environments are...
 
-                       ENV=cygwin32 Compile using Gnu Fortran (g77).  This is the Fortran 
+                       ENV=cygwin32 Compile using Gnu Fortran (gfortran).  This is the Fortran 
                                   compiler for Cygwin systems. 
 				  Produce ELF 32-bit MSB dynamic lib.
 
-          OS=win64     For Cygwin on a PC. The possible environments are... (NOT VERIFIED)
+                       ENV=mingw Compile using gfortran.  This is the Fortran 
+                                 compiler for MinGW systems. 
+				  Produce ELF 32-bit MSB dynamic lib.
 
-                       ENV=cygwin64 Compile using Gnu Fortran (g77).  This is the Fortran 
+          OS=win64     For MS-Windows on a PC. The possible environments are... (NOT VERIFIED)
+
+                       ENV=cygwin64 Compile using Gnu Fortran (gfortran).  This is the Fortran 
                                   compiler for Cygwin systems. 
+				  Produce ELF 64-bit MSB dynamic lib.
+
+                       ENV=mingw Compile using gfortran.  This is the GNU Fortran 
+                                 compiler for MinGW systems. 
 				  Produce ELF 64-bit MSB dynamic lib.
 
      IRBEM_NTIME_MAX=<ntime_max>

@@ -25,7 +25,6 @@ c function returns version of fortran source code
 
       REAL*4 FUNCTION IRBEM_FORTRAN_VERSION(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -44,12 +43,32 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
       END
 
 
+c function returns release of fortran source code
 
-c function returns version of fortran source code
+      REAL*4 FUNCTION IRBEM_FORTRAN_RELEASE(argc, argv)   ! Called by IDL
+      INCLUDE 'wrappers.inc'
+
+       j = loc(argc)                    ! Obtains the number of arguments (argc)
+                                        ! Because argc is passed by VALUE.
+
+      call IRBEM_FORTRAN_RELEASE1(%VAL(argv(1)))
+
+      IRBEM_FORTRAN_VERSION = 9.9
+
+      RETURN
+      END
+
+      SUBROUTINE IRBEM_FORTRAN_RELEASE1(RLS)
+        INCLUDE 'fortran_release.inc'
+        CHARACTER*80 RLS
+        RLS = FORTRAN_RELEASE
+      END
+
+
+c function returns maximum size of variables
 
       REAL*4 FUNCTION GET_IRBEM_NTIME_MAX(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -69,7 +88,6 @@ c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
       REAL*4 FUNCTION make_lstar(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -96,7 +114,7 @@ c
 c
 	IMPLICIT NONE
 	INCLUDE 'variables.inc'
-        INCLUDE 'ntime_max.inc'
+	INCLUDE 'ntime_max.inc'
 C
 c declare inputs
         INTEGER*4    kext,k_ext,k_l,options(5)
@@ -191,7 +209,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION make_lstar_shell_splitting(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -321,7 +338,6 @@ c Compute Bmin assuming 90° PA at S/C
 
 	END
 c
-c
 C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION Lstar_Phi(argc, argv)   ! Called by IDL
@@ -398,7 +414,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION drift_shell(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -480,7 +495,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION trace_field_line(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -505,7 +519,6 @@ c --------------------------------------------------------------------
 c
       REAL*4 FUNCTION trace_field_line2(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -605,10 +618,11 @@ c
         CALL field_line_tracing_opt2(xGeo,R0
      &     ,Lm,XJ,BLOCAL,BMIN,posit,ind)
 	END
-
+c
+c --------------------------------------------------------------------
+c
       REAL*4 FUNCTION trace_field_line_towards_earth(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -691,7 +705,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION find_mirror_point(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -791,7 +804,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION find_MAGequator(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -866,7 +878,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION GET_FIELD(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -946,7 +957,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION GET_FIELD_MULTI_IDL(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1000,10 +1010,11 @@ c     Declare internal variables
 
       enddo
       end
-
+c
+c --------------------------------------------------------------------
+c
       REAL*4 FUNCTION GET_MLT(argc, argv) ! Called by IDL
       INCLUDE 'wrappers.inc'
-c     INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
       j = loc(argc)             ! Obtains the number of arguments (argc)
                                 ! Because argc is passed by VALUE.
@@ -1063,7 +1074,6 @@ c******************************************************************************
 c *****************************************************************************
       REAL*4 FUNCTION GET_HEMI(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1085,7 +1095,6 @@ c******************************************************************************
 c *****************************************************************************
       REAL*4 FUNCTION GET_HEMI_MULTI_IDL(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1628,7 +1637,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION coord_trans(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1652,7 +1660,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION coord_trans_vec(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1677,7 +1684,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gsm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1714,7 +1720,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gsm2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1753,7 +1758,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gse(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1791,7 +1795,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gse2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1832,7 +1835,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gdz2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1855,7 +1857,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gdz(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1878,7 +1879,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2gei(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1917,7 +1917,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gei2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1956,7 +1955,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2sm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -1995,7 +1993,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION sm2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2034,7 +2031,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gsm2sm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2073,7 +2069,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION sm2gsm(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2111,7 +2106,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION geo2mag(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2145,7 +2139,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION mag2geo(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2178,7 +2171,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION sph2car(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2201,7 +2193,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION car2sph(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2224,7 +2215,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION rll2gdz(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2246,7 +2236,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION gse2hee(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2269,7 +2258,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hee2gse(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2292,7 +2280,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hae2hee(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2315,7 +2302,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hee2hae(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2338,7 +2324,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION hae2heeq(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2361,7 +2346,6 @@ C-----------------------------------------------------------------------------
 
       REAL*4 FUNCTION heeq2hae(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2395,7 +2379,6 @@ c
 !---------------------------------------------------------------------------------------------------
       REAL*4 FUNCTION fly_in_nasa_aeap(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2426,7 +2409,6 @@ c
 !---------------------------------------------------------------------------------------------------
       REAL*4 FUNCTION get_ae8_ap8_flux_idl(argc, argv)   ! Called by IDL
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 
        j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2461,7 +2443,6 @@ c
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 !
       j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2498,7 +2479,6 @@ c
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 !
       j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2603,7 +2583,6 @@ c
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 !
       j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2636,7 +2615,6 @@ c
       REAL*4 FUNCTION SGP4_ELE(argc, argv)   ! Called by IDL
 !
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 !
       j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2671,7 +2649,6 @@ c
       REAL*4 FUNCTION RV2COE_IDL(argc, argv)   ! Called by IDL
 !
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 !
       j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.
@@ -2704,7 +2681,6 @@ c
       REAL*4 FUNCTION DATE_AND_TIME2DECY_IDL(argc, argv)   ! Called by IDL
 !
       INCLUDE 'wrappers.inc'
-c      INTEGER*4 argc, argv(*)                      ! Argc and Argv are integers
 !
       j = loc(argc)                    ! Obtains the number of arguments (argc)
                                        ! Because argc is passed by VALUE.

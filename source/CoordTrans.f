@@ -1218,7 +1218,8 @@ c input=GDZ
 	   endif
 	   if (sysaxesOUT.EQ.8) then  !RLL
 	      call gdz_geo(xIN(2),xIN(3),xIN(1),xTMP(1),xTMP(2),xTMP(3))
-	      xOUT(1)=SQRT(xTMP(1)*xTMP(1)+xTMP(2)*xTMP(2)+xTMP(3)*xTMP(3))
+	      xOUT(1)=SQRT(xTMP(1)*xTMP(1)+xTMP(2)*xTMP(2)+
+     &               xTMP(3)*xTMP(3))
 	      xOUT(2)=xIN(2)
 	      xOUT(3)=xIN(3)
 	   endif
