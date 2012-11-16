@@ -262,6 +262,8 @@ c loop on energies
      &                    energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                   Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
+     &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
             enddo
@@ -279,6 +281,10 @@ c loop on energies
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                  Flux(i,ieny) = (FL1-10.D0** FL)/
      &                          (energy(2,ieny)-energy(1,ieny))
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
+     &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
+                     if (energy(2,ieny) .lt. 0.05D0 .or.
+     &               energy(2,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
             enddo
@@ -291,6 +297,8 @@ c loop on energies
                      CALL TRARA(IHEADEMIN,MAPEMIN,L(i),BBo(i),
      &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
+     &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
             enddo
@@ -313,6 +321,8 @@ c loop on energies
      &                        energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
+     &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -331,6 +341,10 @@ c loop on energies
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/
      &                    (energy(2,ieny)-energy(1,ieny))
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
+     &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
+                     if (energy(2,ieny) .lt. 0.05D0 .or.
+     &               energy(2,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -344,6 +358,8 @@ c loop on energies
                      CALL TRARA(IHEADEMAX,MAPEMAX,L(i),BBo(i),
      &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
+     &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
             enddo
@@ -366,6 +382,8 @@ c loop on energies
      &                        energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
+                     if (energy(1,ieny) .lt. 0.1D0 .or.
+     &               energy(1,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -384,6 +402,10 @@ c loop on energies
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/
      &                     (energy(2,ieny)-energy(1,ieny))
+                     if (energy(1,ieny) .lt. 0.1D0 .or.
+     &               energy(1,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
+                     if (energy(2,ieny) .lt. 0.1D0 .or.
+     &               energy(2,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -397,6 +419,8 @@ c loop on energies
                      CALL TRARA(IHEADPMIN,MAPPMIN,L(i),BBo(i),
      &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
+                     if (energy(1,ieny) .lt. 0.1D0 .or.
+     &               energy(1,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
                   enddo
                endif
             enddo
@@ -419,6 +443,8 @@ c loop on energies
      &                        energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
+                     if (energy(1,ieny) .lt. 0.1D0 .or.
+     &               energy(1,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -437,6 +463,10 @@ c loop on energies
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/
      &                     (energy(2,ieny)-energy(1,ieny))
+                     if (energy(1,ieny) .lt. 0.1D0 .or.
+     &               energy(1,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
+                     if (energy(2,ieny) .lt. 0.1D0 .or.
+     &               energy(2,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -450,6 +480,8 @@ c loop on energies
                      CALL TRARA(IHEADPMAX,MAPPMAX,L(i),BBo(i),
      &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
+                     if (energy(1,ieny) .lt. 0.1D0 .or.
+     &               energy(1,ieny) .gt. 300.D0) Flux(i,ieny)=baddata
                   enddo
                endif
             enddo
