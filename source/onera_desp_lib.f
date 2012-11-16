@@ -53,7 +53,7 @@ c function returns release of fortran source code
 
       call IRBEM_FORTRAN_RELEASE1(%VAL(argv(1)))
 
-      IRBEM_FORTRAN_VERSION = 9.9
+      IRBEM_FORTRAN_RELEASE = 9.9
 
       RETURN
       END
