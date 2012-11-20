@@ -211,7 +211,12 @@ AROPTIONS_win32=-r
 
 FOPTIONS_SHARED_win32_cygwin32=-mno-cygwin -I%IDLINC% -Wl,--add-stdcall-alias -fno-second-underscore -w
 FOPTIONS_NONSHARED_win32_cygwin32=-c -mno-cygwin -shared -mno-align-double -fno-second-underscore -w
-FC_win32_cygwin32=gfortran
+#FC_win32_cygwin32=gfortran
+# gfortran doesn't accept -mno-cygwin
+# alternative is FC_win32_cygwin32=i686-w64-mingw32-gfortran if you install the mingw cross compilers
+# but that generates a DLL that matlab doesn't recognize
+# using g77 does work under cygwin, if you have g77 installed, and it builds a DLL Matlab likes.
+FC_win32_cygwin32=g77
 PIC_win32_cygwin32=
 LDOPTIONS_win32_cygwin32=-shared
 WRAPPER_win32_cygwin32=32
@@ -386,6 +391,7 @@ purge:
 
 #------------------------------------------------------------------------------
 # determine fortran code version from svn or cvs, store in fortran_version.inc
+# if subversion is not found, then leave in place existing fortran_version.inc
 #------------------------------------------------------------------------------
 
 version.fortran:
