@@ -43,7 +43,9 @@ EXAMPLE=./example
 #     SVN_REV     : revision number of the repository.
 #------------------------------------------------------------------------------
 
-SVN_WC?=$(shell if [ -d .svn ] ; then echo 1 ; else echo 0; fi)
+#SVN_WC?=$(shell if [ -d .svn ] ; then echo 1 ; else echo 0; fi)
+# check for existence of svn, then check for working copy
+SVN_WC?=$(shell if [[ `svn --version --quiet` =~ [0-9] ]] ; then echo `svn info | grep -c ^URL:` ; else echo 0 ; fi)
 ifeq ($(SVN_WC),1)
    SVN_ROOT   =$(strip $(subst Repository Root:,,$(shell svn info | grep 'Repository Root: ')))
    SVN_URL    =$(strip $(subst URL: ,,$(shell svn info | grep 'URL: ')))
