@@ -2869,7 +2869,33 @@ c
       END
 
 
+C-----------------------------------------------------------------------------
+C Wrapper and procedure
+C-----------------------------------------------------------------------------
+
+      REAL*4 FUNCTION make_lstar_shell_splitting2_idl(argc, argv)   ! Called by IDL
+      INCLUDE 'wrappers.inc'
+
+       j = loc(argc)                   ! Obtains the number of arguments (argc)
+                                       ! Because argc is passed by VALUE.
+
+c  Call subroutine make_Lstar_shell_splitting2, converting the IDL parameters to standard FORTRAN
+c  passed by reference arguments.
+c
+      call make_lstar_shell_splitting2(%VAL(argv(1)), %VAL(argv(2)),
+     + %VAL(argv(3)),
+     * %VAL(argv(4)),  %VAL(argv(5)),  %VAL(argv(6)),  %VAL(argv(7)),
+     * %VAL(argv(8)),  %VAL(argv(9)),  %VAL(argv(10)), %VAL(argv(11)),
+     + %VAL(argv(12)), %VAL(argv(13)), %VAL(argv(14)), %VAL(argv(15)),
+     + %VAL(argv(16)), %VAL(argv(17)), %VAL(argv(18)), %VAL(argv(19)))
+
+      make_lstar_shell_splitting2_idl = 9.9
+
+      RETURN
+      END
+c
 c --------------------------------------------------------------------
+c
 c Alternate version without useless 100k time/position array
         SUBROUTINE make_lstar_shell_splitting2(Nipa,kext,options,
      & sysaxes,iyearsat,idoy,UT,xIN1,xIN2,xIN3,
