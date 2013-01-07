@@ -953,9 +953,9 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>Bgeo:</b> BxGEO,ByGEO and BzGEO of the magnetic field
-    (nT), (array(3) of double)</font> 
+    (nT), (array(3,NTIME_MAX) of double)</font> 
     <br />
-    <font face="ARIAL, HELVETICA"><b>Bl:</b> magnitude of magnetic field (double) (nT)</font> 
+    <font face="ARIAL, HELVETICA"><b>Bl:</b> magnitude of magnetic field (array(NTIME_MAX) of double) (nT)</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -964,7 +964,7 @@
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE from IDL:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'get_field_multi_idl',ntime,kext,options,sysaxes,iyear,idoy,ut,
+    <font face="ARIAL, HELVETICA">result = call_external(lib_name, 'get_field_multi_idl_',ntime,kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput,Bgeo, Bl,&nbsp; /f_value)</font> 
     <br />
     &nbsp; 
