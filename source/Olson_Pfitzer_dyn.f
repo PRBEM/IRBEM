@@ -115,6 +115,14 @@ C   CALCULATE SCALED DISTANCES
         XXX(I) = XX(I) * SCL
         XXXX(I) = XX(I) * 1.0D0
       END DO
+C   MODIF VINCENT (Feb. 2013) : if XXX(1) = 15 then crash --> divide by zero in BFMAGP
+      IF (XXX(1) .EQ. 15.d0) THEN
+        WRITE(6,*) 'in BDYNAM (OP dyn), X(1)=15 --> X(1) = 14.9999999
+     &     to avoid dividing by zero in BFMAGP'
+        XXX(1) = 14.9999999D0
+      ENDIF
+C   END MODIF VINCENT
+C
 C   CALL THE QUIET TIME SUBROUTINE.
       CALL BFMAGP(XXX, BM) 
       CALL BFRING(XXXX, BR)
