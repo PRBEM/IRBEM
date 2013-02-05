@@ -171,6 +171,14 @@ LDOPTIONS_linux64_intel64=-shared
 WRAPPER_linux64_intel64=64
 LIBNAME_linux64_intel64=linux_x86_64
 
+FOPTIONS_SHARED_linux64_intel64_debug=-Bdynamic -g -debug extended -fpe0 -O0 -check all -traceback
+FOPTIONS_NONSHARED_linux64_intel64_debug=-c -g -debug extended -fpe0 -O0 -check all -traceback
+FC_linux64_intel64_debug=ifort
+PIC_linux64_intel64_debug=-fPIC
+LDOPTIONS_linux64_intel64_debug=-shared
+WRAPPER_linux64_intel64_debug=64
+LIBNAME_linux64_intel64_debug=linux_x86_64_debug
+
 FOPTIONS_SHARED_linux64_gnu32=-mno-align-double -fno-second-underscore -w -m32
 FOPTIONS_NONSHARED_linux64_gnu32=-c -mno-align-double -w -m32
 FC_linux64_gnu32=gfortran
@@ -288,6 +296,7 @@ all.linux32.gnu32: all.build
 all.linux32.pgi32: all.build
 all.linux64.intel32: all.build
 all.linux64.intel64: all.build
+all.linux64.intel64_debug: all.build
 all.linux64.gnu32: all.build
 all.linux64.gnu64: all.build
 all.linux64.pgi64: all.build
