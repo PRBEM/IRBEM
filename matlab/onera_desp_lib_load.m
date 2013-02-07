@@ -23,18 +23,27 @@ function info = onera_desp_lib_load(libfile,headerfile)
 %function onera_desp_lib_load(libfile,headerfile);
 % checks for the presence of the onera_desp_lib dynamic library in memory
 % if not present, attempts to load it using a headerfile
+% checks environment variable IRBEM_LIB_DLL to specify the file to load
+%  (full file path, or a file name in the matlab search path)
+% otherwise, it guesses the file name
+
 if ~libisloaded('onera_desp_lib'),
     if nargin < 2,
         headerfile = 'onera_desp_lib.h';
     end
     if nargin < 1,
-        if ispc,
+        if ~isempty(getenv('IRBEM_LIB_DLL')),
+            libfile = getenv('IRBEM_LIB_DLL');
+        elseif ispc,
            libfile = 'onera_desp_lib.dll';
         elseif ismac,
            libfile = 'onera_desp_lib.dylib';
         else
            libfile = 'onera_desp_lib.so';
         end
+    end
+    if ~exist(libfile,'file'),
+        error('libfile %s not found',libfile);
     end
     loadlibrary(libfile,headerfile,'alias','onera_desp_lib');
 end
