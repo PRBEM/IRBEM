@@ -674,7 +674,7 @@ C FlxSCL - Position in the Header of the lnFlux scale factor
 C FlxInc - Unscaled increment in B between string values
 C FlxOff - Offset in B string of the B0 lnFlux value
 
-      INTEGER SLEN, BSCL, FlxSCL, FlxInc, FlxOff
+      INTEGER*4 SLEN, BSCL, FlxSCL, FlxInc, FlxOff
       DATA SLEN, BSCL, FlxSCL, FlxInc, FlxOff /1, 6, 7, -256, 3/
 
       Npts = 1

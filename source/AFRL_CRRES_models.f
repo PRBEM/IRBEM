@@ -787,7 +787,7 @@ c
 c
        IMPLICIT NONE
 c
-       INTEGER ish
+       INTEGER*4 ish
        INTEGER*4 Ne,Nbb0,Nl
 c
        REAL*8 Ec(22),tmp_Ec(22)
@@ -841,7 +841,7 @@ c
 c
        IMPLICIT NONE
 c
-       INTEGER ish
+       INTEGER*4 ish
        INTEGER*4 Ne,Nbb0,Nl
 c
        REAL*8 Ec(22),tmp_Ec(22)

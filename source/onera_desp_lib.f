@@ -1113,7 +1113,7 @@ c
       RETURN
       END
 c
-      integer function int_field_select ( kint )
+      integer*4 function int_field_select ( kint )
       integer*4 kint
 
 	IF (kint .lt. 0) THEN
@@ -2439,7 +2439,7 @@ c
 !---------------------------------------------------------------------------------------------------
       REAL*4 FUNCTION fly_in_afrl_crres(argc, argv)   ! Called by IDL
 !
-      INTEGER   CHAR_SIZE
+      INTEGER*4   CHAR_SIZE
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'
@@ -2475,7 +2475,7 @@ c
 !---------------------------------------------------------------------------------------------------
       REAL*4 FUNCTION get_crres_flux_idl(argc, argv)   ! Called by IDL
 !
-      INTEGER   CHAR_SIZE
+      INTEGER*4   CHAR_SIZE
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'
@@ -2511,7 +2511,7 @@ c
 !---------------------------------------------------------------------------------------------------
       REAL*4 FUNCTION fly_in_ige(argc, argv)   ! Called by IDL
 !
-      INTEGER   CHAR_SIZE
+      INTEGER*4   CHAR_SIZE
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'
@@ -2545,7 +2545,7 @@ c
 !---------------------------------------------------------------------------------------------------
       REAL*4 FUNCTION fly_in_meo_gnss(argc, argv)   ! Called by IDL
 !
-      INTEGER   CHAR_SIZE
+      INTEGER*4   CHAR_SIZE
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'
@@ -2579,7 +2579,7 @@ c
 !---------------------------------------------------------------------------------------------------
       REAL*4 FUNCTION SGP4_TLE(argc, argv)   ! Called by IDL
 !
-      INTEGER   CHAR_SIZE
+      INTEGER*4   CHAR_SIZE
       PARAMETER	(CHAR_SIZE=500)
 
       INCLUDE 'wrappers.inc'

@@ -20,7 +20,7 @@ C     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       SUBROUTINE BAZ_T(X,Y,Z,N,B)
 C     BAZIS FOR TILTE-MODEL(S) MAGNETIC FIELD
 C     X,Y,Z = X,Y,Z/10.D0 !  IN NORMALIZATION UNITS
-      INTEGER I,J,K,L,N
+      INTEGER*4 I,J,K,L,N
       REAL*8 X,Y,Z,B(3,1),SYM(3,10),ASY(3,10),JWORK(3,10)
       K=0
 C 1-3:******** 1.Usym(1,3,5  ) FOR N=17 ******
@@ -95,7 +95,7 @@ C     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       SUBROUTINE JETSYM(X,Y,Z,L,B)
 C     SYMMETRIC JET
       REAL*8 X,Y,Z,B(3,*),Z2,P2
-      INTEGER I,L,J
+      INTEGER*4 I,L,J
       DO J=1,L
          DO I=1,3
             B(I,J)=0.D0
@@ -124,7 +124,7 @@ C     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       SUBROUTINE JETASY(X,Y,Z,L,B)
 C     ASYMMETRIC JET ~R3 - REVISED 06/06/95
       REAL*8 X,Y,Z,B(3,*),P2,Z2,WORK
-      INTEGER L,I,J
+      INTEGER*4 L,I,J
       DO J=1,L
          DO I=1,3
             B(I,J)=0.D0
@@ -163,7 +163,7 @@ C     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       SUBROUTINE PTNCL(X,Y,Z,N,SYM,ASY)
 C     DERIVES grad [ P(i,j)*r^i]
       REAL*8 X,Y,Z,SYM(3,7),ASY(3,7),P(0:8,0:8),WORK,R2,C,R(-1:10),RN
-      INTEGER N,I,J
+      INTEGER*4 N,I,J
 C
       IF(N.GT.7.OR.N.LT.1) THEN
          WRITE(*,*) ' ERROR GENERATED IN OSTAPENKO-MALTSEV 1997'
@@ -217,7 +217,7 @@ C     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C     P(i,0) = LEGENDRE'S POLYNOMS Pi(x)
 C     AND ITS DERIVES: P(i,j)=(d/dx)^j (Pi(x))
       REAL*8 X,P(0:8,0:8)
-      INTEGER N,I,J
+      INTEGER*4 N,I,J
       IF(N.GT.7.OR.N.LT.1) THEN
          WRITE(*,*) ' ERROR GENERATED IN OSTAPENKO-MALTSEV 1997'
          WRITE(*,'(37H LEGENDRE POLYNOM: WRONG PARAMETER N=I2)') N
@@ -240,7 +240,7 @@ C
 C     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       SUBROUTINE BOM97(RE,B)
 C     EXTERNAL MODEL MAGNETIC FIELD (WITH TILTE)
-      INTEGER MF,I,J,NA
+      INTEGER*4 MF,I,J,NA
       PARAMETER (MF=29)
       REAL*8 A(MF),RE(3),R(3),X,Y,Z,B(3),BAZIS(3,MF)
       COMMON/COEFOM97/A,NA
@@ -262,7 +262,7 @@ C
       END
 C     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       SUBROUTINE SET_A(Dst,Pdyn,Kp,IMFz,SN)
-      INTEGER MF,I,J,K,NC,L,NA
+      INTEGER*4 MF,I,J,K,NC,L,NA
       PARAMETER (MF=29,NC=4)
       REAL*8 AA(85),C(4),SN,A(MF),Dst,Pdyn,Kp,IMFz
       COMMON/COEFOM97/A,NA

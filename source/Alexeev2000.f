@@ -68,7 +68,7 @@
 * 									   
 *          Written by I. Alexeev					   
 *--------------------------------------------------------------------------
-      DIMENSION x(3), bm(3), par(10), bb(7,3)
+      DIMENSION x(3), bm(3), par(10), bb(7,3), bimf(3)
       REAL*8   a2000_ut
       INTEGER*4 a2000_iyear,a2000_imonth,a2000_iday
 *
@@ -2011,7 +2011,7 @@ C
         REAL GST,SLONG,SRASN,SDEC,RAD,T,VL,G,OBLIQ,SOB,SLP,SIND,
      1       COSD,SC
 
-        INTEGER IYR,IDAY,IHOUR,MIN,ISEC
+        INTEGER*4 IYR,IDAY,IHOUR,MIN,ISEC
       common /ddd/ sind,cosd
       DOUBLE PRECISION DJ,FDAY
       DATA RAD/57.295779513/

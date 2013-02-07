@@ -1294,7 +1294,7 @@ C        FOR ON, OR 2. FOR MAIN EFFECTS OFF BUT CROSS TERMS ON
 C
 C        To get current values of SW: CALL TRETRV7(SW)
 C
-      INTEGER I,ISW
+      INTEGER*4 I,ISW
 C
       REAL*8 SW(25),SWC(25),SV(25),SVV(25),SAV(25)
 c

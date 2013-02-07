@@ -713,7 +713,7 @@ C--------------------------------------------------------------------
       SUBROUTINE TSELEC(SV)
       IMPLICIT NONE
 C        SET SWITCHES
-      INTEGER I,ISW
+      INTEGER*4 I,ISW
 C
       REAL*8 SW(25),SWC(25),SV(25),SVV(25),SAV(25)
 c

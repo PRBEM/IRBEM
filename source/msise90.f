@@ -1102,7 +1102,7 @@ C-----------------------------------------------------------------------
       IMPLICIT NONE
 C        SET SWITCHES
 C        SW FOR MAIN TERMS, SWC FOR CROSS TERMS
-      INTEGER I,ISW
+      INTEGER*4 I,ISW
 C
       REAL*8 SW(25),SWC(25),SV(25),SVV(25),SAV(25)
 c

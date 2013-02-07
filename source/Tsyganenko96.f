@@ -2682,7 +2682,7 @@ C
       IMPLICIT NONE
 C
       REAL*8 PS,X,Y,Z,BX,BY,BZ,PSI,SPS,CPS,P,U,V,T,Q
-      INTEGER M
+      INTEGER*4 M
       SAVE M,PSI,SPS,CPS
 
       DATA M,PSI/0,5.d0/
