@@ -194,15 +194,14 @@
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>iyear</b>, <b>iyr</b> or <b>iyearsat</b>: array(NTIME_MAX) of long integer year when
-        measurements are given</font> 
-    </p>
-    <p>
+        measurements are given. /font> 
+    <br>
         <font face="ARIAL, HELVETICA"><b>idoy:</b> array(NTIME_MAX) of long integer doy when
         measurements are given</font> 
-    </p>
-    <p>
+	  <br>
         <font face="ARIAL, HELVETICA"><b>UT</b> or <b>secs</b>: array(NTIME_MAX) of double, UT in seconds</font> 
-    </p>
+<br>
+<i> Note: In matlab, year/doy/UT arguments are replaced by the single <b>matlabd</b> argument, which is a Matlab date numbers (a double precision day counter created with <b>datenum</b>). They can be generated, if needed, using the helper function [iyear,idoy,UT] = <b>onera_desp_lib_matlabd2yds</b>(matlabd).  </i>
     <p>
         <font face="ARIAL, HELVETICA"><b>x1:</b> array(NTIME_MAX) of double, first coordinate
         according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
