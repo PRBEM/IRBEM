@@ -24,21 +24,21 @@ C
        INTEGER*4   Activ,k_ext,k_l
        REAL*8      xGEO(3)
        REAL*8      xSM(3)
-       REAL*8      BxSM(3)
+       REAL*8      BxSM(3),BIMF(3)
        REAL*8      Bxext(3)
        REAL*8      Bxint(3),den,vel,dst
        REAL*8      BxGEO(3),Bl,density,speed,dst_nt,fkp,fkp_osta
        REAL*8      Pdyn_nPa,ByIMF_nt,BzIMF_nt,G1_tsy01,G2_tsy01,G3_tsy01
        REAL*8      W1_tsy04,W2_tsy04,W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04
-       REAL*8      Al,Al_ind
+       REAL*8      Al,Al_ind,BxIMF_nt
        REAL*8      PARMOD(10),tilt,sn,Pdyn,BzIMF
 C
        REAL*8      Bo,xc,yc,zc,ct,st,cp,sp
 C
        COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
        COMMON /magmod/k_ext,k_l,kint
-       COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
+       COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,BxIMF_nt,ByIMF_nt,
+     &        BzIMF_nt,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
      &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
        COMMON /index/activ
        COMMON /dip_ang/tilt
@@ -257,14 +257,22 @@ c Case for Alexeev dynamic mag model 2000 (use of GSM coordinates)
 c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT), G1,G2
 c
        if (k_ext .eq. 12) then
+	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+     &    .GT.50.D0) THEN
+	     Ifail=-1
+	     RETURN
+	  ENDIF
           den=density
    	  vel=speed
 	  dst=dst_nt
-	  BzIMF=BzIMF_nt
+	  BIMF(1)=BxIMF_nt
+	  BIMF(2)=ByIMF_nt
+	  BIMF(3)=BzIMF_nt
 	  Al_ind=Al
           CALL GEO_GSM(xGEO,xSM)
-          CALL a2000(den,vel,BzIMF,dst,al_ind,xSM,BxSM)
-          CALL GSM_GEO(BxSM,Bxext)
+          CALL a2000(real(den),real(vel),real(BIMF),
+     &    real(dst),real(al_ind),real(xSM),BxSM,ifail)
+          if (Ifail .eq. 0) CALL GSM_GEO(BxSM,Bxext)
        endif
 c
 C
