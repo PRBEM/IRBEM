@@ -40,7 +40,7 @@
 *           alexeev@dec1.sinp.msu.ru					   
 ***************************************************************************
 
-      subroutine a2000(ro,v,bimf,dst,al,x,bm)
+      subroutine a2000(ro,v,bimf,dst,al,x,bm,ifail)
 *--------------------------------------------------------------------------
 *  Calculation of magnetic field vector Bm in point x(3) 		   
 *              inside the Earth's magnetosphere 			   
@@ -70,7 +70,7 @@
 *--------------------------------------------------------------------------
       DIMENSION x(3), bm(3), par(10), bb(7,3), bimf(3)
       REAL*8   a2000_ut
-      INTEGER*4 a2000_iyear,a2000_imonth,a2000_iday
+      INTEGER*4 a2000_iyear,a2000_imonth,a2000_iday,ifail
 *
       COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
 *
@@ -78,6 +78,7 @@
       iy=a2000_iyear
       mo=a2000_imonth
       id=a2000_iday
+      ifail=0
       call submod(ut,iy,mo,id,ro,v,bimf,dst,al,par)
       r1=par(6)
        IF(x(1)+0.5/R1*(x(2)**2+x(3)**2).GT.R1) then
@@ -87,6 +88,7 @@
        bb(j,i)=0.
        end do
        end do
+       ifail=-1
        return
        end if
       call a_field(x,par,bm,bb)
@@ -651,7 +653,7 @@ C******************************************************************
       P=B0/R1/R1
       DO 6 I=1,6
       P=P/R1
-      P1=P1/R1
+!      P1=P1/R1
       A1(I)=CPSI*(D1(I)*P)
       A1(I+6)=SPSI*(D1(I+6)*P)
     6 CONTINUE
