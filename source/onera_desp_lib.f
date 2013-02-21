@@ -1174,9 +1174,12 @@ c
 	integer*4    idoy
 	real*8     UT,dec_year
         REAL*8 tilt,psi
+      INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
+      REAL*8      a2000_ut
 	COMMON /dip_ang/tilt
         REAL*8     pi,rad
         common /rconst/rad,pi
+       COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
 
 	iyear = 1800
 
@@ -1209,6 +1212,12 @@ c
 c
            if ( ut.ge.0.0 ) CALL INIT_GSM(iyearsat,idoy,UT,psi)
            tilt = psi/rad
+
+       a2000_iyear=iyearsat
+       firstJanuary=JULDAY(a2000_iyear,01,01)
+       currentdoy=firstJanuary+idoy-1
+       CALL CALDAT(currentdoy,a2000_iyear,a2000_imonth,a2000_iday)
+       a2000_ut=UT
 
 	return
 	end
@@ -1290,15 +1299,12 @@ c
 	INCLUDE 'variables.inc'
 	COMMON /index/activ
 	integer*4 activ
-        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
-     &        ,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04,
-     &         W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	real*8     density,speed,dst_nt,Pdyn_nPa,ByIMF_nt,BzIMF_nt
+        COMMON /drivers/density,speed,dst_nt,Pdyn_nPa,BxIMF_nt,ByIMF_nt
+     &        ,BzIMF_nt,G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
+     &        ,W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
+	real*8     density,speed,dst_nt,Pdyn_nPa,BxIMF_nt,ByIMF_nt,BzIMF_nt
 	real*8     G1_tsy01,G2_tsy01,fkp,G3_tsy01,W1_tsy04,W2_tsy04
         real*8     W3_tsy04,W4_tsy04,W5_tsy04,W6_tsy04,Al
-	INTEGER*4    a2000_iyear,a2000_imonth,a2000_iday
-	REAL*8      a2000_ut
-	COMMON /a2000_time/a2000_ut,a2000_iyear,a2000_imonth,a2000_iday
 
 	 integer*4 kext, ifail
 	 real*8 maginput(25)
@@ -1520,27 +1526,25 @@ c Input for Tsy04 storm
 	       return
 	   endif
 c
-           if (kext .eq. 12) then
+        if (kext .eq. 12) then
 c Input for Alexeev 2000
            if (maginput(2).eq.baddata) return
            if (maginput(3).eq.baddata) return
            if (maginput(4).eq.baddata) return
+           if (maginput(6).eq.baddata) return
            if (maginput(7).eq.baddata) return
+           if (maginput(18).eq.baddata) return
            if (maginput(17).eq.baddata) return
-               a2000_iyear=iyearsat
-	       firstJanuary=JULDAY(a2000_iyear,01,01)
-	       currentdoy=firstJanuary+idoy-1
-	       CALL CALDAT(currentdoy,a2000_iyear,
-     &         a2000_imonth,a2000_iday)
-	       a2000_ut=UT
-               density=maginput(3)
-	       speed=maginput(4)
-	       dst_nt=maginput(2)
-	       BzIMF_nt=maginput(7)
-	       Al=maginput(17)
-	       ifail = 0
-	       return
-	   endif
+           density=maginput(3)
+           speed=maginput(4)
+           dst_nt=maginput(2)
+           BxIMF_nt=maginput(18)
+           ByIMF_nt=maginput(6)
+           BzIMF_nt=maginput(7)
+           Al=maginput(17)
+           ifail = 0
+           return
+        endif
 
        print *, ' invalid kext'
 
