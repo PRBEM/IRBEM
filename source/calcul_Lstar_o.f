@@ -444,7 +444,7 @@ C
          Bl13 = Bl3
         ENDDO
 205     CONTINUE
-        IF (J .EQ. Nrebmax) GOTO 303
+        IF (J .EQ. Nrebmax+1) GOTO 303
         ds3 = dsreb*(B0-Bl13)/(Bl3-Bl13)
         CALL sksyst(ds3,x13,x3,Bl3,Ifail)
         rr32  = x3(1)*x3(1)+x3(2)*x3(2)+x3(3)*x3(3)
