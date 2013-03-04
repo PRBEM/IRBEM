@@ -82,7 +82,6 @@ C    reference surface
        INCLUDE 'variables.inc'
 C
        INTEGER*4  Nreb,Ntet
-c       PARAMETER (Nreb = 50, Ntet = 720)
        PARAMETER (Nreb = 150, Ntet = 720)
 C
        INTEGER*4  k_ext,k_l,kint
@@ -118,6 +117,7 @@ C
        R02 = R0*R0
 C
        Nrebmax = 20*Nreb
+c       write(*,*)'Nrebmax',Nrebmax
 C
        Lm = baddata
        leI0 = 0.D0

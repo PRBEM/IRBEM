@@ -61,7 +61,7 @@ C
 C
        REAL*8     posit(3,20*Nreb)
 C
-       Nrebmax = 1000
+       Nrebmax = 20*Nreb
 C
        CALL CHAMP(xx0,B,B0,Ifail)
        IF (Ifail.LT.0) THEN

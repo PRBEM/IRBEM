@@ -355,19 +355,21 @@
 
 	<font face="ARIAL, HELVETICA"><b>POSIT:</b> (note: size
 	varies. Changes from what's given here will be provided in the
-	function definitions). xGEO,yGEO and zGEO
-	  along the drift shell, (array(3,1000,48) of double)</font>	<br />
-	1st element: x, y, z GEO coord, 2nd element: points along
-	field line, 3rd element: number of field lines. <br />
+	function definitions). xGEO,yGEO and zGEO along the drift
+	shell, (array(3,1000,48) of double)</font> <br /> 1st element:
+	x, y, z GEO coord, 2nd element: points along field line, 3rd
+	element: number of field lines. Note, sometimes the long
+	dimension is 3000 rather than 1000; see specific functions for
+	clarification. <br />
 
 	<font face="ARIAL, HELVETICA"><b>Nposit:</b> (note: size
 	varies. Changes from what's given here will be provided in the
 	function definitions) long integer array (48) providing the
 	number of points along the field line for each field line
-	traced in 2nd element of POSIT array (max 1000).</font>
+	traced in 2nd element of POSIT array (max 1000 for some functions, 3000 for others).</font>
     <p>
         <font face="ARIAL, HELVETICA"><b>Note:</b> Posit is organized as follow: array(xyz,along
-        bounce,drift index). Nposit tells how many of the 1000 points available are used to
+        bounce,drift index). Nposit tells how many of the 1000 (or 3000) points available are used to
         described one bounce.</font> 
         <br />
     </p>
@@ -1114,7 +1116,7 @@
 
       <b>Lm, Blocal, Bmin, XJ, POSIT, Nposit</b> <p>
       See <a href=#COMMON_ARGUMENTS>Common Argument Definitions</a><br>
-	POSIT is (3,1000), Nposit is a scalar.
+	POSIT is (3,3000), Nposit is a scalar.
 
     &nbsp; 
     <p>
@@ -1167,7 +1169,7 @@
 
       <b>POSIT, Nposit</b> <p>
       See <a href=#COMMON_ARGUMENTS>Common Argument Definitions</a><br>
-	POSIT is (3,1000), Nposit is a scalar.
+	POSIT is (3,3000), Nposit is a scalar.
 
     <p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 

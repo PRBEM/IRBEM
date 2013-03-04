@@ -547,7 +547,7 @@ c
         IMPLICIT NONE
         INTEGER*4 kext,options(5),sysaxes,iyearsat,idoy
         REAL*8 UT,xIN1,xIN2,xIN3,maginput(25),R0
-        REAL*8 Lm,BLOCAL(1000),BMIN,XJ,posit(3,1000)
+        REAL*8 Lm,BLOCAL(3000),BMIN,XJ,posit(3,3000)
         INTEGER*4 ind
 
         R0=1.D0
@@ -582,15 +582,15 @@ c Declare internal variables
 c
 c Declare output variables
         INTEGER*4  ind
-        REAL*8     BLOCAL(1000),BMIN,XJ
+        REAL*8     BLOCAL(3000),BMIN,XJ
         REAL*8     Lm
-	REAL*8     posit(3,1000)
+	REAL*8     posit(3,3000)
 C
 	COMMON /magmod/k_ext,k_l,kint
       integer*4 int_field_select, ext_field_select
 C
         do i=1,3
-	   do j=1,1000
+	   do j=1,3000
 	     posit(i,j)=baddata
 	   enddo
 	enddo
@@ -667,12 +667,12 @@ c Declare internal variables
 c
 c Declare output variables
       INTEGER*4  ind, ifail
-      REAL*8     posit(3,1000)
+      REAL*8     posit(3,3000)
       integer*4 int_field_select, ext_field_select
 C
 C
       do i=1,3
-        do j=1,1000
+        do j=1,3000
           posit(i,j)=baddata
         enddo
       enddo
