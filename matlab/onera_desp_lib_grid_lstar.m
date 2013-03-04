@@ -262,11 +262,6 @@ switch(output_option),
         Lstar = Phi;
     case 'Lstar',
         Lstar = 2*pi*k0./Phi;
-        for i = 1:numel(traces),
-            if ~isempty(traces{i}),
-                traces{i}.Lstar = 2*pi*k0./traces{i}.Phi;
-            end
-        end
     otherwise
         error('Unknown output option %s',output_option);
 end
@@ -323,6 +318,7 @@ for i1 = 1:N1,
                 y = nan([N1,N2,N3]);
             end
             traces{i1,i2}.Phi = nan(N3,1);
+            traces{i1,i2}.Lstar = nan(N3,1);
             traces{i1,i2}.foot_points = cell(N3,1);
             y(i1,i2,:) = traces{i1,i2}.(yvar);
             LAT(i1,i2) = traces{i1,i2}.NorthPoint(1);
@@ -370,8 +366,9 @@ for i1 = 1:N1,
                 traces{i1,i2}.foot_points{i3} = [lat,lon];
                 traces{i1,i2}.Phi(i3) = computePhi(kext,options,matlabd,lat,lon,maginput,dlat)*nT;
                 Phi(i1,i2,i3) = traces{i1,i2}.Phi(i3);
+                traces{i1,i2}.Lstar(i3) = 2*pi*k0/traces{i1,i2}.Phi(i3);
                 if (verbose>=1) && (now-last_t>1/24/60/60),
-                    fprintf('Phi(%d,%d,%d) = %g (Lstar = %g)\n',i1,i2,i3,Phi(i1,i2,i3),2*pi*k0/Phi(i1,i2,i3));
+                    fprintf('Phi(%d,%d,%d) = %g (Lstar = %g)\n',i1,i2,i3,Phi(i1,i2,i3),traces{i1,i2}.Lstar(i3));
                     last_t = now;
                 end
             end
@@ -398,6 +395,7 @@ for i1 = 1:N1,
                 Bm = nan([N1,N2,N3]);
             end
             traces{i1,i2}.Phi = nan(N3,1);
+            traces{i1,i2}.Lstar = nan(N3,1);
             traces{i1,i2}.foot_points = cell(N3,1);
             I(i1,i2,:) = traces{i1,i2}.I;
             Bm(i1,i2,:) = traces{i1,i2}.Bm;
@@ -458,11 +456,12 @@ for i1 = 1:N1,
             if ~failed,
                 traces{i1,i2}.foot_points{i3} = [lat,lon];
                 traces{i1,i2}.Phi(i3) = computePhi(kext,options,matlabd,lat,lon,maginput,dlat)*nT;
-                Phi(i1,i2,i3) = traces{i1,i2}.Phi(i3);
+                traces{i1,i2}.Lstar(i3) = 2*pi*k0/traces{i1,i2}.Phi(i3);
                 if (verbose>=1) && (now-last_t>1/24/60/60),
-                    fprintf('Phi(%d,%d,%d) = %g (Lstar = %g)\n',i1,i2,i3,Phi(i1,i2,i3),2*pi*k0/Phi(i1,i2,i3));
+                    fprintf('Phi(%d,%d,%d) = %g (Lstar = %g)\n',i1,i2,i3,Phi(i1,i2,i3),traces{i1,i2}.Lstar(i3));
                     last_t = now;
                 end
+                
             end
         end % for i3 -> N3
     end % for i2 -> N2
