@@ -370,25 +370,25 @@ for i3 = 1:N3,
         if Npairs == 1,
             continue;
         end
+        % remove repeats
+        ikeep = setdiff((1:Npairs)',find(all(diff(xy,1,1)==0)));
+        xy = xy(ikeep,:);
+        
         % check for closed contour
-        if isequal(xy(1,:),xy(end,:)),
-            iclose = Npairs;
-        else
-            iclose = find(all(diff(xy,1,1)==0,2)); % iclose == 1 when xy(1,:) == xy(2,:)
+        closed = false;
+        if isequal(xy(1,:),xy(end,:)), % 1st and last match, so first is redundant
+            closed = true;
+            xy = xy(2:end,:); % remove repeated point     
+        elseif periodic(1) && all(ismember([1,N1],xy(:,2))),
+            closed = true; % end-to-end in i1
+        elseif periodic(2) && all(ismember([1,N2],xy(:,1))),
+            closed = true; % end-to-end in i2
         end
-        if isempty(iclose) && periodic(1) && all(ismember([1,N1],xy(:,2))),
-            iclose = -1; % end-to-end in i1
-        end
-        if isempty(iclose) && periodic(2) && all(ismember([1,N2],xy(:,1))),
-            iclose = -2; % end-to-end in i2
-        end
-        if ~isempty(iclose), % closed!
-            ikeep = (1:Npairs)';
-            ikeep = ikeep(~ismember(ikeep,iclose)); % remove duplicated closure point and midpoints
-            lat = interp2(1:N2,1:N1,LAT,xy(ikeep,1),xy(ikeep,2),'linear');
+        if closed,
+            lat = interp2(1:N2,1:N1,LAT,xy(:,1),xy(:,2),'linear');
             % interpolate periodic using sin/cos
-            clon = interp2(1:N2,1:N1,CLON,xy(ikeep,1),xy(ikeep,2),'linear');
-            slon = interp2(1:N2,1:N1,SLON,xy(ikeep,1),xy(ikeep,2),'linear');
+            clon = interp2(1:N2,1:N1,CLON,xy(:,1),xy(:,2),'linear');
+            slon = interp2(1:N2,1:N1,SLON,xy(:,1),xy(:,2),'linear');
             lon = atan2(slon,clon)*180/pi;
             break;
         end
