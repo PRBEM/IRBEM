@@ -3,15 +3,15 @@ function [Lstar,traces] = onera_desp_lib_grid_lstar(kext,options,sysaxes,matlabd
 % compute Lstar on a grid
 % kext, options, sysaxes, matlabd, and maginput are as required by onera_desp_lib_trace_field_line
 % x1, x2, x3 are [N1,N2] matrices of launch points
-%  coordinate N1 is a radial or latitude dimension
-%  coordinate N2 is a periodic dimension like MLT or longitude
-% ***Pption Bm, a0, or K is required
+% ***Option Bm, a0, or K is required
 % keyword options:
 % 'G' - set Bunit to G (default Bunit is nT)
 % 'Phi' - return Phi in nT-RE^2 rather than Lstar
+% 'periodic1' - space is period in i1 (e.g., longitude, local time)
+% 'periodic2' - space is period in i2 (e.g., longitude, local time)
 % param/value options:
 % 'Bm' - grid of Bmirror values in Bunit [N3x1]
-% 'a0' - grid of equatorial pitch angles in degrees [N3x1] (much slower)
+% 'a0' - grid of equatorial pitch angles in degrees [N3x1] (slower)
 % 'K' - grid of K values in RE-sqrt(Bunit) [N3x1]
 % 'k0' - magnetic moment for Lstar = 2*pi*k0/Phi, Bunit-RE^3
 %   default is 0.301153e5 nT-RE^3 for epoch 2000.0
@@ -20,7 +20,7 @@ function [Lstar,traces] = onera_desp_lib_grid_lstar(kext,options,sysaxes,matlabd
 % 'NptsI' - number of points for I integral (default 1000)
 % 'dlat' - latitude spacing for Phi integral (degrees, default 0.1)
 % 'verbose' - verbose setting for diagnostic/status output
-%   (default is 0, set to 1 for about 1 report per second. 
+%   (default is 0, set to 1 for about 1 report per second.
 %    higher integers have more reports)
 % 'maxLm' - stop tracing in dimension 1 if |Lm| exceeds maxLm
 %   set maxLm negative to trace from N1 down to 1
@@ -48,9 +48,15 @@ function [Lstar,traces] = onera_desp_lib_grid_lstar(kext,options,sysaxes,matlabd
 %              K: [N3x1] K, RE*sqrt(Bunit)
 %              Phi: [N3x1] Phi, RE^2*Bunit
 %              Lstar: [N3x1] Lstar, RE
-%              foot_points: [N3x1] cell array of [N2x2] lat,lon (deg) of northern foot points of drift shell
+%              foot_points: [N3x1] cell array of [Nx2] lat,lon (deg) of northern foot points of drift shell
 %
-% call with no inputs to run test
+% call with no inputs to run test/demo
+%
+% Initial implementation by Paul O'Brien
+% Algorithm adapted from
+% Min, K., J. Bortnik, and J. Lee (2013), A novel technique for rapid 
+% L* calculation using UBK coordinates, J. Geophys. Res. Space Physics, 
+% 118, doi:10.1029/2012JA018177.
 
 if nargin == 0, % test
     [Lstar,traces] = test;
@@ -66,6 +72,7 @@ NptsI = 1000; % number of points for I integral
 dlat = 0.1; % latitude spacing for Phi integrals
 verbose = 0;
 maxLm = inf;
+periodic = false(2,1);
 
 i = 1;
 while i <= length(varargin),
@@ -91,6 +98,10 @@ while i <= length(varargin),
             Bm_option = 'a0';
             i = i+1;
             z = varargin{i};
+        case 'periodic1',
+            periodic(1) = true;
+        case 'periodic2',
+            periodic(2) = true;
         case 'phi',
             output_option = 'Phi';
         case 'g',
@@ -137,7 +148,7 @@ for i2 = 1:N2,
     for i1 = I1,
         clear trace
         if verbose >= 2,
-            fprintf('Tracing (%d,%d) = (%g,%g,%g)\n',i1,i2,x1(i1,i2),x2(i1,i2),x3(i1,i2));
+            fprintf('Tracing i=(%d,%d), x=(%g,%g,%g)\n',i1,i2,x1(i1,i2),x2(i1,i2),x3(i1,i2));
         end
         [trace.Lm,trace.Blocal,trace.Bmin,trace.J,trace.GEO] = onera_desp_lib_trace_field_line(kext,options,sysaxes,matlabd,x1(i1,i2),x2(i1,i2),x3(i1,i2),maginput,R0);
         if isempty(trace.Blocal),
@@ -239,7 +250,7 @@ for i2 = 1:N2,
             trace.NorthPoint = interp1(trace.RLL(fNorth,1),trace.RLL(fNorth,2:3),1.0,'linear'); % interpolate to R=1
         end
         if (verbose>=1) && (now-last_t>1/24/60/60),
-            fprintf('Traced [%d,%d], Lm=%g\n',i1,i2,trace.Lm);
+            fprintf('Traced i=(%d,%d), Lm=%g\n',i1,i2,trace.Lm);
             last_t = now;
         end
         traces{i1,i2} = trace;
@@ -248,14 +259,36 @@ end
 
 switch(Bm_option),
     case 'Bm', % contours of constant I on grid in Bm with I(i1,i2,Bm)
-        [Phi,traces] = Phi_at_fixed_i3(kext,options,matlabd,maginput,dlat,traces,'I',verbose,nT,k0);
+        traces = Phi_at_fixed_i3(traces,'I',periodic,verbose);
     case 'a0', % contours of constant I at fixed Bm but with I(i1,i2,a0)
-        [Phi,traces] = Phi_at_fixed_a0(kext,options,matlabd,maginput,dlat,traces,verbose,nT,k0);
+        traces = Phi_at_fixed_a0(traces,periodic,verbose);
     case 'K', % contours of constant Bm at fixed K with Bm(i1,i2,K)
-        [Phi,traces] = Phi_at_fixed_i3(kext,options,matlabd,maginput,dlat,traces,'Bm',verbose,nT,k0);
+        traces = Phi_at_fixed_i3(traces,'Bm',periodic,verbose);
     otherwise,
         error('Unknown Bm_option %s',Bm_option);
 end
+
+% now, with foot_point populated, compute Phi and Lstar
+last_t = now;
+for i1 = 1:N1,
+    for i2 = 1:N2,
+        for i3 = 1:N3,
+            if ~isempty(traces{i1,i2}) && ~isempty(traces{i1,i2}.foot_points{i3}),
+                lat = traces{i1,i2}.foot_points{i3}(:,1);
+                lon = traces{i1,i2}.foot_points{i3}(:,2);
+                traces{i1,i2}.Phi(i3) = computePhi(kext,options,matlabd,lat,lon,maginput,dlat)*nT;
+                Phi(i1,i2,i3) = traces{i1,i2}.Phi(i3);
+                traces{i1,i2}.Lstar(i3) = 2*pi*k0/traces{i1,i2}.Phi(i3);
+                if (verbose>=1) && (now-last_t>1/24/60/60),
+                    fprintf('at i=(%d,%d,%d), x=(%g,%g,%g),%s=%g: Phi = %g (Lstar = %g)\n',i1,i2,i3,...
+                        x1(i1,i2),x2(i1,i2),x3(i1,i2),Bm_option,z(i3),Phi(i1,i2,i3),traces{i1,i2}.Lstar(i3));
+                    last_t = now;
+                end
+            end % if ~isempty...
+        end % for i3
+    end % for i2
+end % for i1
+
 
 switch(output_option),
     case 'Phi',
@@ -274,7 +307,6 @@ function Phi = computePhi(kext,options,matlabd,lat,lon,maginput,dlat)
 persistent settings grid
 newsettings = {kext,options,matlabd,maginput,dlat}; % can we re-use the grid?
 if ~isequal(settings,newsettings),
-    settings = newsettings;
     grid.lat = linspace(-20,90,ceil((90--20)/dlat));
     grid.NLAT = length(grid.lat);
     grid.lon = linspace(0,360,2*length(lon)); % overkill longitude spacing, just in case
@@ -288,6 +320,7 @@ if ~isequal(settings,newsettings),
     grid.partialPhi = grid.partialPhi-repmat(grid.partialPhi(:,end),1,grid.NLAT); % includes minus sign for northern hemi
     % grid.partialPhi(ilon,ilat) is the line integral from
     % [grid.lat(ilat),grid.lon(ilon)] to [90,grid.lon(ilon)] of {B dot rhat dsin(LAT)}
+    settings = newsettings; % success, so we can re-use grid if same settings are requested.
 end
 
 % prepare for lon integral
@@ -301,7 +334,70 @@ partialPhi = interp2(grid.LAT,grid.LON,grid.partialPhi,lat,lon,'linear');
 % perform longitude integral
 Phi = dlon'*partialPhi; % northern hemisphere integral is negative B.r<0
 
-function [Phi,traces] = Phi_at_fixed_i3(kext,options,matlabd,maginput,dlat,traces,yvar,verbose,nT,k0)
+function foot_points = Phi_contours(LAT,LON,I,I0,periodic)
+% general purpose contouring and interpolating routine
+% LAT,LON are N1xN2
+% I is N1xN2xN3, gives I as a function of LAT,LON
+% I0 is N3x1, a set of values of I0 at which to find contours
+% foot_points is a N3x1 cell array of {lat,lon}
+% where lat and lon are Nx1, and provide the contours
+
+[N1,N2] = size(LAT);
+N3 = length(I0);
+foot_points = cell(N3,1);
+% facilitate periodic interpolation
+CLON = cosd(LON);
+SLON = sind(LON);
+
+for i3 = 1:N3,
+    if ~isfinite(I0(i3)),
+        continue;
+    end
+    C = contourc(I(:,:,i3),I0(i3)+[0 0]);
+    %         C = [level1 x1 x2 x3 ... level2 x2 x2 x3 ...;
+    %              pairs1 y1 y2 y3 ... pairs2 y2 y2 y3 ...]
+    if isempty(C),
+        continue;
+    end
+    ipair = 1;
+    lat = nan;
+    lon = nan;
+    while ipair < size(C,2),
+        Npairs = C(2,ipair);
+        xy = C(:,ipair+(1:Npairs))'; %[i2,i1]
+        ipair = ipair+Npairs+1; % next
+        if Npairs == 1,
+            continue;
+        end
+        % check for closed contour
+        if isequal(xy(1,:),xy(end,:)),
+            iclose = Npairs;
+        else
+            iclose = find(all(diff(xy,1,1)==0,2)); % iclose == 1 when xy(1,:) == xy(2,:)
+        end
+        if isempty(iclose) && periodic(1) && all(ismember([1,N1],xy(:,2))),
+            iclose = -1; % end-to-end in i1
+        end
+        if isempty(iclose) && periodic(2) && all(ismember([1,N2],xy(:,1))),
+            iclose = -1; % end-to-end in i2
+        end
+        if ~isempty(iclose), % closed!
+            ikeep = (1:Npairs)';
+            ikeep = ikeep((ikeep ~= iclose)); % remove duplicated closure point and midpoints
+            lat = interp2(1:N2,1:N1,LAT,xy(ikeep,1),xy(ikeep,2),'linear');
+            % interpolate periodic using sin/cos
+            clon = interp2(1:N2,1:N1,CLON,xy(ikeep,1),xy(ikeep,2),'linear');
+            slon = interp2(1:N2,1:N1,SLON,xy(ikeep,1),xy(ikeep,2),'linear');
+            lon = atan2(slon,clon)*180/pi;
+            break;
+        end
+    end % while ipair
+    if all(isfinite(lat)) && all(isfinite(lon)),
+        foot_points{i3} = [lat,lon];
+    end
+end % for i3
+
+function traces = Phi_at_fixed_i3(traces,yvar,periodic,verbose)
 % yvar is Bm for traces at fixed K, yvar is I for traces at fixed Bm
 last_t = now;
 [N1,N2] = size(traces);
@@ -323,61 +419,25 @@ for i1 = 1:N1,
             y(i1,i2,:) = traces{i1,i2}.(yvar);
             LAT(i1,i2) = traces{i1,i2}.NorthPoint(1);
             LON(i1,i2) = traces{i1,i2}.NorthPoint(2);
-        end
-    end
-end
-Phi = nan([N1,N2,N3]);
+        end % if ~isempty
+    end % for i2
+end % for i1
 
 % make contours
 for i1 = 1:N1,
     for i2 = 1:N2,
-        for i3 = 1:N3,
-            y0 = y(i1,i2,i3);
-            if ~isfinite(y0),
-                continue; % cannot do this launch point
+        if ~isempty(traces{i1,i2}) && isfinite(LAT(i1,i2)) && isfinite(LON(i1,i2)),
+            y0 = squeeze(y(i1,i2,:));
+            traces{i1,i2}.foot_points = Phi_contours(LAT,LON,y,y0,periodic);
+            if (verbose>=1) && (now-last_t>1/24/60/60),
+                fprintf('Traced foot points for i=(%d,%d): lat = %g, lon = %g)\n',i1,i2,LAT(i1,i2),LON(i1,i2));
+                last_t = now;
             end
-            % trajectory points
-            lat = nan(N2,1);
-            lon = nan(N2,1);
-            % starting point
-            j2 = i2;
-            lat(1) = LAT(i1,i2);
-            lon(1) = LON(i1,i2);
-            failed = false;
-            for i = 2:N2,
-                j2 = 1+rem(j2,N2);
-                f = isfinite(y(:,j2,i3));
-                if sum(f)>=2,
-                    lat(i) = interp1(y(f,j2,i3),LAT(f,j2),y0,'linear');
-                end
-                if ~isfinite(lat(i)),
-                    failed = true;
-                    break
-                end
-                DLON = rem(2*360+180+LON(:,j2)-lon(i-1),360)-180;
-                dlon = interp1(y(f,j2,i3),DLON(f),y0,'linear');
-                lon(i) = rem(2*360+lon(i-1) + dlon,360);
-                if ~isfinite(lon(i)),
-                    failed = true;
-                    break;
-                end
-            end
-            if ~failed,
-                traces{i1,i2}.foot_points{i3} = [lat,lon];
-                traces{i1,i2}.Phi(i3) = computePhi(kext,options,matlabd,lat,lon,maginput,dlat)*nT;
-                Phi(i1,i2,i3) = traces{i1,i2}.Phi(i3);
-                traces{i1,i2}.Lstar(i3) = 2*pi*k0/traces{i1,i2}.Phi(i3);
-                if (verbose>=1) && (now-last_t>1/24/60/60),
-                    fprintf('Phi(%d,%d,%d) = %g (Lstar = %g)\n',i1,i2,i3,Phi(i1,i2,i3),traces{i1,i2}.Lstar(i3));
-                    last_t = now;
-                end
-            end
-        end
-    end
-end
+        end % if ~isempty
+    end % for i2
+end % for i1
 
-
-function [Phi,traces] = Phi_at_fixed_a0(kext,options,matlabd,maginput,dlat,traces,verbose,nT,k0)
+function traces = Phi_at_fixed_a0(traces,periodic,verbose)
 last_t = now;
 [N1,N2] = size(traces);
 % northern foot points at R=1
@@ -401,117 +461,83 @@ for i1 = 1:N1,
             Bm(i1,i2,:) = traces{i1,i2}.Bm;
             LAT(i1,i2) = traces{i1,i2}.NorthPoint(1);
             LON(i1,i2) = traces{i1,i2}.NorthPoint(2);
-        end
-    end
-end
+        end % if ~isempty
+    end % for i2
+end % for i1
 
-% now we have
-% I(LAT,LON,a0)
-% Bm(LAT,LON,a0)
+% now have I(LAT,LON,a0) and Bm(LAT,LON,a0)
 
-Phi = nan([N1,N2,N3]);
-% make contours
+% make contours of constant Bm at fixed I
 for i1 = 1:N1,
     for i2 = 1:N2,
-        for i3 = 1:N3,
-            I0 = I(i1,i2,i3);
-            Bm0 = Bm(i1,i2,i3);
-            if ~isfinite(I0) || ~isfinite(Bm0),
-                continue; % cannot do this launch point
+        if ~isempty(traces{i1,i2}) && isfinite(LAT(i1,i2)) && isfinite(LON(i1,i2)),
+            I0 = squeeze(I(i1,i2,:));
+            Bm0 = squeeze(Bm(i1,i2,:));
+            ib = find(isfinite(Bm0) & isfinite(I0)); % logical index into finite Bm0
+            if isempty(ib),
+                continue;
             end
-            % trajectory points
-            lat = nan(N2,1);
-            lon = nan(N2,1);
-            % starting point
-            j2 = i2;
-            lat(1) = LAT(i1,i2);
-            lon(1) = LON(i1,i2);
-            failed = false;
-            for i = 2:N2,
-                j2 = 1+rem(j2,N2);
-                tmpBm = nan(N1,1); % Bm at I = I0 vs x1
-                for j1 = 1:N1,
-                    f = isfinite(I(j1,j2,:));
-                    if sum(f)>=2,
-                        tmpBm(j1) = interp1(squeeze(I(j1,j2,f)),squeeze(Bm(j1,j2,f)),I0,'linear');
+            I0 = I0(ib); % only interpolate to finite Bm0
+            tmpBm = nan(size(Bm)); % I(LAT,LON,Bm0)
+            for j1 = 1:N1,
+                for j2 = 1:N2
+                    xI = squeeze(I(j1,j2,:));
+                    yBm = squeeze(Bm(j1,j2,:));
+                    f = isfinite(xI) & isfinite(yBm);
+                    Nf = sum(f);
+                    if Nf>=2,
+                        tmpBm(j1,j2,ib) = interp1(xI(f),yBm(f),I0,'linear');
+                    elseif (Nf == 1) && any(xI(f)==I0), % singleton, exact match
+                        tmpBm(j1,j2,ib(xI(f)==I0)) = yBm(f);
                     end
                 end
-                f = isfinite(tmpBm);
-                if sum(f)>=2,
-                    lat(i) = interp1(tmpBm(f),LAT(f,j2),Bm0,'linear');
-                end
-                if ~isfinite(lat(i)),
-                    failed = true;
-                    break;
-                end
-                DLON = rem(2*360+180+LON(:,j2)-lon(i-1),360)-180;
-                dlon = interp1(tmpBm(f),DLON(f),Bm0,'linear');
-                lon(i) = rem(2*360+lon(i-1) + dlon,360);
-                if ~isfinite(lon(i)),
-                    failed = true;
-                    break;
-                end
             end
-            
-            if ~failed,
-                traces{i1,i2}.foot_points{i3} = [lat,lon];
-                traces{i1,i2}.Phi(i3) = computePhi(kext,options,matlabd,lat,lon,maginput,dlat)*nT;
-                traces{i1,i2}.Lstar(i3) = 2*pi*k0/traces{i1,i2}.Phi(i3);
-                if (verbose>=1) && (now-last_t>1/24/60/60),
-                    fprintf('Phi(%d,%d,%d) = %g (Lstar = %g)\n',i1,i2,i3,Phi(i1,i2,i3),traces{i1,i2}.Lstar(i3));
-                    last_t = now;
-                end
-                
+            traces{i1,i2}.foot_points = Phi_contours(LAT,LON,tmpBm,Bm0,periodic);
+            if (verbose>=1) && (now-last_t>1/24/60/60),
+                fprintf('Traced foot points for i=(%d,%d): lat = %g, lon = %g)\n',i1,i2,LAT(i1,i2),LON(i1,i2));
+                last_t = now;
             end
-        end % for i3 -> N3
-    end % for i2 -> N2
-end % for i1 -> N1
+        end % if ~isempty
+    end % for i2
+end % for i1
+
 
 function [Lstar,traces] = test
-[LAT,LON] = ndgrid(35:2:80,0:15:359);
-%[LAT,LON] = ndgrid(40:4:80,0:30:359);
+% run a short demo using all 3 grid types on a LAT/LON grid at R=1.0
+[LAT,LON] = ndgrid(35:2:80,0:15:359); % finer grid for demo
+% [LAT,LON] = ndgrid(40:4:80,0:30:359); % coarser grid for debugging
 kext = 'T89';
 maginput = onera_desp_lib_maginputs(2); % Kp=2
 R = ones(size(LAT));
-options = {};
-args = {kext,options,'RLL',datenum(2010,1,1),R,LAT,LON,maginput,'verbose',inf};
+options = {}; 
+args = {kext,options,'RLL',datenum(2010,1,1),R,LAT,LON,maginput,'verbose',inf,'periodic2'};
 
-a0 = [10:10:90]; % deg
-[Lstar,traces] = onera_desp_lib_grid_lstar(args{:},'a0',a0);
-for i = length(a0):-2:1,
-    figure;
-    contourf(LON,LAT,Lstar(:,:,i),2:10);
-    axis([0 360 0 90]);
-    xlabel('Longitude, ^o East');
-    ylabel('Latitude, ^o North');
-    title(sprintf('T89, Kp=2, a0=%g',a0(i)));
-    cb = colorbar('vert');
-    ylabel(cb,'L*');
+zvar = {'a0','Bm','K'}; % test all three options for definining mirror point grid
+for ivar = 1:length(zvar),
+    extras = {}; % extra arguments specific to zvar
+    switch(zvar{ivar}),
+        case 'K', % K grid
+            z = [0;0.1;0.3;1.0]; % sqrt(G)*RE
+            extras{end+1} = 'G'; % force Gauss in Bunit
+            iplot = 1:length(z); % which z to plot
+        case 'a0', % a0 grid
+            z = [10:10:90]; % deg
+            iplot = length(z):-2:1; % which z to plot
+        case 'Bm', % Bmirror grid
+            z = [0.3e3;1e3;3e3;10e3;30e3]; % nT
+            iplot = 1:length(z); % which z to plot
+    end
+
+    % trace!
+    [Lstar,traces] = onera_desp_lib_grid_lstar(args{:},zvar{ivar},z,extras{:});
+    for iz = iplot, % make contour plots
+        figure;
+        contourf(LON,LAT,Lstar(:,:,iz),2:10); % contours in L*
+        axis([0 360 0 90]);
+        xlabel('Longitude, ^o East');
+        ylabel('Latitude, ^o North');
+        title(sprintf('T89, Kp=2, %s=%g',zvar{ivar},z(iz)));
+        cb = colorbar('vert');
+        ylabel(cb,'L*');
+    end
 end
-
-K = [0;0.1;0.3;1.0]; % sqrt(G)*RE
-[Lstar,traces] = onera_desp_lib_grid_lstar(args{:},'K',K,'G');
-for i = 1:length(K),
-    figure;
-    contourf(LON,LAT,Lstar(:,:,i),2:10);
-    axis([0 360 0 90]);
-    xlabel('Longitude, ^o East');
-    ylabel('Latitude, ^o North');
-    title(sprintf('T89, Kp=2, K=%g',K(i)));
-    cb = colorbar('vert');
-    ylabel(cb,'L*');
-end
-
-Bm = [0.3e3;1e3;3e3;10e3;30e3]; % nT
-[Lstar,traces] = onera_desp_lib_grid_lstar(args{:},'Bm',Bm);
-for i = 1:length(Bm),
-    figure;
-    contourf(LON,LAT,Lstar(:,:,i),2:10);
-    axis([0 360 0 90]);
-    xlabel('Longitude, ^o East');
-    ylabel('Latitude, ^o North');
-    title(sprintf('T89, Kp=2, Bm=%g',Bm(i)));
-    cb = colorbar('vert');
-    ylabel(cb,'L*');
-end
-
