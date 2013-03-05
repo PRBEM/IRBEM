@@ -350,7 +350,7 @@ CLON = cosd(LON);
 SLON = sind(LON);
 
 for i3 = 1:N3,
-    if ~isfinite(I0(i3)),
+    if ~isfinite(I0(i3)) || ~any(isfinite(I(:,:,i3))),
         continue;
     end
     C = contourc(I(:,:,i3),I0(i3)+[0 0]);
