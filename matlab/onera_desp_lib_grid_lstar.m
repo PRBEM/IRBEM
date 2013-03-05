@@ -250,7 +250,7 @@ for i2 = 1:N2,
             trace.NorthPoint = interp1(trace.RLL(fNorth,1),trace.RLL(fNorth,2:3),1.0,'linear'); % interpolate to R=1
         end
         if (verbose>=1) && (now-last_t>1/24/60/60),
-            fprintf('Traced i=(%d,%d), Lm=%g\n',i1,i2,trace.Lm);
+            fprintf('Traced i=(%d,%d), x=(%g,%g,%g): Lm=%g\n',i1,i2,x1(i1,i2),x2(i1,i2),x3(i1,i2),trace.Lm);
             last_t = now;
         end
         traces{i1,i2} = trace;
@@ -350,10 +350,11 @@ CLON = cosd(LON);
 SLON = sind(LON);
 
 for i3 = 1:N3,
-    if ~isfinite(I0(i3)) || ~any(isfinite(I(:,:,i3))),
+    I3 = I(:,:,i3); % matrix to contour
+    if ~isfinite(I0(i3)) || ~any(isfinite(I3(:))),
         continue;
     end
-    C = contourc(I(:,:,i3),I0(i3)+[0 0]);
+    C = contourc(I3,I0(i3)+[0 0]);
     %         C = [level1 x1 x2 x3 ... level2 x2 x2 x3 ...;
     %              pairs1 y1 y2 y3 ... pairs2 y2 y2 y3 ...]
     if isempty(C),
@@ -379,11 +380,11 @@ for i3 = 1:N3,
             iclose = -1; % end-to-end in i1
         end
         if isempty(iclose) && periodic(2) && all(ismember([1,N2],xy(:,1))),
-            iclose = -1; % end-to-end in i2
+            iclose = -2; % end-to-end in i2
         end
         if ~isempty(iclose), % closed!
             ikeep = (1:Npairs)';
-            ikeep = ikeep((ikeep ~= iclose)); % remove duplicated closure point and midpoints
+            ikeep = ikeep(~ismember(ikeep,iclose)); % remove duplicated closure point and midpoints
             lat = interp2(1:N2,1:N1,LAT,xy(ikeep,1),xy(ikeep,2),'linear');
             % interpolate periodic using sin/cos
             clon = interp2(1:N2,1:N1,CLON,xy(ikeep,1),xy(ikeep,2),'linear');
@@ -392,7 +393,7 @@ for i3 = 1:N3,
             break;
         end
     end % while ipair
-    if all(isfinite(lat)) && all(isfinite(lon)),
+    if all(isfinite(lat)) && all(isfinite(lon)) && (length(lon)>=2),
         foot_points{i3} = [lat,lon];
     end
 end % for i3
