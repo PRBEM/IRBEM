@@ -341,29 +341,16 @@ install: install.lib
 
 install.lib:
 	@echo Installing
-	@if [ -f $(SOURCEDIR)/onera_desp_lib_*.so ] ; then \
-	   cp $(SOURCEDIR)/onera_desp_lib_*.so $(INSTALLDIR)/matlab/onera_desp_lib.so;\
-	   cp $(SOURCEDIR)/onera_desp_lib_*.so $(INSTALLDIR);\
-	 else \
-	   $(NULL) ; \
-	 fi
-	@if [ -f $(SOURCEDIR)/onera_desp_lib_*.dll ] ; then \
-	   cp $(SOURCEDIR)/onera_desp_lib_*.dll $(INSTALLDIR)/matlab/onera_desp_lib.dll;\
-	   cp $(SOURCEDIR)/onera_desp_lib_*.dll $(INSTALLDIR);\
-	 else \
-	   $(NULL) ; \
-	 fi
-	@if [ -f $(SOURCEDIR)/onera_desp_lib_*.dylib ] ; then \
-	  @cp $(SOURCEDIR)/onera_desp_lib_*.dylib $(INSTALLDIR)/matlab;\
-	   cp $(SOURCEDIR)/onera_desp_lib_*.dll $(INSTALLDIR);\
-	 else \
-	   $(NULL) ; \
-	 fi
-	@if [ -f $(SOURCEDIR)/liboneradesp_*.a ] ; then \
-	   cp $(SOURCEDIR)/liboneradesp_*.a $(INSTALLDIR);\
-	 else \
-	   $(NULL) ; \
-	fi
+
+	@echo  Installing $(SOURCEDIR)/liboneradesp_$(LIBNAME_$(OS)_$(ENV)).$(NONSHAREDEXT_$(OS)) to $(INSTALLDIR)
+	cp $(SOURCEDIR)/liboneradesp_$(LIBNAME_$(OS)_$(ENV)).$(NONSHAREDEXT_$(OS)) $(INSTALLDIR)
+
+	@echo Installing $(SOURCEDIR)/onera_desp_lib_$(LIBNAME_$(OS)_$(ENV)).$(SHAREDEXT_$(OS)) to $(INSTALLDIR)
+	cp $(SOURCEDIR)/onera_desp_lib_$(LIBNAME_$(OS)_$(ENV)).$(SHAREDEXT_$(OS)) $(INSTALLDIR)
+
+	@echo Installing $(SOURCEDIR)/onera_desp_lib_$(LIBNAME_$(OS)_$(ENV)).$(SHAREDEXT_$(OS)) to $(INSTALLDIR)/matlab/onera_desp_lib.$(SHAREDEXT_$(OS))
+	cp $(SOURCEDIR)/onera_desp_lib_$(LIBNAME_$(OS)_$(ENV)).$(SHAREDEXT_$(OS)) $(INSTALLDIR)/matlab/onera_desp_lib.$(SHAREDEXT_$(OS))
+
 	@echo Installing done
 
 
