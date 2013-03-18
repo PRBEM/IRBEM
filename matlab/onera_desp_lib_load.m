@@ -45,6 +45,7 @@ if ~libisloaded('onera_desp_lib'),
     if ~exist(libfile,'file'),
         error('libfile %s not found',libfile);
     end
+    fprintf('Loading %s\n',libfile);
     loadlibrary(libfile,headerfile,'alias','onera_desp_lib');
 end
 
