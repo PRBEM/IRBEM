@@ -32,7 +32,8 @@ function [Lstar,traces] = onera_desp_lib_grid_lstar(kext,options,sysaxes,matlabd
 %             Nt: is number of points in field line trace
 %             Lm: McIlwain's L, RE
 %         Blocal: [Ntx1] local field strength, Bunit
-%           Bmin: minimum field strength on field line, Bunit
+%           Bmin: minimum field strength on field line, Bunit, i.e., min(Blocal)
+%           iBmin: index of Bmin: Blocal(iBmin) == Bmin
 %              J: I for particle mirroring at launch point x1(i1,i2), x2(i1,i2), x3(i1,i2), RE
 %            GEO: [Nx3] field points in GEO
 %            RLL: [Ntx3] geographic radius, lat, lon (RE, deg, deg)
@@ -167,7 +168,11 @@ for i2 = 1:N2,
         trace.Nt = length(trace.Blocal);
         % convert nT to Bunit
         trace.Blocal = trace.Blocal*nT;
-        trace.Bmin = trace.Bmin*nT;
+        [Bmin,iBmin] = min(trace.Blocal);
+        Bmin = Bmin(1); % just in case minimum occurs twice
+        iBmin = iBmin(1);
+        trace.Bmin = Bmin; % replace library value which can sometimes be smaller than min Blocal
+        trace.iBmin = iBmin;
         % check for Shabansky
         dir = -1; % B decreasing
         imins = [];
@@ -204,28 +209,28 @@ for i2 = 1:N2,
         I = nan(size(Bm)); % allocate space for I
         ds = sqrt(sum(diff(trace.GEO,1,1).^2,2)); % step
         s = [0;cumsum(ds)]; % distance along field line
-        trace.NorthMirrorPoint = nan(length(I),3);
-        trace.SouthMirrorPoint = nan(length(I),3);
+        NorthMirrorPoint = nan(length(I),3);
+        SouthMirrorPoint = nan(length(I),3);
         for i = 1:length(Bm),
-            if Bm(i) <= trace.Bmin, % equatorial case
+            if Bm(i) <= Bmin, % equatorial case
                 I(i) = 0;
-                trace.NorthMirrorPoint(i,:) = trace.GEO(1,:);
-                trace.SouthMirrorPoint(i,:) = trace.GEO(1,:);
+                NorthMirrorPoint(i,:) = trace.GEO(iBmin,:);
+                SouthMirrorPoint(i,:) = trace.GEO(iBmin,:);
             else
                 bm = Bm(i); % Bmirror
                 s1 = interp1(trace.Blocal(1:imins(1)),s(1:imins(1)),bm,'linear'); % one mirror point
                 s2 = interp1(trace.Blocal(imins(1):end),s(imins(1):end),bm,'linear'); % other mirror point
                 if s1==s2,
                     I(i) = 0;
-                    trace.NorthMirrorPoint(i,:) = trace.GEO(1,:);
-                    trace.SouthMirrorPoint(i,:) = trace.GEO(1,:);
+                    NorthMirrorPoint(i,:) = trace.GEO(imins(1),:);
+                    SouthMirrorPoint(i,:) = trace.GEO(imins(1),:);
                 else
                     si = linspace(s1,s2,NptsI); % grid in s betwen mirror points
                     bi = interp1(s,trace.Blocal,si,'linear');
                     assert(all(bi./bm<=1.001)); % allow only a little fudge for numerics
                     I(i) = trapz(si,sqrt(1-min(bi./bm,1))); % integrate
-                    trace.NorthMirrorPoint(i,:) = interp1(trace.Blocal(1:imins(1)),trace.GEO(1:imins(1),:),bm,'linear'); % one mirror point
-                    trace.SouthMirrorPoint(i,:) = interp1(trace.Blocal(imins(1):end),trace.GEO(imins(1):end,:),bm,'linear'); % other mirror point
+                    NorthMirrorPoint(i,:) = interp1(trace.Blocal(1:imins(1)),trace.GEO(1:imins(1),:),bm,'linear'); % one mirror point
+                    SouthMirrorPoint(i,:) = interp1(trace.Blocal(imins(1):end),trace.GEO(imins(1):end,:),bm,'linear'); % other mirror point
                 end
             end
         end
@@ -233,25 +238,38 @@ for i2 = 1:N2,
         switch(Bm_option),
             case 'Bm',
                 trace.Bm = z;
-                trace.alpha0deg = asind(sqrt(trace.Bmin./trace.Bm));
                 trace.I = interp1(Bm,I,z,'linear');
                 trace.K = trace.I.*sqrt(trace.Bm);
+                trace.alpha0deg = asind(sqrt(trace.Bmin./trace.Bm));
+                % cover two ways we could get not-quite-90 degrees due to
+                % round off
+                trace.alpha0deg(trace.Bm <= trace.Bmin) = 90;
+                trace.alpha0deg(trace.I == 0) = 90;
             case 'a0',
                 trace.alpha0deg = z;
                 trace.Bm = trace.Bmin./sind(trace.alpha0deg).^2;
                 trace.I = interp1(Bm,I,trace.Bm,'linear');
-                trace.I(trace.alpha0deg==90) = 0; % equatorial case
+                trace.I(trace.alpha0deg==90) = 0; % force equatorial case
                 trace.K = trace.I.*sqrt(trace.Bm);
             case 'K',
                 trace.K = z;
                 trace.Bm = interp1(K,Bm,trace.K,'linear');
                 trace.I = trace.K./sqrt(trace.Bm);
-                trace.alpha0deg = asind(sqrt(trace.Bmin./Bm));
+                trace.alpha0deg = asind(sqrt(trace.Bmin./trace.Bm));
+                trace.alpha0deg(trace.K==0) = 90; % force equatorial case
             otherwise,
                 error('Unknown Bm_option %s',Bm_option);
         end
         trace.alpha0rads = trace.alpha0deg*pi/180;
         trace.RLL = onera_desp_lib_coord_trans(trace.GEO,'GEO2RLL',matlabd);
+        trace.NorthMirrorPoint = interp1(Bm,NorthMirrorPoint,trace.Bm,'linear');
+        trace.SouthMirrorPoint = interp1(Bm,SouthMirrorPoint,trace.Bm,'linear');
+        ifix = trace.Bm < Bmin; % should never happen, now that trace.Bmin = min(trace.Blocal)
+        if any(ifix), % use the point with smallest B, which should be near trace.Bmin
+            Nfix = sum(ifix);
+            trace.NorthMirrorPoint(ifix,:) = repmat(trace.GEO(iBmin,:),Nfix,1);
+            trace.SouthMirrorPoint(ifix,:) = repmat(trace.GEO(iBmin,:),Nfix,1);
+        end
         % find NorthPoint geographic LAT,LON in deg of northern crossing of
         % R=1
         fNorth = find(trace.RLL(:,2)>=median(trace.RLL(:,2)));
@@ -546,7 +564,7 @@ function [Lstar,traces] = test
 % run a short demo using all 3 grid types on a LAT/LON grid at R=1.0
 [LAT,LON] = ndgrid(35:2:80,0:15:359); % finer grid for demo
 % [LAT,LON] = ndgrid(40:4:80,0:30:359); % coarser grid for debugging
-if false, % dipole
+if true, % dipole
     field_model = 'dipole';
     options = {'DIPOLE'};
     kext = '';
