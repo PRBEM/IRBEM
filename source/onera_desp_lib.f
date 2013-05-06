@@ -163,6 +163,16 @@ c
      6        xIN1(isat), xIN2(isat), xIN3(isat),
      6        alti, lati, longi, xGEO )
 
+        if (xIN1(isat) .eq. baddata .and. xIN2(isat) .eq. baddata
+     &  .and. xIN3(isat) .eq.baddata) then
+           Lm(isat)=baddata
+           Lstar(isat)=baddata
+           XJ(isat)=baddata
+           BLOCAL(isat)=baddata
+           BMIN(isat)=baddata
+           GOTO 99
+        endif
+
 	    call set_magfield_inputs ( kext, maginput(1,isat), ifail )
 
 c        if (alti .le. 50.) ifail=-10 ! removed by TPO, 5/31/2011 - why would we force fail for alt<50km?
