@@ -2782,6 +2782,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'ntime_max.inc'
+      INCLUDE 'variables.inc'
 
       INTEGER*4 nmax,i,ntime, sysaxesIN, sysaxesOUT
       INTEGER*4 iyear(ntime_max),idoy(ntime_max),y,d
@@ -2795,6 +2796,13 @@ C
          d = idoy(i)
          s = secs(i)
 
+        if (xINV(1,i) .eq. baddata .and. xINV(2,i) .eq. baddata
+     &  .and. xINV(3,i) .eq.baddata) then
+           xOUTV(1,i) = baddata
+           xOUTV(2,i) = baddata
+           xOUTV(3,i) = baddata
+           goto 10
+        endif
 	 xIN(1) = xINV(1,i) ! copy each array element into 3x1 array
 	 xIN(2) = xINV(2,i)
          xIN(3) = xINV(3,i)
@@ -2805,6 +2813,7 @@ C
 	 xOUTV(2,i) = xOUT(2)
          xOUTV(3,i) = xOUT(3)
 
+10      continue
       ENDDO
 
       END
