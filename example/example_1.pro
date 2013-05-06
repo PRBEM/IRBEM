@@ -1,8 +1,11 @@
 pro compare_output, expect, calc, prefix,fmt
 	e = STRCOMPRESS(STRING(expect,format=fmt),/REMOVE_ALL)
 	c = STRCOMPRESS(STRING(calc,format=fmt),/REMOVE_ALL)
-	if e eq c then correct='Ok' else correct='*** discrepancy ***'
-	print,prefix,c,'         | ',e,'      | ',correct
+	myError=abs(calc/expect-1.)*100.
+;	if e eq c then correct='Ok' else correct='*** discrepancy ***'
+;	print,prefix,c,'         | ',e,'      | ',correct
+	if myError le 0.001 then correct='Ok' else correct='*** discrepancy ***'
+	print,prefix,c,'         | ',e,'      | ',myError,'% -> ',correct
 return
 end
 
@@ -75,11 +78,11 @@ result = call_external(lib_name, 'make_lstar_',$
 ntime,kext,options,sysaxes,iyear,idoy,ut, x1,x2,x3,$
 maginput,lm,lstar,blocal,bmin,xj,mlt, /f_value)
 
-print,'         Your distribution | Expected value |  Diagnostic'
-compare_output,6.6159597D0,Lm(0),    'Lm =     ','(f9.7)'
-compare_output,5.9074070D0,Lstar(0), 'L* =     ','(f9.7)'
-compare_output,104.54581D0,Blocal(0),'Blocal = ','(f9.5)'
-compare_output,104.15972D0,Bmin(0),  'Bmin =   ','(f9.5)'
+print,'         Your distribution | Expected value |  Error(%) -> Diagnostic'
+compare_output,6.6154250D0,Lm(0),    'Lm =     ','(f9.7)'
+compare_output,5.9544700D0,Lstar(0), 'L* =     ','(f9.7)'
+compare_output,104.52422D0,Blocal(0),'Blocal = ','(f9.5)'
+compare_output,104.17935D0,Bmin(0),  'Bmin =   ','(f9.5)'
 
 print,''
 print,'Testing make_lstar_shell_splitting ...'
@@ -126,9 +129,9 @@ result = call_external(lib_name, 'make_lstar_shell_splitting_',$
 ntime,Npa,kext,options,sysaxes,iyear,idoy,ut, x1,x2,x3,alpha,$
 maginput,lm,lstar,blocal,bmin,xj,mlt, /f_value)
 
-expectLstar=[6.3440260d0,6.3377330d0,6.2429260d0,6.0852281d0,5.9219087d0,5.9074070d0]
-expectBloc=[13739.408d0,892.84257d0,252.97473d0,139.37175d0,107.78491d0,104.54581d0]
-print,'         Your distribution | Expected value |  Diagnostic'
+expectLstar=[6.4019230d0,6.3878798d0,6.2932170d0,6.1326451d0,5.9692525d0,5.9544700d0]
+expectBloc=[13757.979d0,893.43930d0,252.96913d0,139.36545d0,107.77378d0,104.52422d0]
+print,'         Your distribution | Expected value |  Error(%) -> Diagnostic'
 for i=0,5 do compare_output,expectLstar(i), lstar(0,i),'L* =     ','(f9.7)'
 for i=0,5 do begin
    if expectBloc(i) LT 1000.D0 then compare_output,expectBloc(i), blocal(0,i),'blocal = ','(f9.5)'
@@ -150,8 +153,8 @@ Bgeo=dblarr(3)
 Bl=0.d0
 result = call_external(lib_name, 'get_field_', kext,options,sysaxes,iyear,idoy,ut, $
 x1,x2,x3, maginput,Bgeo, Bl,  /f_value)
-print,'         Your distribution | Expected value |  Diagnostic'
-compare_output,104.54581D0, bl,'blocal = ','(f9.5)'
+print,'         Your distribution | Expected value |  Error(%) -> Diagnostic'
+compare_output,104.52422D0, bl,'blocal = ','(f9.5)'
 
 print,''
 print,'Testing fly_in_ige ...'
@@ -195,36 +198,37 @@ expected_ige_energy=[$
 5.1961500d+0]
 
 expected_ige_flux=[$
-1.031546d10,$ 
-8.842727d09,$
-7.666364d09,$
-6.476364d09,$
-5.522727d09,$
-4.744546d09,$
-3.860909d09,$
-3.004546d09,$
-2.200909d09,$
-1.501818d09,$
-9.549091d08,$
-5.691818d08,$
-1.990000d08,$
-7.036364d07,$
-2.817273d07,$
-1.012818d07,$
-3.932727d06,$
-1.446364d06,$
-4.761818d05,$
-1.031091d05,$
-2.870909d04,$
-8.793636d03,$
-1.396545d03,$
-5.281818d02,$
-1.630454d02,$
-3.252273d01,$
-5.341818d00]
+1.08273d+10,$ 
+9.26455d+09,$ 
+8.01455d+09,$ 
+6.81091d+09,$ 
+5.80000d+09,$ 
+4.92636d+09,$ 
+3.99364d+09,$ 
+3.10000d+09,$ 
+2.26727d+09,$ 
+1.54636d+09,$ 
+9.82909d+08,$ 
+5.86364d+08,$ 
+2.01818d+08,$ 
+7.10818d+07,$ 
+2.83636d+07,$ 
+1.01427d+07,$ 
+3.91364d+06,$ 
+1.43455d+06,$ 
+4.69818d+05,$ 
+1.00955d+05,$ 
+2.78727d+04,$ 
+8.48091d+03,$ 
+1.33827d+03,$ 
+5.05273d+02,$ 
+1.55673d+02,$ 
+3.10218d+01,$ 
+5.09273d+00]
+
 
 result = call_external(lib_name, 'fly_in_ige_', launch_year,mission_duration,whichm,whatf,Nene,energy,Lower_flux,Mean_flux,Upper_flux,/f_value)
-print,'         Your distribution | Expected value |  Diagnostic'
+print,'         Your distribution | Expected value |  Error(%) -> Diagnostic'
 
 for i=0,Nene-1 do begin
    compare_output,expected_ige_energy(i), Energy(0,i),'Energy = ','(f9.7)'
@@ -256,16 +260,16 @@ expected_meo_gnss_energy=[$
 2.2400000d+0]
 
 expected_meo_gnss_flux=[$
-8.300000d05,$ 
-5.240000d05,$
-2.502730d05,$
-1.040270d05,$
-4.021820d04,$
-1.166450d04,$
-3.032730d03]
+8.17273d+05,$ 
+5.13000d+05,$
+2.43545d+05,$
+1.00664d+05,$
+3.87364d+04,$
+1.11864d+04,$
+2.90091d+03]
 
 result = call_external(lib_name, 'fly_in_meo_gnss_', launch_year,mission_duration,whichm,whatf,Nene,energy,Lower_flux,Mean_flux,Upper_flux,/f_value)
-print,'         Your distribution | Expected value |  Diagnostic'
+print,'         Your distribution | Expected value |  Error(%) -> Diagnostic'
 
 for i=0,Nene-1 do begin
    compare_output,expected_meo_gnss_energy(i), Energy(0,i),'Energy = ','(f9.7)'
