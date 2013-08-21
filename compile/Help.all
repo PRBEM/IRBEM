@@ -54,17 +54,17 @@ Make Variables
                        ENV=gnu64    Compile using Gnu Fortran (g77)
                                   Produce ELF 64-bit MSB dynamic lib.
 
-          OS=darwin      For darwin/MacOS.  The possible environments are...
+          OS=osx      For MacOSX.  The possible environments are...
           (Tip: make sure your Xcode installation is reasonably up-to-date)
 
                        ENV=gnu32     Compile using the Gnu-supplied gfortran.
-                                     Produce darwin-O 32-bit dynamic lib.
+                                     Produce Mach-O 32-bit dynamic lib.
                        ENV=gnu64     Compile using the Gnu-supplied gfortran.
-                                     Produce darwin-O 64-bit dynamic lib.
+                                     Produce Mach-O 64-bit dynamic lib.
                        ENV=intel32   Compile using the Intel ifort compiler.
-                                     Produce darwin-O 32-bit dynamic lib.
+                                     Produce Mach-O 32-bit dynamic lib.
                        ENV=intel64   Compile using the Intel ifort compiler.
-                                     Produce darwin-O 64-bit dynamic lib.
+                                     Produce Mach-O 64-bit dynamic lib.
 
           OS=linux32   For Linux 32-bit on an IBM PC, a Mac Power PC or a Dual Alpha.  
                        The possible environments are...
