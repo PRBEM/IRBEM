@@ -12,6 +12,7 @@ case !version.os of
     'linux':ext='so'
     'sunos':ext='so'
     'Win32':ext='dll'
+    'darwin':ext='dylib'
 endcase
 lib_name='../onera_desp_lib_'+!version.OS+'_'+$
    !version.ARCH+'.'+ext

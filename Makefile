@@ -265,20 +265,44 @@ WRAPPER_win64_cygwin64=64
 LIBNAME_win64_cygwin64=Win64_x86
 
 #------------------------------------------------------------------------------
-# Macros for Mach.
+# Macros for darwin.
 #------------------------------------------------------------------------------
 
-SHAREDEXT_mach=dylib
-NONSHAREDEXT_mach=a
-AROPTIONS_mach=rc
+SHAREDEXT_darwin=dylib
+NONSHAREDEXT_darwin=a
+AROPTIONS_darwin=rc
 
-FOPTIONS_SHARED_mach_gnu32=-w
-FOPTIONS_NONSHARED_mach_gnu32=-w
-FC_mach_gnu32=g95
-PIC_mach_gnu32=
-LDOPTIONS_mach_gnu32=-dynamic
-WRAPPER_mach_gnu32=32
-LIBNAME_mach_gnu32=mach
+FOPTIONS_SHARED_darwin_gnu32=-mno-align-double -ffixed-line-length-none -w -m32 -dynamiclib
+FOPTIONS_NONSHARED_darwin_gnu32=-c -w -ffixed-line-length-none -mno-align-double -m32
+FC_darwin_gnu32=gfortran
+PIC_darwin_gnu32=
+LDOPTIONS_darwin_gnu32=-dynamic
+WRAPPER_darwin_gnu32=32
+LIBNAME_darwin_gnu32=darwin_x86
+
+FOPTIONS_SHARED_darwin_gnu64=-mno-align-double -ffixed-line-length-none -w -m64 -dynamiclib
+FOPTIONS_NONSHARED_darwin_gnu64=-c -w -ffixed-line-length-none -mno-align-double -m64
+FC_darwin_gnu64=gfortran
+PIC_darwin_gnu64=
+LDOPTIONS_darwin_gnu64=-dynamic
+WRAPPER_darwin_gnu64=64
+LIBNAME_darwin_gnu64=darwin_x86_64
+
+FOPTIONS_SHARED_darwin_intel32=-w -dynamiclib
+FOPTIONS_NONSHARED_darwin_intel32=-c -w
+FC_darwin_intel32=ifort
+PIC_darwin_intel32=
+LDOPTIONS_darwin_intel32=-dynamic
+WRAPPER_darwin_intel32=32
+LIBNAME_darwin_intel32=darwin_x86
+
+FOPTIONS_SHARED_darwin_intel64=-w -dynamiclib
+FOPTIONS_NONSHARED_darwin_intel64=-c -w
+FC_darwin_intel64=ifort
+PIC_darwin_intel64=
+LDOPTIONS_darwin_intel64=-dynamic
+WRAPPER_darwin_intel64=64
+LIBNAME_darwin_intel64=darwin_x86_64
 
 #------------------------------------------------------------------------------
 # Compile/link entire distribution.
@@ -305,7 +329,10 @@ all.win32.cygwin32: all.build
 all.win64.cygwin64: all.build
 all.win32.mingw: all.build
 all.win64.mingw: all.build
-all.mach.gnu32: all.build
+all.darwin.gnu32: all.build
+all.darwin.gnu64: all.build
+all.darwin.intel32: all.build
+all.darwin.intel64: all.build
 all.sunos.sparc32: all.build
 all.sunos.sparc64: all.build
 all.sunos.gnu32: all.build
@@ -341,6 +368,9 @@ install: install.lib
 
 install.lib:
 	@echo Installing
+
+	@echo Creating $(INSTALLDIR)
+	mkdir -p $(INSTALLDIR)/matlab
 
 	@echo  Installing $(SOURCEDIR)/liboneradesp_$(LIBNAME_$(OS)_$(ENV)).$(NONSHAREDEXT_$(OS)) to $(INSTALLDIR)
 	cp $(SOURCEDIR)/liboneradesp_$(LIBNAME_$(OS)_$(ENV)).$(NONSHAREDEXT_$(OS)) $(INSTALLDIR)
