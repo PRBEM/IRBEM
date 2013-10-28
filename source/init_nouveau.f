@@ -270,8 +270,8 @@ c
 	  BIMF(3)=BzIMF_nt
 	  Al_ind=Al
           CALL GEO_GSM(xGEO,xSM)
-          CALL a2000(real(den),real(vel),real(BIMF),
-     &    real(dst),real(al_ind),real(xSM),BxSM,ifail)
+          CALL a2000(den,vel,BIMF,
+     &    dst,al_ind,xSM,BxSM,ifail)
           if (Ifail .eq. 0) CALL GSM_GEO(BxSM,Bxext)
        endif
 c
