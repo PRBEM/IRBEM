@@ -744,6 +744,7 @@ C
         REAL*8     pi,rad
         common /rconst/rad,pi
 C
+        CALL INITIZE
        colati = pi/2.d0 - lati*rad
 C
        x(1) = r*SIN(colati)*COS(longi*rad)
@@ -764,6 +765,7 @@ C
         REAL*8     pi,rad
         common /rconst/rad,pi
 C
+        CALL INITIZE
        SQ = x(1)*x(1) + x(2)*x(2)
        r = SQRT(SQ + x(3)*x(3))
        IF (SQ.NE.0.d0) GOTO 2
@@ -794,6 +796,7 @@ C
         REAL*8     pi,rad
         common /rconst/rad,pi
 C
+        CALL INITIZE
        colati = pi/2.d0 - lati*rad
 C
       st     = sin(colati)
@@ -821,6 +824,7 @@ C
         REAL*8     pi,rad
         common /rconst/rad,pi
 C
+        CALL INITIZE
        colati = pi/2.d0 - lati*rad
 C
       st     = sin(colati)
