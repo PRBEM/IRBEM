@@ -936,6 +936,9 @@ C
 
 	INTEGER*4 N,ierr
         REAL*8    year
+        INTEGER*4 year_error_reported ! only report year error once
+        save year_error_reported
+        DATA year_error_reported/0/ ! initially not reported
 c
       DATA G65/0.D0,-30334.D0,-2119.D0,-1662.D0,2997.D0,1594.D0,
      *1297.D0,-2038.D0,1292.D0,856.D0,957.D0,804.D0,479.D0,-390.D0,
@@ -1191,7 +1194,10 @@ c
 C
 	if ( (year.lt.1965.D0).or.(year.gt.2015.D0) ) then
 	   ierr=1
-	   write(*,999) year
+           if (year_error_reported .eq. 0) then
+              write(*,999) year
+              year_error_reported = 1
+           endif
 c	   goto 300 ! continue, just throw an error
 	endif
 c
