@@ -46,21 +46,42 @@
 
 	  <el>
 	    <li> Manually create your top-level folder "irbem"
-	    <li> Download the <a href = "http://irbem.svn.sourceforge.net/viewvc/irbem/trunk/data/?view=tar">matlab folder tarball</a>, 
+	    <li> Download the <a href ="http://sourceforge.net/p/irbem/code/HEAD/tarball?path=/trunk/matlab">matlab folder tarball</a>, 
 	      and untar/unzip its contents into a folder called "irbem\matlab"
-	    <li> Download the <a href = "http://irbem.svn.sourceforge.net/viewvc/irbem/trunk/matlab/?view=tar">data folder tarball</a>, 
+	    <li> Download the <a href = "http://sourceforge.net/p/irbem/code/HEAD/tarball?path=/trunk/data">data folder tarball</a>, 
 	      and untar/unzip its contents into a folder called "irbem\data"
-	    <li> Download the <a href = "http://irbem.svn.sourceforge.net/viewvc/irbem/trunk/onera_desp_lib_Win32_x86.dll">32-bit</a>
-	      windows DLL and <b>save it as "irbem\matlab\onera_desp_lib.dll"</b>
 	    <li> Open Matlab 
 	    <li> Under the File menu, click "Set Path"
 	    <li> Add "irbem\matlab" to your Matlab path 
 	    <li> Add "irbem\data" to your Matlab path
 	    <li> Click "Save" to save your new Matlab path for future sessions
-	    <li> Installation is complete
+	    <li> Download the <a href = "http://sourceforge.net/p/irbem/code/HEAD/tree/trunk/onera_desp_lib_Win32_x86.dll?format=raw">32-bit</a>
+	      windows DLL and <b>save it as "irbem\matlab\onera_desp_lib.dll"</b>
 	  </el>
 
     </p>
+
+  <p>
+    <font face="ARIAL, HELVETICA"><font size=+1><a name=WindowsInstallation><b>Sort of easy way for 64-bit windows users:</b>
+	  <ul>
+	    <li> Do all the steps above, except download the <a href = "http://sourceforge.net/p/irbem/code/HEAD/tree/trunk/onera_desp_lib_Win64_x86.dll?format=raw">64-bit</a>
+	      windows DLL and <b>save it as "irbem\matlab\onera_desp_lib.dll"</b>
+	    <li> Then you have to install the latest free Microsoft Visual Studio, including its "redistributables" (these are DLLs needed by the IRBEM library and Matlab requires this compiler to acceass any DLL)
+	    <li> Then you have to add the following DLLs to the matlab folder where onera_desp_lib.dll resides. (We're working on a version of the DLL that does not have these dependencies):
+	      <ul>
+		<li> (Except where noted, these are part of cygwin64, but can sometimes be found on-line without installing it)
+		<li> libgcc_s_seh-1.dll
+		<li> libgfortran-3.dll
+		<li> libquadmath-0.dll
+		<li> (These one may not be needed anymore, or only need for extras)
+		<li> libgsl-0.dll
+		<li> libgcc_s_sjlj-1.dll 
+		<li> libgslcblas-0.dll
+		<li> IEShims.dll (usually found in the internet explorer folder, e.g., c:\program files\internet explorer. Copy it)
+              </ul>
+	  </ul>
+  </p>
+    
     <p>
         <font face="ARIAL, HELVETICA"><font size=+1><b>Hard way for everyone else:</b>
 	  The IRBEM make file (call <i>make help</i> from irbem/trunk) will create
