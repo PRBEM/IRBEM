@@ -1,6 +1,9 @@
 /*
 An MPI program to genereate multiple Lstar/hmin values
 From time/loc parameters from a binary file
+
+Example compile command:
+mpicc -s -O3 -L/home/tpo26062/lib -o multi_Lstar_hmin.mpix multi_Lstar_hmin.c -lonera_desp_lib_linux_x86_64
  */
 
 #include <stdlib.h>
@@ -139,7 +142,8 @@ int main(int argc, char *argv[]) {
       fprintf(stderr,"%s: magic=<%s> file name: %s\n",__func__,HEADER_MAGIC,infilename);
       cleanup(-1);
     }
-    maginput_varies = header[HEADER_LEN] & 1;
+    maginput_varies = header[strlen(HEADER_MAGIC)] & 1;
+    printf("Master: maginput_varies=%i\n",maginput_varies);
     
     /* load data, allocate large arrays */
     
