@@ -269,7 +269,7 @@ C
        Bl = B0 ! reset to starting value
 15     continue ! prepare to do loop
        IFOUND = 0
-       DO J = 1,100
+       DO J = 1,500
          B1 = Bl ! store for comparison after step
          CALL sksyst(dsreb,x1,x2,Bl,Ifail)
          IF (Ifail.LT.0) THEN
