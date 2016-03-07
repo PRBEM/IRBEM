@@ -111,8 +111,15 @@ c
      6    alti, lati, longi, xGEO )
 	    
 	call set_magfield_inputs ( kext, maginput, ifail )
+ 
 	
 	if ( ifail.lt.0 ) goto 999
+         if (kext .eq. 13) then !special script to read files and
+                          !init parameters for TS07D
+!            PRINT *, 'CALLING TS07D INI FILE'
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+            call INIT_TS07D_TLPR
+        end if
 c
 c
         CALL find_foot(lati,longi,alti,stop_alt,

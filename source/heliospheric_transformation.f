@@ -61,10 +61,11 @@ c
 	REAL*8    secs
 	REAL*8    xHAE(3),xHEEQ(3)
 	REAL*8    T0,Lamda0,st,ct,sl,cl,so,co
+	 
 c
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
 C
-        CALL SUN2(iyr,idoy,secs,T0,Lamda0,st,ct,sl,cl,so,co)
+        CALL SUN2(iyr,idoy,secs, T0,  Lamda0,st,ct,sl,cl,so,co)
         CALL HAE_HEEQ(xHAE,xHEEQ)
        	RETURN
 	end
@@ -95,13 +96,30 @@ c
 c	
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
 c
-	xHEEQ(1) =  (ct*co-st*cl*so)*xHAE(1) + (ct*so+st*cl*co)*xHAE(2)
-     &              + st*sl*xHAE(3)
-	xHEEQ(2) = (-st*co-ct*cl*so)*xHAE(1) + (ct*cl*co-st*so)*xHAE(2)
-     &              + ct*sl*xHAE(3)
-        xHEEQ(3) =  sl*so*xHAE(1)            - sl*co*xHAE(2)           
+! c	xHEEQ(1) =  (ct*co-st*cl*so)*xHAE(1) + (ct*so+st*cl*co)*xHAE(2)	!old
+! 	xHEEQ(1) =  (co*ct-so*cl*st)*xHAE(1) + (-co*st-so*cl*ct)*xHAE(2)
+! c	&              + st*sl*xHAE(3)	!old
+!      &              + so*sl*xHAE(3)
+! c	xHEEQ(2) = (-st*co-ct*cl*so)*xHAE(1) + (ct*cl*co-st*so)*xHAE(2)	!old
+! 	xHEEQ(2) = (so*ct+co*cl*st)*xHAE(1) + (-so*st+co*cl*ct)*xHAE(2)
+! c    &              + ct*sl*xHAE(3)	!old
+!      &              + co*sl*xHAE(3)
+! c      xHEEQ(3) =  sl*so*xHAE(1)            - sl*co*xHAE(2)	!old
+!        xHEEQ(3) =  sl*st*xHAE(1)            + sl*ct*xHAE(2)
+! c    &              + cl*xHAE(3)	!old
+!      &              + cl*xHAE(3)
+! c
+
+	xHEEQ(1) =  (co*ct-so*cl*st)*xHAE(1) + (so*ct+co*cl*st)*xHAE(2)
+     &              + sl*st*xHAE(3)
+
+	xHEEQ(2) = (-co*st-so*cl*ct)*xHAE(1) + (-so*st+co*cl*ct)*xHAE(2)
+     &              + sl*ct*xHAE(3)
+
+       xHEEQ(3) =  so*sl*xHAE(1)            - co*sl*xHAE(2)
      &              + cl*xHAE(3)
-c
+
+ 
        	RETURN
 	END
 C
@@ -133,10 +151,11 @@ c
 	REAL*8    secs
 	REAL*8    xHAE(3),xHEEQ(3)
 	REAL*8    T0,Lamda0,st,ct,sl,cl,so,co
+	
 c
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
 C
-        CALL SUN2(iyr,idoy,secs,T0,Lamda0,st,ct,sl,cl,so,co)
+        CALL SUN2(iyr,idoy,secs, T0, Lamda0,st,ct,sl,cl,so,co)
         CALL HEEQ_HAE(xHEEQ,xHAE)
        	RETURN
 	end
@@ -202,10 +221,11 @@ c
 	REAL*8    secs
 	REAL*8    xHAE(3),xHEE(3)
 	REAL*8    T0,Lamda0,st,ct,sl,cl,so,co
+	 
 c
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
 C
-        CALL SUN2(iyr,idoy,secs,T0,Lamda0,st,ct,sl,cl,so,co)
+        CALL SUN2(iyr,idoy,secs, T0, Lamda0,st,ct,sl,cl,so,co)
         CALL HAE_HEE(xHAE,xHEE)
        	RETURN
 	end
@@ -237,9 +257,10 @@ c
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
 	DATA rad /57.29577951308D0/
 c
-        angle=(Lamda0+180.0D0)/rad
-	xHEE(1) =  COS(angle)*xHAE(1) + SIN(angle)*xHAE(2)
-	xHEE(2) = -SIN(angle)*xHAE(1) + COS(angle)*xHAE(2)
+        !angle=(Lamda0+180.0D0)/rad
+        angle=(Lamda0+180)/rad		!Kellerman (this angle is simply a rotation for aries (eq point) to earth sun line (not to ecliptic long of sun as stated, checked with position and output of Lamda0
+	xHEE(1) = COS(angle)*xHAE(1) + SIN(angle)*xHAE(2)
+	xHEE(2) = -SIN(angle)*xHAE(1) + COS(angle)*xHAE(2) 
         xHEE(3) =  xHAE(3)
 c
        	RETURN
@@ -265,7 +286,7 @@ C
 ! CALLING SEQUENCE: hee2hae1(iyr,idoy,secs,xHEE,xHAE)
 !---------------------------------------------------------------------------------------------------
 c
-        SUBROUTINE hee2hae1(iyr,idoy,secs,xHEE,xHAE)
+        SUBROUTINE hee2hae1(iyr,idoy,secs,xHEE,xHAE,TT)
 	INTEGER*4 iyr,idoy
 	REAL*8    secs
 	REAL*8    xHAE(3),xHEE(3)
@@ -273,7 +294,7 @@ c
 c
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
 C
-        CALL SUN2(iyr,idoy,secs,T0,Lamda0,st,ct,sl,cl,so,co)
+        CALL SUN2(iyr,idoy,secs, T0, Lamda0,st,ct,sl,cl,so,co)
         CALL HEE_HAE(xHEE,xHAE)
        	RETURN
 	end
@@ -300,16 +321,17 @@ c
         IMPLICIT NONE
 c
 	REAL*8 xHAE(3),xHEE(3)
-	REAL*8 T0,Lamda0,rad,angle,st,ct,sl,cl,so,co
-c	
-        COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
+	REAL*8 T0,Lamda0,rad,angle,st,ct,sl,cl,so,co, ang
+	REAL*8 :: pi
+	 
+        COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co        
 	DATA rad /57.29577951308D0/
-c
-        angle=(Lamda0+180.0D0)/rad
-	xHAE(1) =  COS(angle)*xHEE(1) - SIN(angle)*xHEE(2)
-	xHAE(2) =  SIN(angle)*xHEE(1) + COS(angle)*xHEE(2)
+		pi = ACOS(0.0D0)*2.0D0
+		angle=-(Lamda0+180)			!Kellerman
+		angle=angle/rad		
+	xHAE(1) =  COS(angle)*xHEE(1) + SIN(angle)*xHEE(2)
+	xHAE(2) =  -SIN(angle)*xHEE(1) + COS(angle)*xHEE(2)
         xHAE(3) =  xHEE(3)
-c
        	RETURN
 	END
 C
@@ -339,6 +361,7 @@ c
 	REAL*8    xGSE(3),xHEE(3)
         REAL*8    ERA,AQUAD,BQUAD
 	REAL*8    T0,Lamda0,st,ct,sl,cl,so,co
+	 
 c
         COMMON/GENER/ERA,AQUAD,BQUAD
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
@@ -347,11 +370,11 @@ C
 	do i=1,3
 	   xGSE(i)=xGSE(i)*ERA
 	enddo
-        CALL SUN2(iyr,idoy,secs,T0,Lamda0,st,ct,sl,cl,so,co)
+        CALL SUN2(iyr,idoy,secs, T0, Lamda0,st,ct,sl,cl,so,co)
         CALL GSE_HEE(xGSE,xHEE)
 	do i=1,3
 	   xHEE(i)=xHEE(i)/1.495985D8
-	enddo
+	enddo		
 	end
 !
 !---------------------------------------------------------------------------------------------------
@@ -380,6 +403,7 @@ c
 	REAL*8    xGSE(3),xHEE(3)
         REAL*8    ERA,AQUAD,BQUAD
 	REAL*8    T0,Lamda0,st,ct,sl,cl,so,co
+	 
 c
         COMMON/GENER/ERA,AQUAD,BQUAD
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
@@ -387,7 +411,7 @@ C
 	do i=1,3
 	   xHEE(i)=xHEE(i)*1.495985D8
 	enddo
-        CALL SUN2(iyr,idoy,secs,T0,Lamda0,st,ct,sl,cl,so,co)
+        CALL SUN2(iyr,idoy,secs, T0, Lamda0,st,ct,sl,cl,so,co)
         CALL GSE_HEE(xHEE,xGSE)
         CALL INITIZE
 	do i=1,3
@@ -419,6 +443,7 @@ c
 	REAL*8 xGSE(3),xHEE(3)
 	REAL*8 T0,Lamda0,rad,st,ct,sl,cl,so,co
 	REAL*8 r0,e,nu
+	
 c	
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co
 	DATA rad /57.29577951308D0/
@@ -447,15 +472,15 @@ C
 !              Planet. Space Sci., Vol 40, pp 711-717, 1992
 !
 ! INPUT: iyr -> year (long integer)
-!        iday -> day of year (long integer)
+!        idoy -> day of year (long integer)
 !        secs -> UT in seconds (double)
 !
 ! OUTPUT: T0 -> Time in Julian centuries (36525 days) from 12:00 UT on 1st January 2000 (double)
 !         Lamda0 -> The Sun's ecliptic longitude in deg. (double)
 !
-! CALLING SEQUENCE: SUN2(iyr,iday,secs,T0,Lamda0)
+! CALLING SEQUENCE: SUN2(iyr,idoy,secs,T0,Lamda0)
 !---------------------------------------------------------------------------------------------------
-	SUBROUTINE SUN2(iyr,iday,secs,T0,Lamda0,st,ct,sl,cl,so,co)
+	SUBROUTINE SUN2(iyr,idoy,secs,T0, Lamda0,st,ct,sl,cl,so,co)
 C
 	IMPLICIT NONE
 C
@@ -464,35 +489,77 @@ C good for years 1901 through 2099. accuracy 0.006 degree
 c
 c From M.A. Hapgood, Space physics coordinate transformations: a user guide
 c Planet. Space Sci., Vol 40, pp 711-717, 1992
+c last change A. C. Kellerman 18/02/2016
+c added epoch 2000 functionality and corrected errors in the Hapgood
+c formulae, i.e. hours input and errors with deg -> sin,tan functions
 C
-        INTEGER*4 JULDAY
-	INTEGER*4 iyr,iday,dom,month,MJD
-	REAL*8    secs,T0
-	REAL*8    M,Lamda,Lamda0,rad
-	REAL*8    omega,l,theta,st,ct,sl,cl,so,co
+	REAL*8 QCDFTDB
+	INTEGER*4 JULDAY
+	INTEGER*4 iyr,idoy, dom, MJD, NST, j
+	INTEGER*4    month, day, hour, mt, sc
+	REAL*8    secs, T0, TT, dj, dlm, varpi, ggeo, lgeo, rgeo, lon
+	REAL*8    M,Lamda,Lamda0,rad,aberr
+	REAL*8    omega,l,theta,st,ct,sl,cl,so,co, londif
+	REAL*8 :: dpi, dpi2
+	 
+	dpi = ACOS(0.0d0)*2.0D0
+	dpi2 = 2.0D0*dpi
 C
-	DATA rad /57.29577951308D0/
+	DATA rad /57.29577951308D0/ !180 /pi
 c
 	IF (iyr.LT.1901 .OR. iyr.GT.2099) RETURN
 C
-        dom=1
-	month=1
-        MJD=JULDAY(month,dom,iyr)+(iday-1)-2400001 !2400001=julday(11,17,1858)
-	T0=(MJD-51544.5D0)/36525.0D0   !equation (3)
-	M=357.528D0+35999.05D0*T0+0.04107D0*secs
-	Lamda=280.46D0+36000.772D0*T0+0.04107D0*secs
-	Lamda0=Lamda+(1.915D0-0.0048D0*T0)*SIN(M)+0.02D0*SIN(2.D0*M)  !equation (5)
-c
-	omega=(73.6667D0+0.013958D0*(MJD+3242.0D0)/365.25D0)/rad
-	l=7.25D0/rad
-	theta=ATAN(COS(l)*TAN(Lamda0/rad-omega))
+!         dom=1
+! 		month=1
+!        MJD=JULDAY(month,dom,iyr)+(idoy-1)-2400001 !2400001=julday(11,17,1858)    old
+
+	CALL DOY_AND_UT2DATE_AND_TIME(iyr,idoy,secs,month,day,hour,mt,sc)  
+	TT=QCDFTDB(iyr,month,day,hour,mt,sc,0)
+	!T0=(MJD-51544.5D0)/36525.0D0   !equation (3)
+	
+	T0=TT*1d0/(8.64d6*365.25d0)
+	dj=T0*36525d0	
+! 	M=357.528D0+35999.05D0*T0+0.04107D0*secs ! this is incorrect 
+        !the equation is based on hours (AKellerman ref. Hapgood '92)
+! 	Lamda=280.46D0+36000.772D0*T0+0.04107D0*secs	! as above
+! 	Lamda0=Lamda+(1.915D0-0.0048D0*T0)*SIN(M/rad)+0.02D0*SIN(2.D0*M/rad)  !equation (5)
+
+
+	dlm= ((100.4664568d0)+(mod (35999.3728565d0*T0, 360.0d0)))/rad
+	varpi=((102.9373481d0)+(0.3225654d0*T0))/rad
+	ggeo=dlm-varpi
+	lgeo=dlm+(1.915d0*SIN(ggeo)+0.02d0*SIN(2.0d0*ggeo))/rad
+	rgeo=(1.00014d0)-0.01617d0*COS(ggeo)-0.00014d0*COS(2.0d0*ggeo)
+	lon=lgeo+dpi
+	omega=((75.76d0)+1.397d0*T0)/rad
+	l=7.25d0/rad
+
+	aberr=20.0d0/3600.0d0/rad
+	londif=mod (lon-aberr-omega, dpi2)
+  
+	Lamda0 = lon*rad
+	
+! 	omega=(73.6667D0+0.013958D0*(MJD+3242.0D0)/365.25D0)/rad
+! 	l=7.25D0/rad
+! 	londif=Lamda0/rad-omega
+! 	londif=mod (londif, dpi2)					
+	IF (londif.gt.dpi) londif=londif-dpi2		
+	IF (londif.lt.-dpi) londif=londif+dpi2		
+	
+	theta=ATAN(COS(l)*TAN(londif))
+
+	IF (theta.gt.dpi) theta=theta-dpi2		!Kellerman
+	IF (theta.lt.-dpi) theta=theta+dpi2		!Kellerman
+
+	IF (abs(theta-londif).lt.dpi/2.0D0) theta=theta+dpi			!Kellerman
+	!WRITE(*,'((f15.5), i4, 2(f15.5))') Lamda0, idoy, theta*rad, omega*rad
+
 	st=SIN(theta)
 	ct=COS(theta)
 	sl=SIN(l)
 	cl=COS(l)
 	so=SIN(omega)
-	CO=COS(omega)
-c
+	CO=COS(omega)	
         RETURN
         END
 C

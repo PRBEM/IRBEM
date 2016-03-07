@@ -18,10 +18,20 @@ Installation Instructions
 -------------------------
 
 IRBEM-LIB has a makefile setup to automatically build the library.
-The following steps should be taken to build and install IRBEM-LIB.
+
+If you want to use the TS07d libraries then follow the additional instructions
+in the TS07D section below
+
+** TS07D setup:
+        a. Unpack the TS07d.tar.bz2 files to the directory of your choice.
+        b. Set the TS07D_DIR parameter in the Makefile to the same directory which
+            you unpacked the above file
+        c. Follow the installation instructions below to install IRBEM in the usual way
+
+** The following steps should be taken to build and install IRBEM-LIB:
 
         1. Set your current directory (cd) to the top level IRBEM-LIB
-	 directory.
+	 directory. 
 
         2. Compile/link the distribution.  First enter...
 
@@ -74,5 +84,4 @@ The following steps should be taken to build and install IRBEM-LIB.
            `source/...' directory by entering...
 
               make clean
-
 

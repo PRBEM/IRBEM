@@ -361,3 +361,74 @@
      &       /86400.d0)/(lastDecember-firstJanuary+1.d0)
 
        end
+
+!--------------------------------------------------------------------------
+
+! This function returns TT seconds from J2000.0 for
+! a given UTC date and time.
+! NAME: QCDFTDB
+! INPUT: year,month,day,hour,minute,sec,msec or arrays thereof
+!              UTC date and time (from 1/1/1972), UT1 time for 1900-1972
+! KEYWORDS: cdfepoin  calculate UTC date from CDF epoch value first
+! OUTPUT: TT (~TDB) seconds from J2000.0 (1/1/2000 12:00 TDB)
+! RESTRICTIONS: for array input before 2000.0 it works only if timespan
+!               less than 6 months. Also does not work when array spans
+!               years before and after 2000.
+!
+! HISTORY: created by m.fraenz@qmw.ac.uk 23/8/2001
+!       03/12/2001 array input MF
+!       addapted for IRBEM - A. C. Kellerman 01/02/2012
+!
+
+      FUNCTION QCDFTDB (year,month,day,hour,minute,sec,msec)
+      IMPLICIT NONE
+      INTEGER*4 year, month, day, hour, minute
+      INTEGER*4 sec, msec, yarr(23), marr(23)
+      INTEGER*4 jd, i, index0, yvar
+
+      REAL*8 cdfepoin, deltat, theta, jsec, QCDFTDB
+
+      ! some of this may be repetative from above
+      ! calculate Julian Date from J2000 (Seidelmann 12.92):
+      yvar=year+4800+(month-14)/12
+      jd=(yvar*1461)/4
+      jd=jd+((month-2-((month-14)/12)*12)*367)/12
+      jd=jd-2451545 ! subtract jd2000.0 to keep numbers small
+      yvar=yvar+100
+      jd=1D0*(jd-((yvar/100)*3)/4+day-32076)+0.5d0 ! for 00:00
+
+      ! convert to seconds and add seconds of day:
+      jsec=jd*86400d0
+      jsec=jsec+hour*3600d0
+      jsec=jsec+minute*60d0
+      jsec=jsec+sec+1D0
+      jsec=jsec+msec/1000d0
+      ! now add leapseconds:
+      IF (year.GE.2000) then
+          deltat=63.184d0
+      ELSE IF (year.GE.1972) THEN
+          deltat=42.184d0
+      DATA yarr / 1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,
+     *1982,1983,1985,1988,1990,1991,1992,1993,1994,1996,1997,1999,3000/
+      DATA marr / 7,1,1,1,1,1,1,1,1,7,7,7,7,1,1,1,7,7,7,1,7,1,0 /
+
+      i=1
+100   IF (year.GE.yarr(i)) then
+        deltat=deltat+1d0
+        i=i+1
+        goto 100
+      endif
+      IF ((i.LT.22).AND.(month.LT.marr(i-1))) deltat=deltat-1d0
+      ELSE IF (year.GE.1900) THEN
+        theta=(jsec/86400d0/36525d0)+1D0 ! Julian centuries from 1900.0
+      deltat=((((((((58353.42d0*theta-232424.66d0)*theta+372919.88d0)
+     **theta-303191.19d0)*theta+124906.15d0)*theta-18756.33d0)*
+     *theta-2637.8d0)*theta+815.20d0)*theta+87.24)*theta-2.44d0
+      ELSE
+        deltat=0d0
+      END IF
+      jsec=jsec+deltat
+
+      QCDFTDB = jsec
+      END
+

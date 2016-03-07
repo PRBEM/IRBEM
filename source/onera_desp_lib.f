@@ -153,6 +153,9 @@ C
 	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
+        if (kext .eq. 13) then !TS07D tail par init, only need it once
+            call INIT_TS07D_TLPR
+        end if
 
         DO isat = 1,ntime
 
@@ -174,6 +177,11 @@ c
         endif
 
 	    call set_magfield_inputs ( kext, maginput(1,isat), ifail )
+
+        if (kext .eq. 13) then !TS07D coeff init
+            call INIT_TS07D_COEFFS(iyearsat(isat),idoy(isat),ut(isat))
+        end if
+
 
 c        if (alti .le. 50.) ifail=-10 ! removed by TPO, 5/31/2011 - why would we force fail for alt<50km?
 	    if ( ifail.lt.0 ) then
@@ -289,6 +297,9 @@ C
 	k_ext = ext_field_select ( kext )
 c
         CALL INITIZE
+        if (kext .eq. 13) then !TS07D tail par init, only need it once
+            call INIT_TS07D_TLPR
+        end if
 
        DO isat = 1,ntime
 	  call init_fields ( kint, iyearsat(isat), idoy(isat),
@@ -299,6 +310,13 @@ c
      6        alti, lati, longi, xGEO )
 
 	  call set_magfield_inputs ( kext, maginput(1,isat), ifail )
+
+       if (kext .eq. 13) then !special script to read files and
+                          !init parameters for TS07D
+!            PRINT *, 'CALLING TS07D INI FILE'
+            call INIT_TS07D_COEFFS(iyearsat(isat),idoy(isat),ut(isat))
+       end if
+
 
 	  if ( ifail.lt.0 ) then
 	    DO IPA=1,Nipa
@@ -488,6 +506,14 @@ c
 
 	call set_magfield_inputs ( kext, maginput, ifail )
 
+        if (kext .eq. 13) then !special script to read files and
+                          !init parameters for TS07D
+!            PRINT *, 'CALLING TS07D INI FILE'
+            call INIT_TS07D_TLPR
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+       end if
+
+
 	if ( ifail.lt.0 ) then
 	       Lm=baddata
 	       Lstar=baddata
@@ -616,6 +642,13 @@ c
      6    alti, lati, longi, xGEO )
 
 	call set_magfield_inputs ( kext, maginput, ifail )
+        if (kext .eq. 13) then !special script to read files and
+                          !init parameters for TS07D
+!            PRINT *, 'CALLING TS07D INI FILE'
+            call INIT_TS07D_TLPR
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+        end if
+
 
 	if ( ifail.lt.0 ) then
  	       Lm=baddata
@@ -702,6 +735,13 @@ c
      6    alti, lati, longi, xGEO )
 
 	call set_magfield_inputs ( kext, maginput, ifail )
+        if (kext .eq. 13) then !special script to read files and
+                          !init parameters for TS07D
+!            PRINT *, 'CALLING TS07D INI FILE'
+            call INIT_TS07D_TLPR
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+        end if
+
 
 	if ( ifail.lt.0 ) then
 	       ind=0
@@ -775,6 +815,13 @@ c
      6    alti, lati, longi, xGEO )
 
 	call set_magfield_inputs ( kext, maginput, ifail )
+        if (kext .eq. 13) then !special script to read files and
+                          !init parameters for TS07D
+!            PRINT *, 'CALLING TS07D INI FILE'
+            call INIT_TS07D_TLPR
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+        end if
+
 
 	if ( ifail.lt.0 ) then
 	       xGEO(1)=baddata
@@ -872,6 +919,13 @@ c
      6    alti, lati, longi, xGEO )
 
 	call set_magfield_inputs ( kext, maginput, ifail )
+        if (kext .eq. 13) then !special script to read files and
+                          !init parameters for TS07D
+!            PRINT *, 'CALLING TS07D INI FILE'
+            call INIT_TS07D_TLPR
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+        end if
+
 
 	if ( ifail.lt.0 ) then
 	       posit(1)=baddata
@@ -945,6 +999,10 @@ c
      6     alti, lati, longi, xGEO )
 
       call set_magfield_inputs ( kext, maginput, ifail )
+        if (kext .eq. 13) then !special script to read files and
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+        end if
+
 
       if ( ifail.lt.0 ) then
          Bl=baddata
@@ -1012,6 +1070,9 @@ C
 c     Declare internal variables
       integer*4 isat
       INTEGER*4 k_ext,k_l,kint,ifail
+      if (kext.eq.13) then
+            call INIT_TS07D_TLPR
+      endif
 
       do isat = 1,ntime
          call GET_FIELD1(kext,options,sysaxes,iyearsat(isat),
@@ -1052,7 +1113,7 @@ c declare inputs
 	INTEGER*4    iyr
 	integer*4    idoy
 	real*8     UT
-	real*8     xGEO
+	real*8     xGEO(3) 
 c
 c Declare internal variables
         REAL*8     dyear
@@ -1163,7 +1224,7 @@ c
 	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 	   WRITE(6,*)
 	ENDIF
-	if (kext .gt. 12) THEN
+	if (kext .gt. 13) THEN
 	   k_ext=5
 	   WRITE(6,*)
 	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -1554,6 +1615,12 @@ c Input for Alexeev 2000
            Al=maginput(17)
            ifail = 0
            return
+        endif
+        if (kext .eq. 13) then
+            if (maginput(5).eq.baddata) return
+            Pdyn_nPa=maginput(5)
+            ifail=0
+            return
         endif
 
        print *, ' invalid kext'
@@ -2965,6 +3032,11 @@ c
      6    alti, lati, longi, xGEO )
 
 	call set_magfield_inputs ( kext, maginput, ifail )
+        if (kext .eq. 13) then !special script to read files and
+            call INIT_TS07D_TLPR
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+        end if
+
 
 	if ( ifail.lt.0 ) then
 	    DO IPA=1,Nipa

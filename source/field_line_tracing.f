@@ -279,7 +279,8 @@ c
        posit(2,ind)=x1(2)
        posit(3,ind)=x1(3)
        Bposit(ind)=Bl
-       DO J = 1,Nrebmax
+       DO J = 1,Nrebmax-1 ! this is the corrected version
+                            !, gives 3000 values, A. Kellerman
          CALL sksyst(-dsreb,x1,x2,Bl,Ifail)
          IF (Ifail.LT.0) RETURN
 	 ind=ind+1

@@ -61,6 +61,10 @@ c
       if ( ifail.lt.0 ) then
          RETURN
       endif
+      if (kext .eq. 13) then
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+      end if
+
 c     
       CALL CHAMP(xGEO,BxGEO,B1,Ifail)
       IF ((Ifail.LT.0).or.(B1.eq.baddata)) THEN
@@ -106,7 +110,10 @@ c     declare outputs
 
 c     declare internal variables
       integer*4  isat
-
+      if (kext .eq. 13) then
+        call INIT_TS07D_TLPR
+      end if
+    
       do isat = 1,ntime
          call GET_HEMI1(kext,options,sysaxes,
      &    iyearsat(isat),idoy(isat),UT(isat),

@@ -178,7 +178,12 @@ c
 	
 	if ( ifail.lt.0 ) RETURN
 c
-c     
+c    
+       if (kext .eq. 13) then !special script to read files and
+            call INIT_TS07D_COEFFS(iyearsat,idoy,ut)
+            call INIT_TS07D_TLPR
+       end if
+
       CALL find_bm_nalpha(xGEO,1,alpha,BL,BMIR,xGEOmir)
       IF (Bmir.NE.baddata) THEN
          Ilflag=0

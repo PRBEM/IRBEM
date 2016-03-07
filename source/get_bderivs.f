@@ -102,6 +102,10 @@ C
 c
       CALL INITIZE
 
+      if (kext .eq. 13) then !special script to read files and
+        call INIT_TS07D_TLPR
+      endif
+
       do isat = 1,ntime
 
          ! initialize outputs to baddata
@@ -125,6 +129,10 @@ c
          if ( ifail.lt.0 ) then
             goto 1000
          endif
+         if (kext .eq. 13) then !special script to read files and
+            call INIT_TS07D_COEFFS(iyearsat(isat),idoy(isat),ut(isat))
+         end if
+
 c
          CALL CHAMP(xGEO,B1GEO,B1,Ifail)
          IF ((Ifail.LT.0).or.(B1.eq.baddata)) THEN

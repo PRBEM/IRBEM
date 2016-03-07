@@ -276,6 +276,18 @@ c
        endif
 c
 C
+c Case for Tsyganenko and Sitnov 07d mag model (use of GSM coordinates)
+c input is Pdyn
+c
+       if (k_ext .eq. 13) then 
+          PARMOD(1)=Pdyn_nPa
+          CALL GEO_GSM(xGEO,xSM)
+          CALL TS07D (PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
+     &      BxSM(3))
+          CALL GSM_GEO(BxSM,Bxext)
+       endif
+
+
        Bl = 0.D0
        DO I = 1,3
          !WRITE(6,*)Bxext(I),Bxint(I)
