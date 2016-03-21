@@ -24,10 +24,10 @@ NULL=true
 #------------------------------------------------------------------------------
 IRBEM_NTIME_MAX=100000
 
-# set this directory to the directory where you bunzip2 the TS07d.tar.gz file
-# Don't include the bunzipped 'TS07D' path in the variable
-# e.g. TS07D_DIR="/var/IRBEM/irbem-code"
-TS07D_DIR="/var/IRBEM/irbem-code" #don't mark it
+# set this directory to the top directory where you have downloaded the tail par and coeff files
+# e.g. TS07D_DIR="/var/IRBEM/irbem-code/TS07D"
+# the environmental variable TS07_DATA_PATH overwrites this setting
+TS07D_DIR="/var/IRBEM/irbem-code/TS07D" #don't mark it
 
 #------------------------------------------------------------------------------
 # Directory locations.

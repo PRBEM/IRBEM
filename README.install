@@ -23,10 +23,24 @@ If you want to use the TS07d libraries then follow the additional instructions
 in the TS07D section below
 
 ** TS07D setup:
-        a. Unpack the TS07d.tar.bz2 files to the directory of your choice.
-        b. Set the TS07D_DIR parameter in the Makefile to the same directory which
-            you unpacked the above file
-        c. Follow the installation instructions below to install IRBEM in the usual way
+    Note, this revised setup differs from the previous installation instructions
+    so please read carefully:
+
+    a. Set either the TS07D_DIR parameter in the Makefile or a global variable TS07_DATA_PATH
+        to a directory of your choice, where you will will download the following files,
+        required for running the TS07d model
+    b. Download the required coeff files from http://rbspgway.jhuapl.edu/coeffs_mag_models
+    c. Download the tail par files from http://rbspgway.jhuapl.edu/sites/default/files/SpaceWeather/TAIL_PAR.zip
+
+    +++ NOTE THAT THE setup_ts07d_files.sh SHELL SCRIPT CAN BE USED TO ACCOMPLISH 
+        STEPS (d) AND (e) BELOW; The script will work on OSX and Linux only.
+
+        If you set the environmental variable TS07_DATA_PATH, then the script will work
+        from it's default location
+
+    d. Unpack the coeff*.par files to subdirectories Coeffs/YYYY_DOY/
+    e. Unzip TAIL_PAR.zip into a subdirectory named TAIL_PAR under the directory as specified in (a) above
+    f. Follow the installation instructions below to install IRBEM in the usual way
 
 ** The following steps should be taken to build and install IRBEM-LIB:
 
