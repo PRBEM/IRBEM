@@ -328,7 +328,7 @@ c
             GOTO 99
           endif
 c
-c Compute Bmin assuming 90° PA at S/C
+c Compute Bmin assuming 90ï¿½ PA at S/C
 	   k_l=0
            IPA=1
            CALL calcul_Lstar_opt(t_resol,r_resol,xGEO
@@ -1215,7 +1215,7 @@ c
 	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 	   WRITE(6,*)
 	ENDIF
-	if (kext .gt. 13) THEN
+	if (kext .gt. 14) THEN
 	   k_ext=5
 	   WRITE(6,*)
 	   WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -1607,6 +1607,7 @@ c Input for Alexeev 2000
            ifail = 0
            return
         endif
+
         if (kext .eq. 13) then
             if (maginput(5).eq.baddata) return
             Pdyn_nPa=maginput(5)
@@ -1614,6 +1615,15 @@ c Input for Alexeev 2000
             return
         endif
 
+        if (kext .eq. 14) then
+c Input for Mead-Tsyganenko
+           if (maginput(1).eq.baddata) return
+	       fkp=maginput(1)*1.d0/10.d0
+	       if (maginput(1).lt.0.d0 .or.
+     &         maginput(1).gt.90.d0) return
+           ifail = 0
+           return
+        endif
        print *, ' invalid kext'
 
        return
@@ -3055,7 +3065,7 @@ c      collect the B components for return in maginput() array
 	   maginput(16)=baddata
 	ENDIF
 c
-c Compute Bmin assuming 90° PA at S/C
+c Compute Bmin assuming 90ï¿½ PA at S/C
 	   k_l=0
            IPA=1
 c             all returned values except Bmin are subsequently overwritten
