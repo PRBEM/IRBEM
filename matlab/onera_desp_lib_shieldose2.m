@@ -136,15 +136,15 @@ function IDET = shieldose2_idet(IDET)
 
 if ~isnumeric(IDET),
     switch(lower(IDET)),
-        case {'al'}, IDET = 1;
-        case {'c','graph','graphite'}, IDET = 2;
-        case {'si'}, IDET = 3;
+        case {'al','aluminum','aluminium'}, IDET = 1;
+        case {'c','carbon','graph','graphite'}, IDET = 2;
+        case {'si','silicon'}, IDET = 3;
         case {'air'}, IDET = 4;
         case {'bone'}, IDET = 5;
-        case {'cafl'}, IDET = 6;
-        case {'gaar'}, IDET = 7;
-        case {'lifl'}, IDET = 8;
-        case {'sio2'}, IDET = 9;
+        case {'cafl','calcium'}, IDET = 6;
+        case {'gaar','gallium'}, IDET = 7;
+        case {'lifl','lithium'}, IDET = 8;
+        case {'sio2','glass'}, IDET = 9;
         case {'tissue'}, IDET = 10;
         case {'water','h2o'}, IDET = 11;
         otherwise
@@ -156,9 +156,9 @@ function IUNIT = shieldose2_iunit(IUNIT)
 
 if ~isnumeric(IUNIT),
     switch(lower(IUNIT)),
-        case {'mils'}, IUNIT = 1;
-        case {'g/cm^2','g/cm2'}, IUNIT = 2;
-        case {'mm'}, IUNIT = 3;
+        case {'mil','mils'}, IUNIT = 1;
+        case {'g/cm^2','g/cm2','gcm2','gpercm2'}, IUNIT = 2;
+        case {'mm','millimeters'}, IUNIT = 3;
         otherwise
             error('Unknown IUNIT "%s" in "%s"',IUNIT,mfilename);
     end
