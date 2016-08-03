@@ -34,7 +34,7 @@ function [ProtDose,ElecDose,BremDose,SolDose,TotDose] = onera_desp_lib_shieldose
 %                air, 4 = AIR DETECTOR
 %                bone, 5 = BONE DETECTOR
 %                CaFl, 6 = CALCIUM FLUORIDE DETECTOR
-%                GaAr, 7 = GALLIUM ARSENIDE DETECTOR
+%                GaAs, 7 = GALLIUM ARSENIDE DETECTOR
 %                LiFl, 8 = LITHIUM FLUORIDE DETECTOR
 %                SiO2, 9 = SILICON DIOXIDE DETECTOR
 %               Tissue, 10 = TISSUE DETECTOR
@@ -142,7 +142,7 @@ if ~isnumeric(IDET),
         case {'air'}, IDET = 4;
         case {'bone'}, IDET = 5;
         case {'cafl','calcium'}, IDET = 6;
-        case {'gaar','gallium'}, IDET = 7;
+        case {'gaas','gaar','gallium'}, IDET = 7;
         case {'lifl','lithium'}, IDET = 8;
         case {'sio2','glass'}, IDET = 9;
         case {'tissue'}, IDET = 10;
