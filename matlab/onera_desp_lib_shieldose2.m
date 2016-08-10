@@ -142,7 +142,7 @@ if ~isnumeric(IDET),
         case {'air'}, IDET = 4;
         case {'bone'}, IDET = 5;
         case {'cafl','calcium'}, IDET = 6;
-        case {'gaas','gaar','gallium'}, IDET = 7;
+        case {'gaar','gaas','gallium'}, IDET = 7;
         case {'lifl','lithium'}, IDET = 8;
         case {'sio2','glass'}, IDET = 9;
         case {'tissue'}, IDET = 10;
