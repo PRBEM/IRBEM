@@ -56,12 +56,15 @@ function [ProtDose,ElecDose,BremDose,SolDose,TotDose] = onera_desp_lib_shieldose
 % shieldose(...,'perYear',1)
 %   1 = specify that input is in flux per second,
 %     but output should be in rads per year
+% shieldose(...,'pad',true)
+%   pad depth array with 0.98,0.99,1.01, and 1.02 of all requested depths
 
 INUC = 3;
 NPTS = 20;
 perYear = 0;
 EUNIT = 1; % dummy--energy must be in MeV
 DURATN = 1; % dummy--shieldose treats flares as fluence & duration but we're not doing that
+pad = false;
 
 for i = 1:2:length(varargin),
     var = varargin{i};
@@ -74,6 +77,8 @@ for i = 1:2:length(varargin),
             INUC = val;
         case {'npts'},
             NPTS = val;
+        case {'pad'},
+            pad = val;
         case {'peryear'},
             perYear = val;
         otherwise
@@ -81,9 +86,16 @@ for i = 1:2:length(varargin),
     end
 end
 
+depth = Target.depth(:);
+if pad,
+    depth = unique(cat(1,depth(:)*0.98,depth(:)*0.99,...
+        depth(:),depth(:)*1.01,depth(:)*1.02));
+end
+
+
 IDET = shieldose2_idet(Target.material);
 IUNIT = shieldose2_iunit(Target.unit);
-IMAX = length(Target.depth);
+IMAX = length(depth);
 
 [EMINS,EMAXS,ESin,SFLUXin,JSMAX] = shieldose2_spect(SolSpect);
 [EMINP,EMAXP,EPin,PFLUXin,JPMAX] = shieldose2_spect(ProtSpect);
@@ -105,7 +117,7 @@ BremDosePtr = libpointer('doublePtr',BremDose);
 SolDosePtr = libpointer('doublePtr',SolDose);
 TotDosePtr = libpointer('doublePtr',TotDose);
 
-calllib('onera_desp_lib','shieldose2_',IDET,INUC,IMAX,IUNIT,Target.depth,...
+calllib('onera_desp_lib','shieldose2_',IDET,INUC,IMAX,IUNIT,depth,...
     EMINS,EMAXS,EMINP,EMAXP,NPTSP,EMINE,EMAXE,NPTSE,...
     JSMAX,JPMAX,JEMAX,EUNIT,DURATN,...
     ESin,SFLUXin,EPin,PFLUXin,EEin,EFLUXin,...
@@ -117,11 +129,21 @@ ElecDose = get(ElecDosePtr,'value');
 BremDose = get(BremDosePtr,'value');
 TotDose = get(TotDosePtr,'value');
 
-SolDose = SolDose(1:IMAX,:);
-ProtDose = ProtDose(1:IMAX,:);
-ElecDose = ElecDose(1:IMAX,:);
-BremDose = BremDose(1:IMAX,:);
-TotDose = TotDose(1:IMAX,:);
+if pad,
+    % trim, re-order, restore duplicates
+    [du,~,ju] = unique(Target.depth); % du(ju) = Target.depths
+    [I,J] = ismember(depth,du); % depth(I) = du(J(I))
+    uiR(J(I)) = find(I);
+    iRetrieve = uiR(ju);    
+else
+    iRetrieve = (1:IMAX)';
+end
+
+SolDose = SolDose(iRetrieve,:);
+ProtDose = ProtDose(iRetrieve,:);
+ElecDose = ElecDose(iRetrieve,:);
+BremDose = BremDose(iRetrieve,:);
+TotDose = TotDose(iRetrieve,:);
 
 if perYear,
     yearseconds = 365*24*60*60;
