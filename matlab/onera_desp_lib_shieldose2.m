@@ -87,6 +87,32 @@ for i = 1:2:length(varargin),
 end
 
 depth = Target.depth(:);
+
+% compute maximum number of depths
+if pad,
+    max_Nd = floor(71/5);
+else
+    max_Nd = 71;
+end
+
+
+if length(depth)>max_Nd,
+    % break up into multiple calls for too many depths
+    ProtDose = nan(length(depth),3);
+    ElecDose = ProtDose;
+    BremDose = ProtDose;
+    SolDose = ProtDose;
+    TotDose = ProtDose;
+    tmpTarget = Target;
+    for i = 1:max_Nd:length(depth),
+        idep = i:min(length(depth),i+max_Nd-1);
+        tmpTarget.depth = Target.depth(idep);
+        [ProtDose(idep,:),ElecDose(idep,:),BremDose(idep,:),SolDose(idep,:),TotDose(idep,:)] = ...
+            onera_desp_lib_shieldose2(ProtSpect,ElecSpect,SolSpect,tmpTarget,varargin{:});
+    end
+    return
+end
+
 if pad,
     depth = unique(cat(1,depth(:)*0.98,depth(:)*0.99,...
         depth(:),depth(:)*1.01,depth(:)*1.02));
@@ -136,7 +162,7 @@ if pad,
     uiR(J(I)) = find(I);
     iRetrieve = uiR(ju);    
 else
-    iRetrieve = (1:IMAX)';
+    iRetrieve = (1:length(depth))';
 end
 
 SolDose = SolDose(iRetrieve,:);
