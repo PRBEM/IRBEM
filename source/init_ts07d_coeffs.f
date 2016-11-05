@@ -46,7 +46,7 @@
       IYR=iyear
       IDY=idoy
       IHR=floor(iut/3600d0)
-      IMN=floor((iut/3600d0)-IHR) * 60 
+      IMN=floor(((iut/3600d0)-IHR) * 60) 
       ISC=iut-IHR*3600-IMN*60
 
       MODMIN=MOD(IMN,5)
