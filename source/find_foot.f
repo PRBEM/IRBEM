@@ -19,6 +19,7 @@
 C S. Bourdarie (June 2004)
 c Modified S./ Bourdarie (July 2004)
 c Modified from find_bm and find_mirror_point by TPO (July 2008)
+c Modified to prevent overshooting into the other hemisphere ACK (Nov 2016)
 c
 C Routine to find foot point of field line at specified altitude and hemi
 C finds foot point at specified altitude to within 1 km
@@ -233,7 +234,14 @@ C
        BFOOTMAG = baddata
 
        dsreb = Lb/(Nreb*1.d0) ! step size
-C
+
+        ! introduced to prevent overshooting
+        ! where one may end up in the opposite hemisphere
+        ! Kellerman / Tenfjord
+       if (dsrep.GT.1) THEN
+        dsreb = 1
+       ENDIF
+
 C calcul du sens du depart 
 C
        CALL sksyst(-dsreb,xx0,x1,Bl,Ifail) ! southward step

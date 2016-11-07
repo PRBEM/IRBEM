@@ -1609,8 +1609,10 @@ c Input for Alexeev 2000
         endif
 
         if (kext .eq. 13) then
-            if (maginput(5).eq.baddata) return
-            Pdyn_nPa=maginput(5)
+c            if (maginput(5).eq.baddata) return
+c            Pdyn_nPa=maginput(5)
+c           no need for solar-wind inputs anymore
+c           they are read directly from the coefficient files
             ifail=0
             return
         endif

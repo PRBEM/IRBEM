@@ -19,28 +19,8 @@ Installation Instructions
 
 IRBEM-LIB has a makefile setup to automatically build the library.
 
-If you want to use the TS07d libraries then follow the additional instructions
-in the TS07D section below
-
-** TS07D setup:
-    Note, this revised setup differs from the previous installation instructions
-    so please read carefully:
-
-    a. Set either the TS07D_DIR parameter in the Makefile or a global variable TS07_DATA_PATH
-        to a directory of your choice, where you will will download the following files,
-        required for running the TS07d model
-    b. Download the required coeff files from http://rbspgway.jhuapl.edu/coeffs_mag_models
-    c. Download the tail par files from http://rbspgway.jhuapl.edu/sites/default/files/SpaceWeather/TAIL_PAR.zip
-
-    +++ NOTE THAT THE setup_ts07d_files.sh SHELL SCRIPT CAN BE USED TO ACCOMPLISH 
-        STEPS (d) AND (e) BELOW; The script will work on OSX and Linux only.
-
-        If you set the environmental variable TS07_DATA_PATH, then the script will work
-        from it's default location
-
-    d. Unpack the coeff*.par files to subdirectories Coeffs/YYYY_DOY/
-    e. Unzip TAIL_PAR.zip into a subdirectory named TAIL_PAR under the directory as specified in (a) above
-    f. Follow the installation instructions below to install IRBEM in the usual way
+If you want to use the TS07d libraries then follow the additional instructions 
+in the TS07D section below these instructions:
 
 ** The following steps should be taken to build and install IRBEM-LIB:
 
@@ -73,10 +53,11 @@ in the TS07D section below
            and top level IRBEM-LIB directories (from the `source/...'
            directory).
 
-           For example, to install the distribution in `/usr/local/irbem_lib'
+           For example, to install the distribution compiled with the OS and
+           ENV specified above to the directory `/usr/local/irbem_lib'
            enter...
 
-              make INSTALLDIR=/usr/local/irbem_lib install
+              make OS=sunos ENV=gnu64 INSTALLDIR=/usr/local/irbem_lib install
 
            The `INSTALLDIR' variable is described in the `make install.help'
            part of this step.
@@ -99,3 +80,34 @@ in the TS07D section below
 
               make clean
 
+** TS07D setup:
+
+    1. Set the global variable TS07_DATA_PATH to a directory of your choice
+       This directory will contain the tail par and coefficient files.
+       You will need ~8.5 GB space to for the files (2007-2016 coefficients)
+    2. run the setup_ts07d_files.sh script. If successful the go to (3)
+
+    +++ The setup_ts07d_files.sh bash script can be used to accomplish 
+        STEPS (a) through (d) BELOW. If it fails then you may have to change the script
+        or follow steps a-d manually
+
+        a. Download the required all.tgz file from http://rbspgway.jhuapl.edu/new_coeffs_mag_models
+          and put it in TS07_DATA_PATH directory
+        b. Download the TAIL_PAR.zip file from http://rbspgway.jhuapl.edu/sites/default/files/SpaceWeather/TAIL_PAR.zip, and put in the TS07_DATA_PATH directory
+
+        c. Unpack the coeff*.par files to subdirectories Coeffs/YYYY_DOY/
+        d. Unzip TAIL_PAR.zip into a subdirectory named TAIL_PAR under the TS07_DATA_PATH directory
+            specified in (a) above
+
+    3. Follow the installation instructions to install IRBEM in the usual way, if you haven't done that already
+
+    +++ ADDITIONAL NOTES (as documentation still requires updating)
+    +++ The IRBEM code will compile regardless of whether you have completed this setup procedure or not
+    +++ The code will fail if the tail par files are not found, however, only baddata (-1e31)
+        will be returned if coefficient files are not found. The code does output an error message 
+        in FORTRAN, which may not be visible if you are running the code from MATLAB, but will not 
+        cause an actual error.
+    +++ The code also will automatically round down to the nearest 5-min coefficient file. 
+        If you are running with a time resolution greater than 5 minutes, want to 
+        interpolate B-field results yourself, and decrease execution time, then restrict your
+        input times to multiples of 5-min with 0 sec.

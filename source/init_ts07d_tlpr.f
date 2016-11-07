@@ -12,7 +12,7 @@
       INTEGER i,TS7LEN ! dir length 
 
       CHARACTER*200 filename,FMT
-      CHARACTER*80 TS7DIR
+      CHARACTER*255 TS7DIR
       CHARACTER*255 ts07d_env
 
       COMMON /TSS/ TSS(80,5) ! tail pars
@@ -25,14 +25,12 @@
       else
         TS7DIR=TRIM(TS07D_DIR)
       endif
+
       i=len(TS7DIR)
       do while (TS7DIR(i:i) == ' ')
         i = i - 1  
       enddo
       TS7LEN=i
-      !TS7DIR=TS7DIR(1:TS7LEN)//'/TS07D' ! we now include this in the
-      !directory path
-        !      TS7LEN = TS7LEN+6
 
       DO 1001 IREAD=1,5
         WRITE(FMT,'("(A", I0, ",A20,I0,A4)")') TS7LEN

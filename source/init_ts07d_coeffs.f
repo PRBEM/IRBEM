@@ -15,33 +15,29 @@
       INTEGER*4 M_INX,N_INX
 
       INTEGER IYR,IDY,IHR,IMN,ISC
-      INTEGER TS7LEN,i,ierr,stat,statb(13) ! file i/o
+      INTEGER TS7LEN,ierr,stat,statb(13) ! file i/o
       LOGICAL OK ! I/O
 
       CHARACTER*18 PAR_FNAME
-      CHARACTER*255 filename,FMT
-      CHARACTER*255 TS7DIR
+      CHARACTER*200 filename,FMT
+      CHARACTER*80 TS7DIR
       CHARACTER*255 ts07d_env
 
       PARAMETER (NTOT=101)
 
       COMMON /TS07D_DATA/ M_INX,N_INX,PDYN,TILT,A07(NTOT)
+
       CALL GETENV('TS07_DATA_PATH', ts07d_env)
       if (LEN_TRIM(ts07d_env).ne.0) then
         TS7DIR=TRIM(ts07d_env)
       else
         TS7DIR=TRIM(TS07D_DIR)
       endif
-
       i=len(TS7DIR)
       do while (TS7DIR(i:i) == ' ')
         i = i - 1  
       enddo
-
-      ! TS7DIR=TS7DIR(1:TS7LEN)//'/TS07D' ! now included in the directory
-      ! path
-      ! TS7LEN = TS7LEN+6
-       TS7LEN=i
+      TS7LEN=i
 
       IYR=iyear
       IDY=idoy
@@ -54,6 +50,9 @@
      +iyear,'_',idoy,'_',IHR,'_',IMN-MODMIN,'.par' 
 
 C     TS7LEN is the directory length
+c      WRITE(FMT,'("(A", I0, ",A8,A18)")') TS7LEN
+c      write(filename,FMT), TS7DIR(1:TS7LEN),'/Coeffs/',PAR_FNAME
+
       WRITE(FMT,'("(A", I0, ",A8,I4,A1,I0.3,A1,A18)")') TS7LEN
       write(filename,FMT), TS7DIR(1:TS7LEN),'/Coeffs/',iyear,'_',
      * idoy,'/',PAR_FNAME
@@ -76,18 +75,29 @@ c check that filename exists:
       READ (1,101) PDYN
       READ (1,101) TILT
 
-    
+c      print *, filename
+c      do i=1,NTOT
+c        write(*,*) 'i=',i,', A07=',A07(i)
+c        call sleep(1)
+c      enddo
+c      write(*,*) COEFF_G, COEFF_B_RMS, M_INX, N_INX, PDYN, TILT
+c      call sleep(10)
+
  100  FORMAT(G15.6)                                         
  101  FORMAT(7x,G15.6)                                            
- 102  FORMAT(7x,I16)                                            
+ 102  FORMAT(7x,I15)                                            
       CLOSE(1)                                        
+
+      
 !      print *, filename
       VXGSE=-400.  !  GSE COMPONENTS OF SOLAR WIND VELOCITY VECTOR; THIS PARTICULAR CHOICE
       VYGSE=   0.  !   IS MADE IN ORDER TO MAKE THE GSW SYSTEM IDENTICAL TO THE STANDARD GSM
       VZGSE=   0.
 
+
       call RECALC_08 (IYR,IDY,IHR,IMN,ISC,VXGSE,VYGSE,VZGSE) ! CALCULATES TILT ANGLE AND
 C                                                                  UPDATES MAIN FIELD COEFFICIENTS      
+
       else
         print *, 'TS07d error: No Coeff files exist for ',iyear,idoy
         print *, 'TS07d error: filename: ',filename,' does not exist'

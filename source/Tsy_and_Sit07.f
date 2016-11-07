@@ -2,54 +2,46 @@ c@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 c Implemented by A. C. Kellerman, including improved calls to
 c bessj from Jay Albert (TS07j.f)
 
-      !SUBROUTINE TS07D (PARMOD,XGSM,YGSM,ZGSM,BX,BY,BZ)
       SUBROUTINE TS07D (XGSM,YGSM,ZGSM,BX,BY,BZ)
-      
-      IMPLICIT  REAL * 8  (A - H, O - Z)
-      REAL*8 TSS,TSO,TSE,PDYN,XGSM,YGSM,ZGSM,BX,BY,BZ
-      REAL*8 A07  
+    
+      REAL*8 XGSM,YGSM,ZGSM,BX,BY,BZ,PSS
+      REAL*8 PDYN,TILT
       INTEGER*4 M_INX,N_INX
     
       PARAMETER(NTOT=101)
-!      CHARACTER*80 NAMETSS(5),NAMETSO(5,4),NAMETSE(5,4)
-!      REAL*8 PARMOD(10)
-!      DIMENSION CXY(101,101),CJY(101,101),XX(101),ZZ(101)
 
       COMMON /GEOPACK1/ AAA(10),SPS,CPS,BBB(3),PSI,CCC(18)
-!      COMMON /INPUT/ PDYN
-!      COMMON /TSTIME/ IYR,IDY,IHR,IMN,ISC
-      COMMON /TSS/ TSS(80,5)
-      COMMON /TSO/ TSO(80,5,4)
-      COMMON /TSE/ TSE(80,5,4)
 
-      DIMENSION BXTS(5),BXTO(5,4),BXTE(5,4)
-      DIMENSION BYTS(5),BYTO(5,4),BYTE(5,4)
-      DIMENSION BZTS(5),BZTO(5,4),BZTE(5,4)
+      REAL*8 BXCF,BYCF,BZCF
+      REAL*8 BXR11,BYR11,BZR11
+      REAL*8 BXR12,BYR12,BZR12
+      REAL*8 BXR21a,BYR21a,BZR21a
+      REAL*8 BXR21s,BYR21s,BZR21s
+
+      REAL*8, DIMENSION(5) :: BXTS,BYTS,BZTS !(5),BXTO(5,4),BXTE(5,4)
+      REAL*8, DIMENSION(5,4) :: BXTO,BYTO,BZTO,BXTE,BYTE,BZTE
       COMMON /TS07D_DATA/ M_INX,N_INX,PDYN,TILT,A07(NTOT)
 
-!      CALL EXTMODEL (1,PSI,XGSM,YGSM,ZGSM,BX,BY,BZ) !GSM ONLY
-      CALL EXTERN_07 (0,A07,NTOT,M_INX,N_INX,PSI,PDYN,XGSM,YGSM,ZGSM,
+      PSS = PSI 
+
+c      print *, '========================'
+c      print *, 'M_INX = ',M_INX
+c      print *, 'N_INX = ',N_INX
+c      print *, 'PDYN = ',PDYN
+c      print *, 'TILT = ', TILT
+c      print *, 'PSI = ', PSI 
+c      print *, '========================'
+          
+      CALL EXTERN_07 (0,A07,NTOT,M_INX,N_INX,PSS,PDYN,XGSM,YGSM,ZGSM,
      *BXCF,BYCF,BZCF,
      *BXTS,BYTS,BZTS,BXTO,BYTO,BZTO,BXTE,BYTE,BZTE,
      *BXR11,BYR11,BZR11,BXR12,BYR12,BZR12,BXR21a,BYR21a,BZR21a,BXR21s,
      *BYR21s,BZR21s,BX,BY,BZ)
 
-c      PRINT *,'     Main field:'
-c      PRINT *,' HXGSM,HYGSM,HZGSM=',HXGSM,HYGSM,HZGSM
-c      PRINT *,' '
-c      PRINT *,'   External field:'
-
-c      PRINT *, 'PSI ',PSI
-c      PRINT *,' PDYN ',PDYN
-c      PRINT *,' XGSM,YGSM,ZGSM=',XGSM,YGSM,ZGSM
-c      PRINT *,' BXGSM,BYGSM,BZGSM=',BX,BY,BZ
-c      PRINT *,' '
-c      PRINT *,'  Geodipole tilt (degrees):', PSI*57.29578
-   
       RETURN
-c
+
       END
-C
+
 c
 c%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 c
@@ -3805,6 +3797,7 @@ C
       SPS=DIP1*X1+DIP2*X2+DIP3*X3
       CPS=SQRT(1.-SPS**2)
       PSI=ASIN(SPS)
+
 C
 C   ELEMENTS OF THE MATRIX GEO TO GSW ARE THE SCALAR PRODUCTS:
 C
