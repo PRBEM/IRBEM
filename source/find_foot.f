@@ -238,7 +238,7 @@ C
         ! introduced to prevent overshooting
         ! where one may end up in the opposite hemisphere
         ! Kellerman / Tenfjord
-       if (dsrep.GT.1) THEN
+       if (dsreb.GT.1) THEN
         dsreb = 1
        ENDIF
 
