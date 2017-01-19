@@ -18,8 +18,12 @@ c bessj from Jay Albert (TS07j.f)
       REAL*8 BXR21a,BYR21a,BZR21a
       REAL*8 BXR21s,BYR21s,BZR21s
 
-      REAL*8, DIMENSION(5) :: BXTS,BYTS,BZTS !(5),BXTO(5,4),BXTE(5,4)
+      REAL*8, DIMENSION(5) :: BXTS,BYTS,BZTS
       REAL*8, DIMENSION(5,4) :: BXTO,BYTO,BZTO,BXTE,BYTE,BZTE
+! for compatibility with older compilers:
+!      REAL*8 BXTS(5),BYTS(5),BZTS(5)
+!      REAL*8 BXTO(5,4),BYTO(5,4),BZTO(5,4),BXTE(5,4),BYTE(5,4),BZTE(5,4)
+
       COMMON /TS07D_DATA/ M_INX,N_INX,PDYN,TILT,A07(NTOT)
 
       PSS = PSI 

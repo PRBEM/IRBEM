@@ -322,7 +322,7 @@ c
 c
 	REAL*8 xHAE(3),xHEE(3)
 	REAL*8 T0,Lamda0,rad,angle,st,ct,sl,cl,so,co, ang
-	REAL*8 :: pi
+	REAL*8 pi
 	 
         COMMON /sunMAH/T0,Lamda0,st,ct,sl,cl,so,co        
 	DATA rad /57.29577951308D0/
@@ -497,10 +497,10 @@ C
 	INTEGER*4 JULDAY
 	INTEGER*4 iyr,idoy, dom, MJD, NST, j
 	INTEGER*4    month, day, hour, mt, sc
-	REAL*8    secs, T0, TT, dj, dlm, varpi, ggeo, lgeo, rgeo, lon
-	REAL*8    M,Lamda,Lamda0,rad,aberr
-	REAL*8    omega,l,theta,st,ct,sl,cl,so,co, londif
-	REAL*8 :: dpi, dpi2
+	REAL*8 secs, T0, TT, dj, dlm, varpi, ggeo, lgeo, rgeo, lon
+	REAL*8 M,Lamda,Lamda0,rad,aberr
+	REAL*8 omega,l,theta,st,ct,sl,cl,so,co, londif
+	REAL*8 dpi, dpi2
 	 
 	dpi = ACOS(0.0d0)*2.0D0
 	dpi2 = 2.0D0*dpi

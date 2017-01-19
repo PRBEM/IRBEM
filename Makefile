@@ -208,6 +208,14 @@ LDOPTIONS_linux64_pgi64=-shared
 WRAPPER_linux64_pgi64=64
 LIBNAME_linux64_pgi64=linux_x86_64
 
+FOPTIONS_SHARED_linux64_pgfortran64=-Mnosecond_underscore -fast 
+FOPTIONS_NONSHARED_linux64_pgfortran64=-c -fast
+FC_linux64_pgfortran64=pgfortran
+PIC_linux64_pgfortran64=-fPIC
+LDOPTIONS_linux64_pgfortran64=-shared
+WRAPPER_linux64_pgfortran64=64
+LIBNAME_linux64_pgfortran64=linux_x86_64
+
 FOPTIONS_SHARED_linux64_gfortran64=-mno-align-double -fno-second-underscore -w -m64
 FOPTIONS_NONSHARED_linux64_gfortran64=-c -mno-align-double -w -m64
 FC_linux64_gfortran64=gfortran -std=legacy -ffixed-line-length-none
@@ -333,6 +341,7 @@ all.linux64.intel64_debug: all.build
 all.linux64.gnu32: all.build
 all.linux64.gnu64: all.build
 all.linux64.pgi64: all.build
+all.linux64.pgfortran64: all.build
 all.linux64.gfortran64: all.build
 all.win32.cygwin32: all.build
 all.win64.cygwin64: all.build

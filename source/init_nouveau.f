@@ -279,17 +279,21 @@ C
 c Case for Tsyganenko and Sitnov 07d mag model (use of GSM coordinates)
 c input is Pdyn
 c
-       if (k_ext .eq. 13) then 
-!          PARMOD(1)=Pdyn_nPa
+       IF (k_ext .eq. 13) THEN 
+c M. Sitnov and G. Stevens recommend limiting the valid output to 20 Re and
+c less:
+       IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+     &    .GT.400.D0) THEN 
+             Ifail=-1
+             RETURN
+          ENDIF
+
           CALL GEO_GSM(xGEO,xSM)
-!          CALL TS07D (PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
-!     &      BxSM(3))
           CALL TS07D (xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
      &      BxSM(3)) ! note that no solar wind input is necessary as it is
                     ! included through the TS07D common block
           CALL GSM_GEO(BxSM,Bxext)
        endif
-
 
        Bl = 0.D0
        DO I = 1,3
