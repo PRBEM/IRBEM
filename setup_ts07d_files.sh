@@ -3,7 +3,7 @@
 # modified Nov 7, 2016 to automate download and unpacking
 
 cd $TS07_DATA_PATH # by default we specify the global variable
-echo "TS07_DATA_PATH: $TS07_DAT_PATH"
+echo "TS07_DATA_PATH: $TS07_DATA_PATH"
 
 COEFF_DIR=$TS07_DATA_PATH/Coeffs
 TAIL_PAR_DIR=$TS07_DATA_PATH/TAIL_PAR
