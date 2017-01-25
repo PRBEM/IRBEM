@@ -280,8 +280,8 @@ c Case for Tsyganenko and Sitnov 07d mag model (use of GSM coordinates)
 c input is Pdyn
 c
        IF (k_ext .eq. 13) THEN 
-c M. Sitnov and G. Stevens recommend limiting the valid output to 20 Re and
-c less:
+c M. Sitnov and G. Stephens recommend limiting the valid output to 20 Re and
+c less based on the current (at the time) expansion:
        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.400.D0) THEN 
              Ifail=-1
