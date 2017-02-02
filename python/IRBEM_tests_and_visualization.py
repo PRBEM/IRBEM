@@ -199,3 +199,15 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
     ax.set_ylabel('y GEO')
     ax.set_zlabel('z GEO')
     return
+    
+def test_find_magequator():
+    model = IRBEM(options = [0,0,0,0,0])
+    X = {}
+    X['x1'] = 651
+    X['x2'] = 63
+    X['x3'] = 15.9
+    X['dateTime'] = '2015-02-02T06:12:43'
+    maginput = {'Kp':40.0}
+    model.find_magequator(X, maginput, STATUS_FLAG = False)
+    print(model.find_magequator_output)
+    return

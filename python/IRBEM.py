@@ -144,7 +144,7 @@ class IRBEM:
         ut, x1, x2, x3 = [doubleArrType() for i in range(4)]
         
         # Prep magentic field model inputs        
-        maginput = self.prepMagInput(maginput)
+        maginput = self._prepMagInput(maginput)
         
         # Now fill the input time and model sampling (s/c location) parameters.
         for dt in range(nTimePy):
@@ -198,8 +198,8 @@ class IRBEM:
         MOD:     2017-01-09
         """
         # Prep the magnetic field model inputs and samping spacetime location.
-        self.prepMagInput(maginput)
-        iyear, idoy, ut, x1, x2, x3 = self.prepTimeLoc(X)
+        self._prepMagInput(maginput)
+        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
         
         # DEFINE OUTPUTS HERE        
         positType = (((ctypes.c_double * 3) * 1000) * 48)
@@ -250,8 +250,8 @@ class IRBEM:
         a = ctypes.c_double(alpha)
         
         # Prep the magnetic field model inputs and samping spacetime location.
-        self.prepMagInput(maginput)
-        iyear, idoy, ut, x1, x2, x3 = self.prepTimeLoc(X)
+        self._prepMagInput(maginput)
+        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
         
         blocal, bmin = [ctypes.c_double(-9999) for i in range(2)]
         positType = (3 * ctypes.c_double)
@@ -294,8 +294,8 @@ class IRBEM:
         MOD:     2016-11-09
         """
         # Prep the magnetic field model inputs and samping spacetime location.
-        self.prepMagInput(maginput)
-        iyear, idoy, ut, x1, x2, x3 = self.prepTimeLoc(X)        
+        self._prepMagInput(maginput)
+        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)        
         
         stop_alt = ctypes.c_double(stopAlt)
         hemi_flag = ctypes.c_int(hemiFlag)
@@ -347,8 +347,8 @@ class IRBEM:
         R0 = ctypes.c_double(R0) 
 
         # Prep the magnetic field model inputs and samping spacetime location.
-        self.prepMagInput(maginput)
-        iyear, idoy, ut, x1, x2, x3 = self.prepTimeLoc(X)
+        self._prepMagInput(maginput)
+        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
         
         # Output variables
         positType = ((ctypes.c_double * 3) * 3000)
@@ -377,9 +377,42 @@ class IRBEM:
         'bmin':bmin.value, 'xj':xj.value}        
         return self.trace_field_line2_output
         
-    def prepMagInput(self, inputDict = None):
+    def find_magequator(self, X, maginput, STATUS_FLAG = False):
         """
-        NAME:  prepMagInput(self, inputDict)
+        NAME: find_magequator(self, X, maginput, STATUS_FLAG = False)
+        USE:  This function finds the coordinates of the magnetic equator from 
+              tracing the magntic field line from the input location.
+        INPUTS: X is a dictionary with  single, non-array values in the 
+              'dateTime', 'x1', 'x2', and 'x3' keys. maginput is a dictionary
+              with model key:input pairs.
+        RETURNS: Dictionary of bmin and XGEO. bmin is the magntitude of the 
+              magnetic field at equator. XGEO is an array of [xGEO,yGEO,zGEO].
+        AUTHOR: Mykhaylo Shumko
+        MOD:     2017-02-02
+        """ 
+        print('In development, use caution!')
+        
+        # Prep the magnetic field model inputs and samping spacetime location.
+        self._prepMagInput(maginput)
+        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
+        
+        # Define outputs
+        bmin = ctypes.c_double(-9999) 
+        XGEOType = (ctypes.c_double * 3)
+        XGEO = XGEOType(-9999, -9999, -9999)
+        
+        self.irbem.find_magequator1_(ctypes.byref(self.kext), \
+                ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
+                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
+                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
+                ctypes.byref(self.maginput), ctypes.byref(bmin), \
+                ctypes.byref(XGEO))
+        self.find_magequator_output = {'bmin':bmin.value, 'XGEO':np.array(XGEO)}
+        return self.find_magequator_output
+        
+    def _prepMagInput(self, inputDict = None):
+        """
+        NAME:  _prepMagInput(self, inputDict)
         USE:   Prepares magnetic field model inputs.
         INPUT: A dictionary containing the maginput keys in either numpy 
               arrays, lists, ints, or doubles. The keys must be some of these: 
@@ -442,9 +475,9 @@ class IRBEM:
             ' Try a dictionary of numpy arrays, lists, ints or floats')
         return self.maginput
         
-    def prepTimeLoc(self, X):
+    def _prepTimeLoc(self, X):
         """
-        NAME:  prepTimeLoc(self, X)
+        NAME:  _prepTimeLoc(self, X)
         USE:   Prepares spacetime outputs.
         INPUT: A dictionary, X containing the time and sampling location. 
                Input keys must be 'dateTime', 'x1', 'x2', 'x3'.
