@@ -104,7 +104,7 @@ class IRBEM:
         
     def make_lstar(self, X, maginput, STATUS_FLAG = False):
         """
-        NAME: call_make_lstar(self, X, kp)
+        NAME: call_make_lstar(self, X, maginput)
         USE:  Runs make_lstar1() from the IRBEM-LIB library. This function 
               returns McLlwain L, L*, blocal, bmin, xj, and MLT from the 
               position from input location.
