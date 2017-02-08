@@ -390,7 +390,6 @@ class IRBEM:
         AUTHOR: Mykhaylo Shumko
         MOD:     2017-02-02
         """ 
-        print('In development, use caution!')
         
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
@@ -401,6 +400,8 @@ class IRBEM:
         XGEOType = (ctypes.c_double * 3)
         XGEO = XGEOType(-9999, -9999, -9999)
         
+        if STATUS_FLAG:
+            print('Running IRBEM find_magequator')
         self.irbem.find_magequator1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \

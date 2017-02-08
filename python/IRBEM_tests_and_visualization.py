@@ -173,7 +173,7 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
         LLA['x2'] = lat
         LLA['x3'] = i*dLon
         LLA['dateTime'] = '2015-02-02T06:12:43'
-        maginput = {'Kp':40.0}
+        maginput = {'Kp':0.0}
         out = model.trace_field_line(LLA, maginput, STATUS_FLAG = False)
         # pltDensity is to plot every pltDensity location of the field line,
         # to ease the graphical visualization. 
