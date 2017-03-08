@@ -125,6 +125,9 @@ class IRBEM:
             X['x3'] = np.array([X['x3']])
 
         nTimePy = len(X['dateTime'])
+        if nTimePy > 50000:
+            print('Warning, more than 50,000 data points fed to IRBEM. '+
+            'It may crash without warning!')
         ntime = ctypes.c_int(nTimePy)        
         
         # Convert times to datetime objects.
@@ -172,7 +175,8 @@ class IRBEM:
                 ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal), \
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt));
         self.lstar1_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:], \
-            'bmin':bmin[:], 'lstar':lstar[:], 'xj':xj[:]}    
+            'bmin':bmin[:], 'lstar':lstar[:], 'xj':xj[:]}  
+        del X
         return self.lstar1_output
         
     def drift_shell(self, X, maginput, STATUS_FLAG = False):
@@ -440,7 +444,7 @@ class IRBEM:
         orderedKeys = ['Kp', 'Dst', 'dens', 'velo', 'Pdyn', 'ByIMF', \
             'BzIMF', 'G1', 'G2', 'G3', 'W1', 'W2', 'W3', 'W4', 'W5', 'W6', \
             'AL']
-            
+        
         # If the model inputs are arrays
         if type(inputDict[list(inputDict.keys())[0]]) == np.ndarray or\
         type(inputDict[list(inputDict.keys())[0]]) == list:

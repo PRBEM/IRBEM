@@ -9,11 +9,11 @@ Created on Fri Jan  6 19:26:04 2017
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pylab as plt
 import numpy as np
-
+import datetime
 from IRBEM import IRBEM
 
 # A few test and visualization scripts.
-def testLStarOutput():
+def testLStarOutput(test_datetime = True):
     """
     This test function will test is the make_lstar1() function works correctly.
     If you run this, the output should be the follwing. 
@@ -24,11 +24,15 @@ def testLStarOutput():
     """
     model = IRBEM(options = [0,0,0,0,0])
     LLA = {}
-    LLA['x1'] = 651
-    LLA['x2'] = 63
-    LLA['x3'] = 15.9
-    LLA['dateTime'] = '2015-02-02T06:12:43'
-    maginput = {'Kp':40.0}
+    LLA['x1'] = [651, 651]
+    LLA['x2'] = [63, 61]
+    LLA['x3'] = [15.9, 1]
+    if test_datetime:
+        LLA['dateTime'] = [datetime.datetime(2015, 2, 2, 6, 12,43), 
+        datetime.datetime(2015, 2, 2, 6,12, 43)]
+    else:
+        LLA['dateTime'] = ['2015-02-02T06:12:43', '2015-02-02T06:12:43']
+    maginput = {'Kp':[40.0, 50]}
     model.make_lstar(LLA, maginput, STATUS_FLAG = False)
     print(model.lstar1_output)
 
