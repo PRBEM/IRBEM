@@ -1,6 +1,7 @@
 import os, glob
 import ctypes
 import numpy as np
+import datetime
 import dateutil.parser
 
 class IRBEM:
@@ -127,9 +128,13 @@ class IRBEM:
         ntime = ctypes.c_int(nTimePy)        
         
         # Convert times to datetime objects.
-        t = nTimePy * [None]
-        for i in range(nTimePy):
-            t[i] = dateutil.parser.parse(X['dateTime'][i])
+        
+        if type(X['dateTime'][0]) is datetime.datetime:
+            t = X['dateTime']
+        else:
+            t = nTimePy * [None]
+            for i in range(nTimePy):
+                t[i] = dateutil.parser.parse(X['dateTime'][i])
             
         nTimePy = len(X['dateTime'])
         ntime = ctypes.c_int(nTimePy)
@@ -486,7 +491,10 @@ class IRBEM:
         RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
         MOD:     2017-01-12
         """
-        t = dateutil.parser.parse(X['dateTime'])
+        if type(X['dateTime']) is datetime.datetime:
+            t = X['dateTime']
+        else:
+            t = dateutil.parser.parse(X['dateTime'])
         iyear = ctypes.c_int(t.year)
         idoy = ctypes.c_int(t.timetuple().tm_yday)
         ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)
