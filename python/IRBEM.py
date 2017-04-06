@@ -1,8 +1,13 @@
-import os, glob
+import os, glob, copy
 import ctypes
 import numpy as np
 import datetime
 import dateutil.parser
+import scipy.interpolate
+import scipy.optimize
+
+Re = 6371 #km
+c = 3.0E8 # m/s
 
 class IRBEM:
     """
@@ -56,6 +61,10 @@ class IRBEM:
     
     Functions wrapped and not tested:
     None
+    
+    Special functions not in normal IRBEM (no online documentation yet):
+    bounce_period()
+    mirror_altitude()
     
     Please contact me at msshumko at gmail.com if you have questions/comments
     or you would like me to wrap a particular function.
@@ -381,8 +390,8 @@ class IRBEM:
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(posit), \
                 ctypes.byref(Nposit))
                 
-        self.trace_field_line2_output = {'POSIT':np.array(posit), \
-        "Nposit":Nposit.value, 'lm':lm.value, 'blocal':blocal, \
+        self.trace_field_line2_output = {'POSIT':np.array(posit[:Nposit.value]), \
+        "Nposit":Nposit.value, 'lm':lm.value, 'blocal':np.array(blocal[:Nposit.value]), \
         'bmin':bmin.value, 'xj':xj.value}        
         return self.trace_field_line2_output
         
@@ -506,3 +515,171 @@ class IRBEM:
         x2 = ctypes.c_double(X['x2'])
         x3 = ctypes.c_double(X['x3'])
         return iyear, idoy, ut, x1, x2, x3
+        
+    def bounce_period(self, X, maginput, E, **kwargs):
+        """
+        NAME:  bounce_period(self, X, maginput, E, **kwargs)
+        USE:   Calculates the bounce period in an arbitary magnetic field 
+               model. The default particle is electron, but an optional Erest
+               parameter can be used to change the rest energy of the particle
+               to a proton.
+        INPUT: A dictionary, X containing the time and sampling location. 
+               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
+               dictionary provides model parameters. Optional parameters
+               are Erest in keV, the rest energy of the bouncing particle, 
+               default is Erest = 511 (electron rest energy). R0 = 1, the limit
+               of the magnetic field line tracing at Earth's surface. Changing 
+               this is useful if the mirror point is below the ground 
+               (unphysical, but may be useful in certain applications).
+               interpNum is the number of samples to take along the field line.
+               Default is 100000, a good balance between speed and accuracy.
+        AUTHOR: Mykhaylo Shumko
+        RETURNS: Bounce period value or values, depending if E is an array or
+                a single value.
+        MOD:     2017-04-06        
+        """
+        Erest = kwargs.get('Erest', 511)
+        R0 = kwargs.get('R0', 1)
+        STATUS_FLAG = kwargs.get('STATUS_FLAG', False)
+        interpNum = kwargs.get('interpNum', 100000)
+        
+        if STATUS_FLAG:
+            print('IRBEM: Calculating bounce periods')
+        
+        fLine = self._interpolate_field_line(X, maginput, R0 = R0, 
+                                             STATUS_FLAG = STATUS_FLAG)
+                                             
+        # If the mirror point is below the ground, Scipy will error, try 
+        # to change the R0 parameter...
+        try:
+            startInd = scipy.optimize.brentq(fLine['fB'], 0, 
+                                             len(fLine['S'])/2)
+            endInd = scipy.optimize.brentq(fLine['fB'], 
+                                       len(fLine['S'])/2, len(fLine['S'])-1)
+        except ValueError as err:
+            if str(err) == 'f(a) and f(b) must have different signs':
+                 raise ValueError('Mirror point below the ground!, Change R0' +
+                 ' or catch this error and assign it a value.', 
+                 '\n Original error: ', err)
+        
+        # Resample S to a finer density of points.
+        if len(fLine['S']) > interpNum: 
+            print('Warning: interpolating with less data than IRBEM outputs,'+
+            ' the bounce period may be inaccurate!')
+        sInterp = np.linspace(startInd, endInd, num = interpNum)
+        
+        # Calculate the small change in position, and magnetic field.
+        dx = np.convolve(fLine['fx'](sInterp), [-1,1], mode = 'same')
+        dy = np.convolve(fLine['fy'](sInterp), [-1,1], mode = 'same')
+        dz = np.convolve(fLine['fz'](sInterp), [-1,1], mode = 'same')
+        ds = 6.371E6*np.sqrt(dx**2 + dy**2 + dz**2)
+        dB = fLine['fB'](sInterp) + fLine['inputB']
+        
+        # This is basically an integral of ds/v||.
+        if type(E) is np.ndarray or type(E) is list:
+            self.Tb = [2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['inputB'], dB, 
+                                              Erest = Erest)[1:-1])) for Ei in E]
+        else:
+            self.Tb = 2*np.sum(np.divide(ds[1:-1], vparalel(E, fLine['inputB'], dB, 
+                                             Erest = Erest)[1:-1]))
+        return self.Tb
+        
+    def mirror_point_altitude(self, X, maginput, **kwargs):
+        """"
+        NAME:  mirror_point_altitude(self, X, maginput)
+        USE:   Calculates the mirror point of locally mirroring electrons
+               in the opposite hemisphere. 
+        INPUT: A dictionary, X containing the time and sampling location. 
+               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
+               dictionary provides model parameters. Optional parameters
+               are Erest in keV, the rest energy of the bouncing particle, 
+               default is Erest = 511 (electron rest energy). R0 = 1, the limit
+               of the magnetic field line tracing at Earth's surface. Changing 
+               this is useful if the mirror point is below the ground 
+               (unphysical, but may be useful in certain applications).
+        RETURNS: Mirror point in the opposite hemisphere.
+        AUTHOR: Mykhaylo Shumko
+        MOD:     2017-04-06        
+        """
+        STATUS_FLAG = kwargs.get('STATUS_FLAG', False)
+        R0 = kwargs.get('R0', 1)
+        
+        if STATUS_FLAG:
+            print('IRBEM: Calculating mirror point altitude')
+            
+        fLine = self._interpolate_field_line(X, maginput, R0 = R0, 
+                                             STATUS_FLAG = STATUS_FLAG)
+                                             
+        # If the mirror point is below the ground, Scipy will error, try 
+        # to change the R0 parameter...
+        try:
+            startInd = scipy.optimize.brentq(fLine['fB'], 0, 
+                                             len(fLine['S'])/2)
+            endInd = scipy.optimize.brentq(fLine['fB'], 
+                                       len(fLine['S'])/2, len(fLine['S'])-1)
+        except ValueError as err:
+            if str(err) == 'f(a) and f(b) must have different signs':
+                 raise ValueError('Mirror point below the ground!, Change R0' +
+                 ' or catch this error and assign it a value.', 
+                 '\n Original error: ', err)
+        
+        # Start indicies of the magnetic field is always in the northern
+        # hemisphere, so take the opposite.
+        self.mirrorAlt = {}
+        if fLine['fz'](startInd) > 0:
+            self.mirrorAlt = Re*(np.sqrt(fLine['fx'](endInd)**2 + 
+            fLine['fy'](endInd)**2 + fLine['fz'](endInd)**2)-1)
+        else:
+            self.mirrorAlt = Re*(np.sqrt(fLine['fx'](startInd)**2 + 
+            fLine['fy'](startInd)**2 + fLine['fz'](startInd)**2)-1)
+        return self.mirrorAlt
+        
+    def _interpolate_field_line(self, X, maginput, R0 = 1, STATUS_FLAG = False):
+        """
+        NAME:  _interpolate_field_line(self, X, maginput)
+        USE:   This function cubic spline interpolates a magnetic field line 
+               that crosses the input location down to a radius, R0 from Earth 
+               center. R0 = 1 (Earth's surface) by default.
+               
+        INPUT: A dictionary, X containing the time and sampling location. 
+               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
+               dictionary provides model parameters.
+        AUTHOR: Mykhaylo Shumko
+        RETURNS: Interpolate objects of the B field, B field path coordinate S,
+                 X, Y, Z GEO coordinates, and B field at input location.
+        MOD:     2017-04-06
+        """
+        print('Function is currently under development! It may misbehave')
+        X2 = copy.deepcopy(X)
+        self.make_lstar(X2, maginput, STATUS_FLAG = STATUS_FLAG)
+        inputblocal = self.lstar1_output['blocal'][0]
+        
+        out = self.trace_field_line(X, maginput, STATUS_FLAG = STATUS_FLAG)
+        if out['Nposit'] == -9999:
+            raise ValueError('This is an open field line!')
+        
+        # Create arrays of GEO coordinates, and path coordinate, S.
+        xGEO = out['POSIT'][:out['Nposit'], 0] 
+        yGEO = out['POSIT'][:out['Nposit'], 1] 
+        zGEO = out['POSIT'][:out['Nposit'], 2] 
+        S = range(len(out['blocal'][:out['Nposit']]))
+        
+        # Interpolate the magnetic field, as well as GEO coordinates.
+        fB = scipy.interpolate.interp1d(S, \
+        np.subtract(out['blocal'][:out['Nposit']], inputblocal), kind = 'cubic')
+        fx = scipy.interpolate.interp1d(S, xGEO, kind = 'cubic')
+        fy = scipy.interpolate.interp1d(S, yGEO, kind = 'cubic')
+        fz = scipy.interpolate.interp1d(S, zGEO, kind = 'cubic')
+        return {'S':S, 'fB':fB, 'fx':fx, 'fy':fy, 'fz':fz, 'inputB':inputblocal}
+        
+"""
+These are helper functions to calculate relativistic velocity, 
+parallel velocity, and relativistic gamma factor.
+Units of energy is keV unless you supply both the particle energy and rest 
+energy in different units.
+
+These functions should be used with caution in your own applications!
+"""
+beta = lambda Ek, Erest = 511: np.sqrt(1-((Ek/Erest)+1)**(-2)) # Ek,a dErest must be in keV
+gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
+vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))

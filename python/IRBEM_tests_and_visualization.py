@@ -6,8 +6,9 @@ Created on Fri Jan  6 19:26:04 2017
 """
 
 # IRBEM test and visualization functions.
-from mpl_toolkits.mplot3d import Axes3D
+#from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pylab as plt
+import matplotlib.gridspec as gridspec
 import numpy as np
 import datetime
 from IRBEM import IRBEM
@@ -215,3 +216,52 @@ def test_find_magequator():
     model.find_magequator(X, maginput, STATUS_FLAG = False)
     print(model.find_magequator_output)
     return
+
+
+# Schults and Lanzerotti Bounce period equation.
+Tsl = lambda L, alpha0, v: 4*6.371E6*np.divide(L, v) * \
+       (1.3802 - 0.3198*(np.sin(np.deg2rad(alpha0)) + \
+       np.sqrt(np.sin(np.deg2rad(alpha0)))))
+beta = lambda Ek: np.sqrt(1-((Ek/511)+1)**(-2))
+
+def test_bounce_period():
+    model = IRBEM(options = [0,0,0,0,0])
+    X = {}
+    kp = 40
+    X['x1'] = 651
+    X['x2'] = 65
+    X['x3'] = 15.9
+    X['dateTime'] = '2015-02-02T22:00:00'
+    maginput = {'Kp':kp}
+    E = np.arange(200, 1000)
+    Tb = model.bounce_period(X, maginput, E)
+    model.make_lstar(X, maginput, STATUS_FLAG = False)
+    L = np.abs(model.lstar1_output['Lm'][0])
+    MLT = model.lstar1_output['MLT'][0]
+   
+    # Plot the bounce period, and compare to the analytic result from Shulz and
+    # Lanzerotti.
+    fig = plt.figure(figsize=(8, 8), dpi=80, facecolor = 'grey')
+    gs = gridspec.GridSpec(1,1)
+    tbPlt = fig.add_subplot(gs[0, 0])
+    tbPlt.plot(E, Tb, label = 'T89')
+    tbPlt.plot(E, Tsl(L, 3.7, 3.0E8*beta(E)), label = 'Shultz and Lanzerotti')
+    tbPlt.legend()
+    tbPlt.set(title = (r'$T_b$'+ ' with IRBEM and S&L. MLT = ' + \
+    str('%.1f' % MLT) + ' kp = ' + str(kp//10)+ ' L = '+ '%.1f' % L), 
+    xlabel = 'Electron kinetic energy (KeV)', ylabel = 'Bounce time (s)')
+    tbPlt.set_xlim([np.min(E), np.max(E)])
+    tbPlt.set_ylim([0.5, 1])
+    gs.tight_layout(fig)
+    
+def test_mirror_point_alt():
+    model = IRBEM(options = [0,0,0,0,0])
+    X = {}
+    kp = 40
+    X['x1'] = 651
+    X['x2'] = -63
+    X['x3'] = 15.9
+    X['dateTime'] = '2015-02-02T06:12:43'
+    maginput = {'Kp':kp}
+    print(model.mirror_point_altitude(X, maginput))
+    print('Altitude should be ~640.96 km')
