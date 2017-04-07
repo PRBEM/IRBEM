@@ -125,16 +125,20 @@ class IRBEM:
         RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary.
         MOD:     2017-01-09
         """
+        # Deep copy so if the single inputs get encapsulated in an array,
+        # it wont be propaged back to the user.
+        X2 = copy.deepcopy(X)
+        
         # Check if function arguments are not lists/arrays. Convert them to 
         # size 1 arrays. This is different than other functions because
         # you can feed an array of positions and times to make_lstar().
-        if type(X['dateTime']) != list and type(X['dateTime']) != np.ndarray:
-            X['dateTime'] = np.array([X['dateTime']])
-            X['x1'] = np.array([X['x1']])
-            X['x2'] = np.array([X['x2']])
-            X['x3'] = np.array([X['x3']])
+        if type(X2['dateTime']) != list and type(X2['dateTime']) != np.ndarray:
+            X2['dateTime'] = np.array([X2['dateTime']])
+            X2['x1'] = np.array([X2['x1']])
+            X2['x2'] = np.array([X2['x2']])
+            X2['x3'] = np.array([X2['x3']])
 
-        nTimePy = len(X['dateTime'])
+        nTimePy = len(X2['dateTime'])
         if nTimePy > 50000:
             print('Warning, more than 50,000 data points fed to IRBEM. '+
             'It may crash without warning!')
@@ -142,14 +146,14 @@ class IRBEM:
         
         # Convert times to datetime objects.
         
-        if type(X['dateTime'][0]) is datetime.datetime:
-            t = X['dateTime']
+        if type(X2['dateTime'][0]) is datetime.datetime:
+            t = X2['dateTime']
         else:
             t = nTimePy * [None]
             for i in range(nTimePy):
-                t[i] = dateutil.parser.parse(X['dateTime'][i])
+                t[i] = dateutil.parser.parse(X2['dateTime'][i])
             
-        nTimePy = len(X['dateTime'])
+        nTimePy = len(X2['dateTime'])
         ntime = ctypes.c_int(nTimePy)
         
         # C arrays are statically defined with the following procedure.
@@ -169,9 +173,9 @@ class IRBEM:
             iyear[dt] = t[dt].year
             idoy[dt] = t[dt].timetuple().tm_yday
             ut[dt] = 3600*t[dt].hour + 60*t[dt].minute + t[dt].second
-            x1[dt] = X['x1'][dt]
-            x2[dt] = X['x2'][dt] 
-            x3[dt] = X['x3'][dt]
+            x1[dt] = X2['x1'][dt]
+            x2[dt] = X2['x2'][dt] 
+            x3[dt] = X2['x3'][dt]
                 
         # Model outputs
         lm, lstar, blocal, bmin, xj, mlt = [doubleArrType() for i in range(6)]
@@ -534,10 +538,13 @@ class IRBEM:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                 raise ValueError('Mirror point below the ground!, Change R0' +
-                 ' or catch this error and assign it a value.', 
-                 '\n Original error: ', err)
-        
+                if STATUS_FLAG:
+                     raise ValueError('Mirror point below the ground!, Change R0' +
+                     ' or catch this error and assign it a value.', 
+                     '\n Original error: ', err)
+                else: 
+                    raise ValueError('Mirror point below the ground!')
+                        
         # Start indicies of the magnetic field is always in the northern
         # hemisphere, so take the opposite.
         self.mirrorAlt = {}
@@ -614,26 +621,26 @@ class IRBEM:
             ' Try a dictionary of numpy arrays, lists, ints or floats')
         return self.maginput
         
-    def _prepTimeLoc(self, X):
+    def _prepTimeLoc(self, Xloc):
         """
-        NAME:  _prepTimeLoc(self, X)
+        NAME:  _prepTimeLoc(self, Xloc)
         USE:   Prepares spacetime outputs.
-        INPUT: A dictionary, X containing the time and sampling location. 
+        INPUT: A dictionary, Xloc containing the time and sampling location. 
                Input keys must be 'dateTime', 'x1', 'x2', 'x3'.
         AUTHOR: Mykhaylo Shumko
         RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
         MOD:     2017-01-12
         """
-        if type(X['dateTime']) is datetime.datetime:
-            t = X['dateTime']
+        if type(Xloc['dateTime']) is datetime.datetime:
+            t = Xloc['dateTime']
         else:
-            t = dateutil.parser.parse(X['dateTime'])
+            t = dateutil.parser.parse(Xloc['dateTime'])
         iyear = ctypes.c_int(t.year)
         idoy = ctypes.c_int(t.timetuple().tm_yday)
         ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)
-        x1 = ctypes.c_double(X['x1']) 
-        x2 = ctypes.c_double(X['x2'])
-        x3 = ctypes.c_double(X['x3'])
+        x1 = ctypes.c_double(Xloc['x1']) 
+        x2 = ctypes.c_double(Xloc['x2'])
+        x3 = ctypes.c_double(Xloc['x3'])
         return iyear, idoy, ut, x1, x2, x3
         
     def _interpolate_field_line(self, X, maginput, R0 = 1, STATUS_FLAG = False):
@@ -651,7 +658,6 @@ class IRBEM:
                  X, Y, Z GEO coordinates, and B field at input location.
         MOD:     2017-04-06
         """
-        print('Function is currently under development! It may misbehave')
         X2 = copy.deepcopy(X)
         self.make_lstar(X2, maginput, STATUS_FLAG = STATUS_FLAG)
         inputblocal = self.lstar1_output['blocal'][0]
