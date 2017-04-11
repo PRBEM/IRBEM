@@ -580,14 +580,14 @@ class IRBEM:
         orderedKeys = ['Kp', 'Dst', 'dens', 'velo', 'Pdyn', 'ByIMF', \
             'BzIMF', 'G1', 'G2', 'G3', 'W1', 'W2', 'W3', 'W4', 'W5', 'W6', \
             'AL']
+        # Assume all values assosiated with keys are the same type.
+        magType = type(inputDict[list(inputDict.keys())[0]])
         
         # If the model inputs are arrays
-        if type(inputDict[list(inputDict.keys())[0]]) == np.ndarray or\
-        type(inputDict[list(inputDict.keys())[0]]) == list:
+        if magType in [np.ndarray, list]:
             nTimePy = len(list(inputDict.keys())[0])
             magInputType = ((ctypes.c_double * nTimePy) * 25)
             self.maginput = magInputType()
-            
             
             # Loop over potential keys.
             for i in range(len(orderedKeys)):
@@ -601,8 +601,7 @@ class IRBEM:
                         self.maginput[i][dt] = ctypes.c_double(-9999) 
                         
         # If model inputs are integers or doubles.
-        elif type(inputDict[list(inputDict.keys())[0]]) == int or \
-        type(inputDict[list(inputDict.keys())[0]]) == float:
+        elif magType in [int, float, np.float64]:
             magInputType = (ctypes.c_double * 25)
             self.maginput = magInputType()
             
