@@ -11,6 +11,7 @@ import matplotlib.pylab as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import datetime
+from mpl_toolkits.mplot3d import Axes3D
 from IRBEM import IRBEM
 
 # A few test and visualization scripts.
@@ -189,7 +190,7 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
     # Now plot the field line
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(xGEO, yGEO, zGEO)
+    ax.scatter(xGEO, yGEO, zGEO, s = 1)
     
     # Draw sphere    
     u, v = np.mgrid[0:2*np.pi:40j, 0:np.pi:20j]
@@ -203,6 +204,7 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
     ax.set_xlabel('x GEO')
     ax.set_ylabel('y GEO')
     ax.set_zlabel('z GEO')
+    plt.show()
     return
     
 def test_find_magequator():
@@ -253,6 +255,7 @@ def test_bounce_period():
     tbPlt.set_xlim([np.min(E), np.max(E)])
     tbPlt.set_ylim([0.5, 1])
     gs.tight_layout(fig)
+    plt.show()
     
 def test_mirror_point_alt():
     model = IRBEM(options = [0,0,0,0,0])
@@ -265,3 +268,17 @@ def test_mirror_point_alt():
     maginput = {'Kp':kp}
     print(model.mirror_point_altitude(X, maginput))
     print('Altitude should be ~640.96 km')
+    
+if __name__ == '__main__':
+    print('Running test: testLStarOutput()')    
+    testLStarOutput()
+    print('Running test: footPointTest')
+    footPointTest()
+    print('Running test: azimuthalFieldLineVisualization')
+    azimuthalFieldLineVisualization(dLon = 5)
+    print('Running test: testDriftShell')
+    testDriftShell()
+    print('Running test: test_find_magequator')
+    test_find_magequator()
+    print('Running test: test_bounce_period')
+    test_bounce_period()
