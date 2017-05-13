@@ -24,7 +24,7 @@ def testLStarOutput(test_datetime = True):
     'Lm': [4.631806704496794], 'bmin': [268.5087756309121], 
     'blocal': [39730.828875776126]}
     """
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = [651, 651]
     LLA['x2'] = [63, 61]
@@ -35,7 +35,7 @@ def testLStarOutput(test_datetime = True):
     else:
         LLA['dateTime'] = ['2015-02-02T06:12:43', '2015-02-02T06:12:43']
     maginput = {'Kp':[40.0, 50]}
-    model.make_lstar(LLA, maginput, STATUS_FLAG = False)
+    model.make_lstar(LLA, maginput)
     print(model.lstar1_output)
 
 def footPointTest():
@@ -47,7 +47,7 @@ def footPointTest():
     'BFOOT': [-30667.04604376155, -7651.837684485317, -39138.97550317413],
     'BFOOTMAG': [50307.82977269011, -9999.0, -9999.0]}
     """
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 63.97
@@ -56,7 +56,7 @@ def footPointTest():
     maginput = {'Kp':40.0} 
     stopAlt = 100
     hemiFlag = 0
-    model.find_foot_point(LLA, maginput, stopAlt, hemiFlag, STATUS_FLAG = False)
+    model.find_foot_point(LLA, maginput, stopAlt, hemiFlag)
     print(model.foot_point_output)
     
 def testDriftShell(pltDensity = 10):
@@ -67,7 +67,7 @@ def testDriftShell(pltDensity = 10):
     You may get a PEP 3118 buffer warning.
     """
     print('Under construction')
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 34
@@ -111,7 +111,7 @@ def test_find_mirror_point():
     {'blocal': 39730.828875776126, 'POSIT': [0.4828763104086329, 
     0.13755093538265498, 0.9794110012635103], 'bmin': 39730.828875776126}
     """
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 63
@@ -119,20 +119,20 @@ def test_find_mirror_point():
     LLA['dateTime'] = '2015-02-02T06:12:43'
     maginput = {'Kp':40.0}
     alpha = 90 # Locally mirroring at input location.
-    print(model.find_mirror_point(LLA, maginput, alpha, STATUS_FLAG = False))
+    print(model.find_mirror_point(LLA, maginput, alpha))
     
 def testTraceFieldLine(pltDensity = 10):
     """
     Test function to plot a fieldline and a sphere.
     """
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 63
     LLA['x3'] = 15.9
     LLA['dateTime'] = '2015-02-02T06:12:43'
     maginput = {'Kp':40.0}
-    out = model.trace_field_line(LLA, maginput, STATUS_FLAG = False)
+    out = model.trace_field_line(LLA, maginput)
     
     # Now plot the field lines
     fig = plt.figure()
@@ -163,7 +163,7 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
     defines at what inerval to plot the field lines, since it is very 
     computationaly expensive to plot. 
     """
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     startLon = 0
     endLon = 360
     
@@ -180,7 +180,7 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
         LLA['x3'] = i*dLon
         LLA['dateTime'] = '2015-02-02T06:12:43'
         maginput = {'Kp':0.0}
-        out = model.trace_field_line(LLA, maginput, STATUS_FLAG = False)
+        out = model.trace_field_line(LLA, maginput)
         # pltDensity is to plot every pltDensity location of the field line,
         # to ease the graphical visualization. 
         xGEO = np.append(xGEO, out['POSIT'][::pltDensity, 0])
@@ -204,18 +204,17 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
     ax.set_xlabel('x GEO')
     ax.set_ylabel('y GEO')
     ax.set_zlabel('z GEO')
-    plt.show()
     return
     
 def test_find_magequator():
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     X = {}
     X['x1'] = 651
     X['x2'] = 63
     X['x3'] = 15.9
     X['dateTime'] = '2015-02-02T06:12:43'
     maginput = {'Kp':40.0}
-    model.find_magequator(X, maginput, STATUS_FLAG = False)
+    model.find_magequator(X, maginput)
     print(model.find_magequator_output)
     return
 
@@ -227,7 +226,7 @@ Tsl = lambda L, alpha0, v: 4*6.371E6*np.divide(L, v) * \
 beta = lambda Ek: np.sqrt(1-((Ek/511)+1)**(-2))
 
 def test_bounce_period():
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     X = {}
     kp = 40
     X['x1'] = 651
@@ -237,7 +236,7 @@ def test_bounce_period():
     maginput = {'Kp':kp}
     E = np.arange(200, 1000)
     Tb = model.bounce_period(X, maginput, E)
-    model.make_lstar(X, maginput, STATUS_FLAG = False)
+    model.make_lstar(X, maginput)
     L = np.abs(model.lstar1_output['Lm'][0])
     MLT = model.lstar1_output['MLT'][0]
    
@@ -255,10 +254,9 @@ def test_bounce_period():
     tbPlt.set_xlim([np.min(E), np.max(E)])
     tbPlt.set_ylim([0.5, 1])
     gs.tight_layout(fig)
-    plt.show()
     
 def test_mirror_point_alt():
-    model = IRBEM(options = [0,0,0,0,0])
+    model = IRBEM(options = [0,0,0,0,0], verbose = True)
     X = {}
     kp = 40
     X['x1'] = 651
@@ -282,3 +280,4 @@ if __name__ == '__main__':
     test_find_magequator()
     print('Running test: test_bounce_period')
     test_bounce_period()
+    plt.show()
