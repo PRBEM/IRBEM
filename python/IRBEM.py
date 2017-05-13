@@ -36,22 +36,22 @@ class IRBEM:
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
     of the  compiled FORTRAN shared object (so) file, otherwise, it will 
-    search for a .so file in the /sources directory.
+    search for a .so file in the ./../sources/ directory.
     
     When creating the instance object, you can use the 'options' kwarg to 
     set the options, dafault is 0,0,0,0,0. Kwarg 'kext' sets the external B 
     field as is set to default of 4 (T89c model), and 'sysaxes' kwarg sets the 
     input coordinate system, and is set to GDZ (lat, long, alt). 
     
-    STATUS_FLAG keyword, set to False by default, prints will print a statement
-    letting you know its about to call a function in shared object. This is 
-    usefull for debugging if Python crashes without any error messages.
+    verbose keyword, set to False by default, will print too much information 
+    (TMI)! Usefull for debugging and for knowing too much. Set it to True if
+    Python quietly crashes (probably an input to Fortran issue)
     
     Python wrapper error value is -9999.
     
     TESTING IRBEM:
-    Run the functions from IRBEM_tests_and_visalization.py. There may be 
-    buffer warnings, but otherwise they should run.
+    Run IRBEM_tests_and_visalization.py. There may be buffer warnings, but 
+    otherwise they should run.
     
     Functions wrapped and tested:
     make_lstar()
@@ -75,6 +75,7 @@ class IRBEM:
     def __init__(self, **kwargs):
         self.compiledIRBEMdir = kwargs.get('IRBEMdir', None)
         self.compiledIRBEMname = kwargs.get('IRBEMname', None)    
+        self.TMI = kwargs.get('verbose', False)
         
         # Unless the shared object location is specified, look for it
         # in the source directory of IRBEM.
@@ -115,7 +116,7 @@ class IRBEM:
             self.options = optionsType(0,0,0,0,0)
         return
         
-    def make_lstar(self, X, maginput, STATUS_FLAG = False):
+    def make_lstar(self, X, maginput):
         """
         NAME: call_make_lstar(self, X, maginput)
         USE:  Runs make_lstar1() from the IRBEM-LIB library. This function 
@@ -182,22 +183,22 @@ class IRBEM:
         # Model outputs
         lm, lstar, blocal, bmin, xj, mlt = [doubleArrType() for i in range(6)]
         
-        if STATUS_FLAG:
-            print("Running IRBEM-LIB make_lstar")
-        self.irbem.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), \
-                ctypes.byref(self.options), ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
-                ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
-                ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), \
-                ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal), \
+        if self.TMI: print("Running IRBEM-LIB make_lstar")
+
+        self.irbem.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), 
+                ctypes.byref(self.options), ctypes.byref(self.sysaxes), ctypes.byref(iyear),
+                ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), 
+                ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), 
+                ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal),
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt));
-        self.lstar1_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:], \
+        self.lstar1_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
             'bmin':bmin[:], 'lstar':lstar[:], 'xj':xj[:]}  
         del X
         return self.lstar1_output
         
-    def drift_shell(self, X, maginput, STATUS_FLAG = False):
+    def drift_shell(self, X, maginput):
         """
-        NAME:  drift_shell(self, X, maginput, STATUS_FLAG = False)
+        NAME:  drift_shell(self, X, maginput, verbose = False)
         USE:  This function traces a full drift shell for particles that have 
                their  mirror point at the input location. The output is a full
                array of positions of the drift shell, usefull for plotting and 
@@ -235,8 +236,8 @@ class IRBEM:
         blocalType = ((ctypes.c_double * 1000) * 48)
         blocal = blocalType()
         
-        if STATUS_FLAG:
-            print("Running IRBEM-LIB drift_shell")
+        if self.TMI: print("Running IRBEM-LIB drift_shell")
+
         self.irbem.drift_shell1_(ctypes.byref(self.kext), ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
@@ -246,9 +247,9 @@ class IRBEM:
                 ctypes.byref(nposit));
         # Format the output into a dictionary, and convert ctypes arrays into
         # native Python format.
-        self.drift_shell_output = {'Lm':lm.value, 'blocal':np.array(blocal), \
-            'bmin':bmin.value, 'lstar':lstar.value, 'xj':xj.value, 'POSIT':np.array(posit), \
-            'Nposit':np.array(nposit)} 
+        self.drift_shell_output = {'Lm':lm.value, 'blocal':np.array(blocal),
+            'bmin':bmin.value, 'lstar':lstar.value, 'xj':xj.value, 
+            'POSIT':np.array(posit), 'Nposit':np.array(nposit)} 
         return self.drift_shell_output
             
             
@@ -256,9 +257,9 @@ class IRBEM:
         print('Under construction and not tested!')
         return
     
-    def find_mirror_point(self, X, maginput, alpha, STATUS_FLAG = False):
+    def find_mirror_point(self, X, maginput, alpha):
         """
-        NAME: find_mirror_point(self, X, maginput, alpha, STATUS_FLAG = False)
+        NAME: find_mirror_point(self, X, maginput, alpha, verbose = False)
         USE:  This function finds the magnitude and location of the mirror 
               point along a field line traced from any given location and 
               local pitch-angle for a set of internal/external field to be 
@@ -282,8 +283,7 @@ class IRBEM:
         positType = (3 * ctypes.c_double)
         posit = positType()
 
-        if STATUS_FLAG:
-            print("Running IRBEM-LIB mirror_point")
+        if self.TMI: print("Running IRBEM-LIB mirror_point")
             
         self.irbem.find_mirror_point1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
@@ -296,7 +296,7 @@ class IRBEM:
                 'POSIT':posit[:]}
         return self.mirror_point_output
     
-    def find_foot_point(self, X, maginput, stopAlt, hemiFlag, STATUS_FLAG = False):
+    def find_foot_point(self, X, maginput, stopAlt, hemiFlag):
         """
         NAME: find_foot_point(X, kp, stopAlt, hemiFlag)
         USE:  This function finds the of the field line crossing a specified 
@@ -331,8 +331,7 @@ class IRBEM:
         BFOOT = outputType(-9999, -9999, -9999)
         BFOOTMAG = outputType(-9999, -9999, -9999)
         
-        if STATUS_FLAG:
-            print("Running IRBEM-LIB find_foot_point")
+        if self.TMI: print("Running IRBEM-LIB find_foot_point")
             
         self.irbem.find_foot_point1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options),\
@@ -346,9 +345,9 @@ class IRBEM:
         'BFOOTMAG':BFOOTMAG[:]}
         return self.foot_point_output
         
-    def trace_field_line(self, X, maginput, R0 = 1, STATUS_FLAG = False):
+    def trace_field_line(self, X, maginput, R0 = 1):
         """
-        NAME: trace_field_line(self, X, maginput, R0 = 1, STATUS_FLAG = False)
+        NAME: trace_field_line(self, X, maginput, R0 = 1, verbose = False)
         USE:  This function traces a full field line which crosses the input 
               position.  The output is a full array of positions of the field 
               line, usefull for plotting and visualisation for a set of 
@@ -384,8 +383,7 @@ class IRBEM:
         blocalType = (ctypes.c_double * 3000)
         blocal = blocalType()
     
-        if STATUS_FLAG:
-            print("Running IRBEM-LIB trace_field_line. Python may " + \
+        if self.TMI: print("Running trace_field_line. Python may",
             "temporarily stop responding")
         
         self.irbem.trace_field_line2_1_(ctypes.byref(self.kext), \
@@ -402,9 +400,9 @@ class IRBEM:
         'bmin':bmin.value, 'xj':xj.value}        
         return self.trace_field_line2_output
         
-    def find_magequator(self, X, maginput, STATUS_FLAG = False):
+    def find_magequator(self, X, maginput):
         """
-        NAME: find_magequator(self, X, maginput, STATUS_FLAG = False)
+        NAME: find_magequator(self, X, maginput, verbose = False)
         USE:  This function finds the coordinates of the magnetic equator from 
               tracing the magntic field line from the input location.
         INPUTS: X is a dictionary with  single, non-array values in the 
@@ -425,8 +423,8 @@ class IRBEM:
         XGEOType = (ctypes.c_double * 3)
         XGEO = XGEOType(-9999, -9999, -9999)
         
-        if STATUS_FLAG:
-            print('Running IRBEM find_magequator')
+        if self.TMI: print('Running IRBEM find_magequator')
+
         self.irbem.find_magequator1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
@@ -460,14 +458,11 @@ class IRBEM:
         """
         Erest = kwargs.get('Erest', 511)
         R0 = kwargs.get('R0', 1)
-        STATUS_FLAG = kwargs.get('STATUS_FLAG', False)
         interpNum = kwargs.get('interpNum', 100000)
         
-        if STATUS_FLAG:
-            print('IRBEM: Calculating bounce periods')
+        if self.TMI: print('IRBEM: Calculating bounce periods')
         
-        fLine = self._interpolate_field_line(X, maginput, R0 = R0, 
-                                             STATUS_FLAG = STATUS_FLAG)
+        fLine = self._interpolate_field_line(X, maginput, R0 = R0)
                                              
         # If the mirror point is below the ground, Scipy will error, try 
         # to change the R0 parameter...
@@ -522,14 +517,12 @@ class IRBEM:
         AUTHOR: Mykhaylo Shumko
         MOD:     2017-04-06        
         """
-        STATUS_FLAG = kwargs.get('STATUS_FLAG', False)
         R0 = kwargs.get('R0', 1)
         
-        if STATUS_FLAG:
-            print('IRBEM: Calculating mirror point altitude')
+        if self.TMI: print('IRBEM: Calculating mirror point altitude')
             
         fLine = self._interpolate_field_line(X, maginput, R0 = R0, 
-                                             STATUS_FLAG = STATUS_FLAG)
+                                             verbose = verbose)
                                              
         # If the mirror point is below the ground, Scipy will error, try 
         # to change the R0 parameter...
@@ -540,7 +533,7 @@ class IRBEM:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                if STATUS_FLAG:
+                if verbose:
                      raise ValueError('Mirror point below the ground!, Change R0' +
                      ' or catch this error and assign it a value.', 
                      '\n Original error: ', err)
@@ -571,6 +564,8 @@ class IRBEM:
               IRBEM functions. Dummy values are -9999.
         MOD:     2017-01-05
         """
+        if self.TMI: print('Prepping magnetic field inputs.')
+
         # If no model inputs (statis magnetic field model)
         if inputDict == None:
             magInputType = (ctypes.c_double * 25)
@@ -620,6 +615,9 @@ class IRBEM:
         else:
             raise TypeError('Model inputs are in an unrecognizable format.' +\
             ' Try a dictionary of numpy arrays, lists, ints or floats')
+
+        if self.TMI: print('Done prepping magnetic field inputs.')
+
         return self.maginput
         
     def _prepTimeLoc(self, Xloc):
@@ -632,6 +630,8 @@ class IRBEM:
         RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
         MOD:     2017-01-12
         """
+        if self.TMI: print('Prepping time and space input variables')
+
         if type(Xloc['dateTime']) is datetime.datetime:
             t = Xloc['dateTime']
         else:
@@ -642,9 +642,10 @@ class IRBEM:
         x1 = ctypes.c_double(Xloc['x1']) 
         x2 = ctypes.c_double(Xloc['x2'])
         x3 = ctypes.c_double(Xloc['x3'])
+        if self.TMI: print('Done prepping time and space input variables')
         return iyear, idoy, ut, x1, x2, x3
         
-    def _interpolate_field_line(self, X, maginput, R0 = 1, STATUS_FLAG = False):
+    def _interpolate_field_line(self, X, maginput, R0 = 1):
         """
         NAME:  _interpolate_field_line(self, X, maginput)
         USE:   This function cubic spline interpolates a magnetic field line 
@@ -659,11 +660,13 @@ class IRBEM:
                  X, Y, Z GEO coordinates, and B field at input location.
         MOD:     2017-04-06
         """
+        if self.TMI: print('Interpolating magnetic field line')
+
         X2 = copy.deepcopy(X)
-        self.make_lstar(X2, maginput, STATUS_FLAG = STATUS_FLAG)
+        self.make_lstar(X2, maginput)
         inputblocal = self.lstar1_output['blocal'][0]
         
-        out = self.trace_field_line(X, maginput, STATUS_FLAG = STATUS_FLAG)
+        out = self.trace_field_line(X, maginput)
         if out['Nposit'] == -9999:
             raise ValueError('This is an open field line!')
         
@@ -679,6 +682,7 @@ class IRBEM:
         fx = scipy.interpolate.interp1d(S, xGEO, kind = 'cubic')
         fy = scipy.interpolate.interp1d(S, yGEO, kind = 'cubic')
         fz = scipy.interpolate.interp1d(S, zGEO, kind = 'cubic')
+        if self.TMI: print('Done interpolating magnetic field line.')
         return {'S':S, 'fB':fB, 'fx':fx, 'fy':fy, 'fz':fz, 'inputB':inputblocal}
         
 """
