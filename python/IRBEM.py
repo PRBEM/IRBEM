@@ -10,6 +10,10 @@ import scipy.optimize
 Re = 6371 #km
 c = 3.0E8 # m/s
 
+# External magnetic field models
+extModels = ['None', 'MF75', 'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 
+    'OM97', 'T01', 'T04', 'A00']
+
 class IRBEM:
     """
     Copyright 2017, Mykhaylo Shumko
@@ -103,7 +107,22 @@ class IRBEM:
         
         # global model parameters, default is T89 model with GDZ coordinate
         # system.
-        self.kext = ctypes.c_int(kwargs.get('kext', 4))
+        # If kext is a string, find the corresponding integer value
+        kext = kwargs.get('kext', 4)
+        if isinstance(kext, str):
+            try:
+                self.kext = ctypes.c_int(extModels.index(kext))
+            except ValueError:
+                print("Incorrect external model selected! Use 'None', 'MF75',",
+                    "'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 'OM97'",
+                    "'T01', 'T04', 'A00'")
+                raise
+
+        else:
+            self.kext = ctypes.c_int(kext)
+        
+        
+        #self.kext = ctypes.c_int(kwargs.get('kext', 4))
         self.sysaxes = ctypes.c_int(kwargs.get('sysaxes', 0))
         
         # If options are not supplied, assume they are all 0's.
