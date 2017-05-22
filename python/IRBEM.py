@@ -145,7 +145,7 @@ class IRBEM:
              system. a 'dateTime' key and values must be provided as well.
         AUTHOR: Mykhaylo Shumko
         RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary.
-        MOD:     2017-01-09
+        MOD:     2017-05-21
         """
         # Deep copy so if the single inputs get encapsulated in an array,
         # it wont be propaged back to the user.
@@ -154,7 +154,8 @@ class IRBEM:
         # Check if function arguments are not lists/arrays. Convert them to 
         # size 1 arrays. This is different than other functions because
         # you can feed an array of positions and times to make_lstar().
-        if type(X2['dateTime']) != list and type(X2['dateTime']) != np.ndarray:
+        if( not isinstance(X2['dateTime'], list) and 
+                not isinstance(X2['dateTime'], np.ndarray) ):
             X2['dateTime'] = np.array([X2['dateTime']])
             X2['x1'] = np.array([X2['x1']])
             X2['x2'] = np.array([X2['x2']])
@@ -211,8 +212,8 @@ class IRBEM:
                 ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal),
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt));
         self.lstar1_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
-            'bmin':bmin[:], 'lstar':lstar[:], 'xj':xj[:]}  
-        del X
+            'bmin':bmin[:], 'Lstar':lstar[:], 'xj':xj[:]}  
+        #del X
         return self.lstar1_output
         
     def drift_shell(self, X, maginput):
