@@ -137,15 +137,16 @@ class IRBEM:
         
     def make_lstar(self, X, maginput):
         """
-        NAME: call_make_lstar(self, X, maginput)
+        NAME: make_lstar(self, X, maginput)
         USE:  Runs make_lstar1() from the IRBEM-LIB library. This function 
               returns McLlwain L, L*, blocal, bmin, xj, and MLT from the 
               position from input location.
         INPUT: X, a dictionary of positions in the specified coordinate  
              system. a 'dateTime' key and values must be provided as well.
         AUTHOR: Mykhaylo Shumko
-        RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary.
-        MOD:     2017-05-21
+        RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary. Or 
+                 class instance self.make_lstar_output
+        MOD:     2017-05-26
         """
         # Deep copy so if the single inputs get encapsulated in an array,
         # it wont be propaged back to the user.
@@ -206,15 +207,16 @@ class IRBEM:
         if self.TMI: print("Running IRBEM-LIB make_lstar")
 
         self.irbem.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), 
-                ctypes.byref(self.options), ctypes.byref(self.sysaxes), ctypes.byref(iyear),
-                ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), 
-                ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), 
-                ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal),
-                ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt));
-        self.lstar1_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
+                ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
+                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut),
+                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), 
+                ctypes.byref(maginput), ctypes.byref(lm), ctypes.byref(lstar),
+                ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(xj),
+                ctypes.byref(mlt));
+        self.make_lstar_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
             'bmin':bmin[:], 'Lstar':lstar[:], 'xj':xj[:]}  
         #del X
-        return self.lstar1_output
+        return self.make_lstar_output
         
     def drift_shell(self, X, maginput):
         """
@@ -241,7 +243,9 @@ class IRBEM:
                nposit structure: long integer array (48) providing the number 
                of points along the field line for each field line traced in 
                2nd element of POSIT max 1000.
-        MOD:     2017-01-09
+
+               Also in class instance drift_shell_output
+        MOD:   2017-05-26
         """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
@@ -289,9 +293,10 @@ class IRBEM:
               is the standard dictionary with the same keys as explained in the
               html doc.
         RETURNS: A dictionary with scalar values of blocal and bmin, and POSIT,
-              the GEO coordinates of the mirror point
+              the GEO coordinates of the mirror point. Also in a class instance
+              find_mirror_point_output
         AUTHOR: Mykhaylo Shumko
-        MOD:     2017-01-05
+        MOD:    2017-05-26
         """
         a = ctypes.c_double(alpha)
         
@@ -312,9 +317,9 @@ class IRBEM:
                 ctypes.byref(a), ctypes.byref(self.maginput), \
                 ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(posit))     
                 
-        self.mirror_point_output = {'blocal':blocal.value, 'bmin':bmin.value, \
-                'POSIT':posit[:]}
-        return self.mirror_point_output
+        self.find_mirror_point_output = {'blocal':blocal.value, 
+            'bmin':bmin.value,'POSIT':posit[:]}
+        return self.find_mirror_point_output
     
     def find_foot_point(self, X, maginput, stopAlt, hemiFlag):
         """
@@ -335,6 +340,7 @@ class IRBEM:
                  XFOOT = location of foot point, GDZ coordinates
                  BFOOT = magnetic field vector at foot point, GEO, nT
                  BFOOTMAG = magnetic field magnitude at foot point, GEO,nT unit
+                 Also class instance of find_foot_point_output
         AUTHOR: Mykhaylo Shumko
         MOD:     2016-11-09
         """
@@ -361,9 +367,9 @@ class IRBEM:
                 ctypes.byref(hemi_flag), ctypes.byref(self.maginput), \
                 ctypes.byref(XFOOT), ctypes.byref(BFOOT), \
                 ctypes.byref(BFOOTMAG))
-        self.foot_point_output = {'XFOOT':XFOOT[:], 'BFOOT':BFOOT[:], \
+        self.find_foot_point_output = {'XFOOT':XFOOT[:], 'BFOOT':BFOOT[:], \
         'BFOOTMAG':BFOOTMAG[:]}
-        return self.foot_point_output
+        return self.find_foot_point_output
         
     def trace_field_line(self, X, maginput, R0 = 1):
         """
@@ -382,9 +388,9 @@ class IRBEM:
         RETURNS: A dictionary with the following key:values
                  'POSIT', 'Nposit', 'lm', 'blocal', 'bmin', 'xj'. 
                  POSIT is an array(3, 3000) of GDZ locations of the field line
-                 at 3000 points.
+                 at 3000 points. Also a class instance trace_field_line_output
         AUTHOR: Mykhaylo Shumko
-        MOD:     2017-01-09
+        MOD:     2017-05-26
         """        
         # specifies radius of reference surface between which field line is 
         # traced.
@@ -406,19 +412,19 @@ class IRBEM:
         if self.TMI: print("Running trace_field_line. Python may",
             "temporarily stop responding")
         
-        self.irbem.trace_field_line2_1_(ctypes.byref(self.kext), \
-                ctypes.byref(self.options),\
-                ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
-                ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
-                ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(self.maginput), \
-                ctypes.byref(R0), ctypes.byref(lm), ctypes.byref(blocal), \
-                ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(posit), \
-                ctypes.byref(Nposit))
+        self.irbem.trace_field_line2_1_(ctypes.byref(self.kext),
+            ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
+            ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
+            ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), 
+            ctypes.byref(self.maginput), ctypes.byref(R0), ctypes.byref(lm),
+            ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(xj), 
+            ctypes.byref(posit), ctypes.byref(Nposit))
                 
-        self.trace_field_line2_output = {'POSIT':np.array(posit[:Nposit.value]), \
-        "Nposit":Nposit.value, 'lm':lm.value, 'blocal':np.array(blocal[:Nposit.value]), \
-        'bmin':bmin.value, 'xj':xj.value}        
-        return self.trace_field_line2_output
+        self.trace_field_line_output = {'POSIT':np.array(posit[:Nposit.value]), 
+            "Nposit":Nposit.value, 'lm':lm.value, 
+            'blocal':np.array(blocal[:Nposit.value]),
+            'bmin':bmin.value, 'xj':xj.value}        
+        return self.trace_field_line_output
         
     def find_magequator(self, X, maginput):
         """
@@ -430,8 +436,9 @@ class IRBEM:
               with model key:input pairs.
         RETURNS: Dictionary of bmin and XGEO. bmin is the magntitude of the 
               magnetic field at equator. XGEO is an array of [xGEO,yGEO,zGEO].
+              Contents are also stored in self.find_magequator_output
         AUTHOR: Mykhaylo Shumko
-        MOD:     2017-02-02
+        MOD:     2017-05-26
         """ 
         
         # Prep the magnetic field model inputs and samping spacetime location.
@@ -445,11 +452,11 @@ class IRBEM:
         
         if self.TMI: print('Running IRBEM find_magequator')
 
-        self.irbem.find_magequator1_(ctypes.byref(self.kext), \
-                ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
-                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
-                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
-                ctypes.byref(self.maginput), ctypes.byref(bmin), \
+        self.irbem.find_magequator1_(ctypes.byref(self.kext), 
+                ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
+                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
+                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), 
+                ctypes.byref(self.maginput), ctypes.byref(bmin), 
                 ctypes.byref(XGEO))
         self.find_magequator_output = {'bmin':bmin.value, 'XGEO':np.array(XGEO)}
         return self.find_magequator_output
@@ -473,8 +480,8 @@ class IRBEM:
                Default is 100000, a good balance between speed and accuracy.
         AUTHOR: Mykhaylo Shumko
         RETURNS: Bounce period value or values, depending if E is an array or
-                a single value.
-        MOD:     2017-04-06        
+                a single value, or class instance self.bounce_period_output
+        MOD:     2017-05-26        
         """
         Erest = kwargs.get('Erest', 511)
         R0 = kwargs.get('R0', 1)
@@ -512,12 +519,13 @@ class IRBEM:
         
         # This is basically an integral of ds/v||.
         if type(E) is np.ndarray or type(E) is list:
-            self.Tb = [2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['inputB'], dB, 
-                                              Erest = Erest)[1:-1])) for Ei in E]
+            self.bounce_period_output = [2*np.sum(np.divide(ds[1:-1], 
+                vparalel(Ei, fLine['inputB'], dB, Erest = Erest)[1:-1])) 
+                for Ei in E]
         else:
-            self.Tb = 2*np.sum(np.divide(ds[1:-1], vparalel(E, fLine['inputB'], dB, 
-                                             Erest = Erest)[1:-1]))
-        return self.Tb
+            self.bounce_period_output = 2*np.sum(np.divide(ds[1:-1],
+                vparalel(E, fLine['inputB'], dB, Erest = Erest)[1:-1]))
+        return self.bounce_period_output
         
     def mirror_point_altitude(self, X, maginput, **kwargs):
         """"
@@ -533,16 +541,16 @@ class IRBEM:
                of the magnetic field line tracing at Earth's surface. Changing 
                this is useful if the mirror point is below the ground 
                (unphysical, but may be useful in certain applications).
-        RETURNS: Mirror point in the opposite hemisphere.
+        RETURNS: Mirror point in the opposite hemisphere, 
+               self.mirror_point_altitude_output
         AUTHOR: Mykhaylo Shumko
-        MOD:     2017-04-06        
+        MOD:     2017-05-26        
         """
         R0 = kwargs.get('R0', 1)
         
         if self.TMI: print('IRBEM: Calculating mirror point altitude')
             
-        fLine = self._interpolate_field_line(X, maginput, R0 = R0, 
-                                             verbose = verbose)
+        fLine = self._interpolate_field_line(X, maginput, R0 = R0)
                                              
         # If the mirror point is below the ground, Scipy will error, try 
         # to change the R0 parameter...
@@ -564,12 +572,14 @@ class IRBEM:
         # hemisphere, so take the opposite.
         self.mirrorAlt = {}
         if fLine['fz'](startInd) > 0:
-            self.mirrorAlt = Re*(np.sqrt(fLine['fx'](endInd)**2 + 
-            fLine['fy'](endInd)**2 + fLine['fz'](endInd)**2)-1)
+            self.mirror_point_altitude_output = Re*(np.sqrt(
+                fLine['fx'](endInd)**2 + fLine['fy'](endInd)**2 + 
+                fLine['fz'](endInd)**2)-1)
         else:
-            self.mirrorAlt = Re*(np.sqrt(fLine['fx'](startInd)**2 + 
-            fLine['fy'](startInd)**2 + fLine['fz'](startInd)**2)-1)
-        return self.mirrorAlt
+            self.mirror_point_altitude_output = Re*(np.sqrt(
+                fLine['fx'](startInd)**2 + fLine['fy'](startInd)**2 + 
+                fLine['fz'](startInd)**2)-1)
+        return self.mirror_point_altitude_output
         
     def _prepMagInput(self, inputDict = None):
         """
@@ -684,7 +694,7 @@ class IRBEM:
 
         X2 = copy.deepcopy(X)
         self.make_lstar(X2, maginput)
-        inputblocal = self.lstar1_output['blocal'][0]
+        inputblocal = self.make_lstar_output['blocal'][0]
         
         out = self.trace_field_line(X, maginput)
         if out['Nposit'] == -9999:
