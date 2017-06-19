@@ -1,4 +1,4 @@
-import os, glob, copy
+import os, sys, glob, copy
 import ctypes
 import numpy as np
 import datetime
@@ -84,12 +84,20 @@ class IRBEM:
         # Unless the shared object location is specified, look for it
         # in the source directory of IRBEM.
         if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
-            self.compiledIRBEMdir = \
-            os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', 'source'))
-            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
-            assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
-            'found in the sources folder!'
+            self.compiledIRBEMdir = os.path.abspath(os.path.join(
+                os.path.dirname( __file__ ), '..', 'source'))
+            
+            # Check if the user runs on a mac, and load correct shared libarary.
+            if sys.platform == 'darwin':
+                soExt = '*.dylib'
+            elif sys.platform == 'win32':
+                soExt = '*.dll'
+            else:
+                soExt = '*.so'            
+            
+            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir, soExt))
+            assert len(fullPaths) == 1, ('Either none or multiple .so files '
+            'found in the sources folder!')
             self.compiledIRBEMname = os.path.basename(fullPaths[0])
             
         self.__author__ = 'Mykhaylo Shumko'
@@ -291,7 +299,7 @@ class IRBEM:
         INPUTS: X is a dictionary with  single, non-array values in the 
               'dateTime', 'x1', 'x2', and 'x3' keys. maginput
               is the standard dictionary with the same keys as explained in the
-              html doc.
+              html doc. Alpha is the local pitch angle.
         RETURNS: A dictionary with scalar values of blocal and bmin, and POSIT,
               the GEO coordinates of the mirror point. Also in a class instance
               find_mirror_point_output
@@ -561,7 +569,7 @@ class IRBEM:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                if verbose:
+                if self.TMI:
                      raise ValueError('Mirror point below the ground!, Change R0' +
                      ' or catch this error and assign it a value.', 
                      '\n Original error: ', err)
