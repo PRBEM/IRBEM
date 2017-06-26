@@ -71,11 +71,11 @@ c inputs is magnetic activity index deduced from Kp
 c This field model is only valid for rSM<15 Re
        if (k_ext .eq. 1) then
           IOPT=Activ
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.289.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL GEO_SM(xGEO,xSM)
           CALL MEAD(xSM(1),xSM(2),xSM(3),IOPT,BxSM(1),BxSM(2),BxSM(3))
           CALL SM_GEO(BxSM,Bxext)
@@ -86,11 +86,11 @@ c inputs is magnetic activity index deduced from Kp
 c This field model is only valid for rGEO<30 Re
        if (k_ext .eq. 2) then
           IOPT=Activ
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.900.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL GEO_GSM(xGEO,xSM)
           CALL TSY87S(IOPT,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),BxSM(3))
           CALL GSM_GEO(BxSM,Bxext)
@@ -101,11 +101,11 @@ c inputs is magnetic activity index deduced from Kp
 c This field model is only valid for rGEO<70 Re
        if (k_ext .eq. 3) then
           IOPT=Activ
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.4900.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL GEO_GSM(xGEO,xSM)
           CALL TSY87l(IOPT,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),BxSM(3))
           CALL GSM_GEO(BxSM,Bxext)
@@ -116,11 +116,11 @@ c inputs is magnetic activity index deduced from Kp
 c This field model is only valid for rGEO<70 Re
        if (k_ext .eq. 4) then
           IOPT=Activ
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.4900.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL GEO_GSM(xGEO,xSM)
           CALL T89C(IOPT,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),BxSM(3))
           CALL GSM_GEO(BxSM,Bxext)
@@ -129,11 +129,11 @@ c Case for Olson-Pfitzer quiet mag model (use of SM coordinates)
 c no parameters as input
 c This field model is only valid for rGEO<15 Re
        if (k_ext .eq. 5) then
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.225.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL GEO_SM(xGEO,xSM)
           CALL BXYZMU(xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),BxSM(3))
           CALL SM_GEO(BxSM,Bxext)
@@ -142,15 +142,15 @@ c Case for Olson-Pfitzer dynamic mag model (use of SM coordinates)
 c inputs are SW density, speed, and Dst index
 c This field model is only valid for rGEO<60 Re
        if (k_ext .eq. 6) then
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.3600.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL GEO_SM(xGEO,xSM)
           den=density
-   	  vel=speed
-	  dst=dst_nt
+           vel=speed
+        dst=dst_nt
           CALL BDYN(den,vel,dst,xSM(1),xSM(2),xSM(3),BxSM(1),
      &    BxSM(2),BxSM(3))
           CALL SM_GEO(BxSM,Bxext)
@@ -160,15 +160,15 @@ c Case for rescent Tsyganenko dynamic mag model 96 (use of GSM coordinates)
 c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT)
 c
        if (k_ext .eq. 7) then
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.1600.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           PARMOD(1)=Pdyn_nPa
-	  PARMOD(2)=dst_nt
+        PARMOD(2)=dst_nt
           PARMOD(3)=ByIMF_nt
-	  PARMOD(4)=BzIMF_nt
+        PARMOD(4)=BzIMF_nt
           CALL GEO_GSM(xGEO,xSM)
           CALL T96_01(PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
      &      BxSM(3))
@@ -178,13 +178,13 @@ c
 c Case for Ostapenko dynamic mag model 97 (use of SM coordinates)
 c inputs is SW pressure, (nPa), DST (nT), f(Kp) and BzIMF (nT)
        if (k_ext .eq. 8) then
-	  dst=dst_nt
+        dst=dst_nt
           Pdyn=Pdyn_nPa
-	  BzIMF=BzIMF_nt
-	  fkp_osta=fkp
-	  sn =SIN(tilt*4.D0*ATAN(1.D0)/180.d0)
+        BzIMF=BzIMF_nt
+        fkp_osta=fkp
+        sn =SIN(tilt*4.D0*ATAN(1.D0)/180.d0)
           CALL GEO_SM(xGEO,xSM)
-	  CALL set_a(dst,Pdyn,fkp_osta,BzIMF,sn)
+        CALL set_a(dst,Pdyn,fkp_osta,BzIMF,sn)
           CALL BOM97(xSM,BxSM)
           CALL SM_GEO(BxSM,Bxext)
        endif
@@ -194,16 +194,16 @@ c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT), G1,G2
 c
        if (k_ext .eq. 9) then
           PARMOD(1)=Pdyn_nPa
-	  PARMOD(2)=dst_nt
+        PARMOD(2)=dst_nt
           PARMOD(3)=ByIMF_nt
-	  PARMOD(4)=BzIMF_nt
+        PARMOD(4)=BzIMF_nt
           PARMOD(5)=G1_tsy01
-	  PARMOD(6)=G2_tsy01
+        PARMOD(6)=G2_tsy01
           CALL GEO_GSM(xGEO,xSM)
-	  IF (xSM(1).LT.-15.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+        IF (xSM(1).LT.-15.D0) THEN
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL T01_01(PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
      &      BxSM(3))
           CALL GSM_GEO(BxSM,Bxext)
@@ -214,16 +214,16 @@ c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT), G1,G2
 c
        if (k_ext .eq. 10) then
           PARMOD(1)=Pdyn_nPa
-	  PARMOD(2)=dst_nt
+        PARMOD(2)=dst_nt
           PARMOD(3)=ByIMF_nt
-	  PARMOD(4)=BzIMF_nt
+        PARMOD(4)=BzIMF_nt
           PARMOD(5)=G2_tsy01
-	  PARMOD(6)=G3_tsy01
+        PARMOD(6)=G3_tsy01
           CALL GEO_GSM(xGEO,xSM)
-	  IF (xSM(1).LT.-15.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+        IF (xSM(1).LT.-15.D0) THEN
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL T01_01(PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
      &      BxSM(3))
           CALL GSM_GEO(BxSM,Bxext)
@@ -234,20 +234,20 @@ c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT), W1-6
 c
        if (k_ext .eq. 11) then
           PARMOD(1)=Pdyn_nPa
-	  PARMOD(2)=dst_nt
+        PARMOD(2)=dst_nt
           PARMOD(3)=ByIMF_nt
-	  PARMOD(4)=BzIMF_nt
+        PARMOD(4)=BzIMF_nt
           PARMOD(5)=W1_tsy04
-	  PARMOD(6)=W2_tsy04
+        PARMOD(6)=W2_tsy04
           PARMOD(7)=W3_tsy04
-	  PARMOD(8)=W4_tsy04
+        PARMOD(8)=W4_tsy04
           PARMOD(9)=W5_tsy04
-	  PARMOD(10)=W6_tsy04
+        PARMOD(10)=W6_tsy04
           CALL GEO_GSM(xGEO,xSM)
-	  IF (xSM(1).LT.-15.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+        IF (xSM(1).LT.-15.D0) THEN
+           Ifail=-1
+           RETURN
+        ENDIF
           CALL T04_s(PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
      &      BxSM(3))
           CALL GSM_GEO(BxSM,Bxext)
@@ -257,18 +257,18 @@ c Case for Alexeev dynamic mag model 2000 (use of GSM coordinates)
 c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT), G1,G2
 c
        if (k_ext .eq. 12) then
-	  IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+        IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
      &    .GT.50.D0) THEN
-	     Ifail=-1
-	     RETURN
-	  ENDIF
+           Ifail=-1
+           RETURN
+        ENDIF
           den=density
-   	  vel=speed
-	  dst=dst_nt
-	  BIMF(1)=BxIMF_nt
-	  BIMF(2)=ByIMF_nt
-	  BIMF(3)=BzIMF_nt
-	  Al_ind=Al
+           vel=speed
+        dst=dst_nt
+        BIMF(1)=BxIMF_nt
+        BIMF(2)=ByIMF_nt
+        BIMF(3)=BzIMF_nt
+        Al_ind=Al
           CALL GEO_GSM(xGEO,xSM)
           CALL a2000(den,vel,BIMF,
      &    dst,al_ind,xSM,BxSM,ifail)
@@ -385,7 +385,7 @@ C
        ySD = zD*xS - zS*xD
        zSD = xD*yS - xS*yD
 C
-       norm = 	SQRT(xSD*xSD + ySD*ySD + zSD*zSD)
+       norm =       SQRT(xSD*xSD + ySD*ySD + zSD*zSD)
 C
        xSD = xSD/norm
        ySD = ySD/norm
@@ -418,28 +418,28 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       GEO_GSM(xGEO,xGSM)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xGEO(3)
-	REAL*8    xGSM(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xGEO(3)
+      REAL*8    xGSM(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
         COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	xGEI =  cgst*xGEO(1) - sgst*xGEO(2)
-	yGEI =  sgst*xGEO(1) + cgst*xGEO(2)
+      xGEI =  cgst*xGEO(1) - sgst*xGEO(2)
+      yGEI =  sgst*xGEO(1) + cgst*xGEO(2)
         zGEI =  xGEO(3)
 C
-	xGSM(1) = xS*xGEI + yS*yGEI + zS*zGEI
-	xGSM(2) = xSD*xGEI + ySD*yGEI + zSD*zGEI
+      xGSM(1) = xS*xGEI + yS*yGEI + zS*zGEI
+      xGSM(2) = xSD*xGEI + ySD*yGEI + zSD*zGEI
         xGSM(3) = xSSD*xGEI + ySSD*yGEI + zSSD*zGEI
 C
         RETURN
@@ -447,28 +447,28 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       GSM_GEO(xGSM,xGEO)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xGSM(3)
-	REAL*8    xGEO(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xGSM(3)
+      REAL*8    xGEO(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
         COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	xGEI = xS*xGSM(1) + xSD*xGSM(2) + xSSD*xGSM(3)
-	yGEI = yS*xGSM(1) + ySD*xGSM(2) + ySSD*xGSM(3)
+      xGEI = xS*xGSM(1) + xSD*xGSM(2) + xSSD*xGSM(3)
+      yGEI = yS*xGSM(1) + ySD*xGSM(2) + ySSD*xGSM(3)
         zGEI = zS*xGSM(1) + zSD*xGSM(2) + zSSD*xGSM(3)
 C
-	xGEO(1) =  cgst*xGEI + sgst*yGEI
-	xGEO(2) = -sgst*xGEI + cgst*yGEI
+      xGEO(1) =  cgst*xGEI + sgst*yGEI
+      xGEO(2) = -sgst*xGEI + cgst*yGEI
         xGEO(3) =  zGEI
 C
         RETURN
@@ -476,19 +476,19 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       GEO_GEI(xGEO,xGEI)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xGEO(3)
-	REAL*8    xGEI(3)
+      REAL*8    xGEO(3)
+      REAL*8    xGEI(3)
         REAL*8    xS,yS,zS,cgst,sgst
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
 C
-	xGEI(1) =  cgst*xGEO(1) - sgst*xGEO(2)
-	xGEI(2) =  sgst*xGEO(1) + cgst*xGEO(2)
+      xGEI(1) =  cgst*xGEO(1) - sgst*xGEO(2)
+      xGEI(2) =  sgst*xGEO(1) + cgst*xGEO(2)
         xGEI(3) =  xGEO(3)
 C
         RETURN
@@ -496,19 +496,19 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       GEI_GEO(xGEI,xGEO)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xGEI(3)
-	REAL*8    xGEO(3)
+      REAL*8    xGEI(3)
+      REAL*8    xGEO(3)
         REAL*8    xS,yS,zS,cgst,sgst
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
 C
-	xGEO(1) =  cgst*xGEI(1) + sgst*xGEI(2)
-	xGEO(2) = -sgst*xGEI(1) + cgst*xGEI(2)
+      xGEO(1) =  cgst*xGEI(1) + sgst*xGEI(2)
+      xGEO(2) = -sgst*xGEI(1) + cgst*xGEI(2)
         xGEO(3) =  xGEI(3)
 C
         RETURN
@@ -516,28 +516,28 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       GEO_SM(xGEO,xSM)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xGEO(3)
-	REAL*8    xSM(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xGEO(3)
+      REAL*8    xSM(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
         COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	xGEI =  cgst*xGEO(1) - sgst*xGEO(2)
-	yGEI =  sgst*xGEO(1) + cgst*xGEO(2)
+      xGEI =  cgst*xGEO(1) - sgst*xGEO(2)
+      yGEI =  sgst*xGEO(1) + cgst*xGEO(2)
         zGEI =  xGEO(3)
 C
-	xSM(1) = xSDD*xGEI + ySDD*yGEI + zSDD*zGEI
-	xSM(2) = xSD*xGEI  + ySD*yGEI  + zSD*zGEI
+      xSM(1) = xSDD*xGEI + ySDD*yGEI + zSDD*zGEI
+      xSM(2) = xSD*xGEI  + ySD*yGEI  + zSD*zGEI
         xSM(3) = xD*xGEI   + yD*yGEI   + zD*zGEI
 C
         RETURN
@@ -545,28 +545,28 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       SM_GEO(xSM,xGEO)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xSM(3)
-	REAL*8    xGEO(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xSM(3)
+      REAL*8    xGEO(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
         COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	xGEI = xSDD*xSM(1) + xSD*xSM(2) + xD*xSM(3)
-	yGEI = ySDD*xSM(1) + ySD*xSM(2) + yD*xSM(3)
+      xGEI = xSDD*xSM(1) + xSD*xSM(2) + xD*xSM(3)
+      yGEI = ySDD*xSM(1) + ySD*xSM(2) + yD*xSM(3)
         zGEI = zSDD*xSM(1) + zSD*xSM(2) + zD*xSM(3)
 C
-	xGEO(1) =  cgst*xGEI + sgst*yGEI
-	xGEO(2) = -sgst*xGEI + cgst*yGEI
+      xGEO(1) =  cgst*xGEI + sgst*yGEI
+      xGEO(2) = -sgst*xGEI + cgst*yGEI
         xGEO(3) =  zGEI
 C
         RETURN
@@ -574,28 +574,28 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       SM_GSM(xSM,xGSM)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xSM(3)
-	REAL*8    xGSM(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xSM(3)
+      REAL*8    xGSM(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
         COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	xGEI = xSDD*xSM(1) + xSD*xSM(2) + xD*xSM(3)
-	yGEI = ySDD*xSM(1) + ySD*xSM(2) + yD*xSM(3)
+      xGEI = xSDD*xSM(1) + xSD*xSM(2) + xD*xSM(3)
+      yGEI = ySDD*xSM(1) + ySD*xSM(2) + yD*xSM(3)
         zGEI = zSDD*xSM(1) + zSD*xSM(2) + zD*xSM(3)
 C
-	xGSM(1) = xS*xGEI + yS*yGEI + zS*zGEI
-	xGSM(2) = xSD*xGEI + ySD*yGEI + zSD*zGEI
+      xGSM(1) = xS*xGEI + yS*yGEI + zS*zGEI
+      xGSM(2) = xSD*xGEI + ySD*yGEI + zSD*zGEI
         xGSM(3) = xSSD*xGEI + ySSD*yGEI + zSSD*zGEI
 C
         RETURN
@@ -603,28 +603,28 @@ C
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE
+      SUBROUTINE
      &       GSM_SM(xGSM,xSM)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8    xGSM(3)
-	REAL*8    xSM(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xGSM(3)
+      REAL*8    xSM(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	COMMON /Soleil/xS,yS,zS,cgst,sgst
+      COMMON /Soleil/xS,yS,zS,cgst,sgst
         COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
-	xGEI = xS*xGSM(1) + xSD*xGSM(2) + xSSD*xGSM(3)
-	yGEI = yS*xGSM(1) + ySD*xGSM(2) + ySSD*xGSM(3)
+      xGEI = xS*xGSM(1) + xSD*xGSM(2) + xSSD*xGSM(3)
+      yGEI = yS*xGSM(1) + ySD*xGSM(2) + ySSD*xGSM(3)
         zGEI = zS*xGSM(1) + zSD*xGSM(2) + zSSD*xGSM(3)
 C
-	xSM(1) = xSDD*xGEI + ySDD*yGEI + zSDD*zGEI
-	xSM(2) = xSD*xGEI  + ySD*yGEI  + zSD*zGEI
+      xSM(1) = xSDD*xGEI + ySDD*yGEI + zSDD*zGEI
+      xSM(2) = xSD*xGEI  + ySD*yGEI  + zSD*zGEI
         xSM(3) = xD*xGEI   + yD*yGEI   + zD*zGEI
 C
         RETURN
@@ -678,31 +678,31 @@ C
 C
        IMPLICIT NONE
 C
-	REAL*8    xGSE(3)
-	REAL*8    xGEO(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xGSE(3)
+      REAL*8    xGEO(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
-	REAL*8    aa,bb,y1,y2,y3
+      REAL*8    aa,bb,y1,y2,y3
 C
        COMMON /Soleil/xS,yS,zS,cgst,sgst
        COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
         aa = -0.3978D0
-	bb = 0.9175D0
+      bb = 0.9175D0
 C
         y1 = aa*zS-bb*yS
-	y2 = bb*xS
-	y3 = -aa*xS
+      y2 = bb*xS
+      y3 = -aa*xS
 C
-	xGEI =  cgst*xGEO(1) - sgst*xGEO(2)
-	yGEI =  sgst*xGEO(1) + cgst*xGEO(2)
+      xGEI =  cgst*xGEO(1) - sgst*xGEO(2)
+      yGEI =  sgst*xGEO(1) + cgst*xGEO(2)
         zGEI =  xGEO(3)
 C
-	xGSE(1) = xS*xGEI + yS*yGEI + zS*zGEI
-	xGSE(2) = y1*xGEI + y2*yGEI + y3*zGEI
+      xGSE(1) = xS*xGEI + yS*yGEI + zS*zGEI
+      xGSE(2) = y1*xGEI + y2*yGEI + y3*zGEI
         xGSE(3) = aa*yGEI + bb*zGEI
 C
         RETURN
@@ -714,38 +714,38 @@ C
 C
        IMPLICIT NONE
 C
-	REAL*8    xGSE(3)
-	REAL*8    xGEO(3)
-	REAL*8    xGEI,yGEI,zGEI
+      REAL*8    xGSE(3)
+      REAL*8    xGEO(3)
+      REAL*8    xGEI,yGEI,zGEI
         REAL*8    xS,yS,zS,cgst,sgst
         REAL*8    xD,yD,zD                     !GEI
         REAL*8    xSD,ySD,zSD,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
-	REAL*8    aa,bb,y1,y2,y3,det
+      REAL*8    aa,bb,y1,y2,y3,det
 C
        COMMON /Soleil/xS,yS,zS,cgst,sgst
        COMMON /sundip/xD,yD,zD,xSD,ySD,zSD
      &      ,xSSD,ySSD,zSSD,xSDD,ySDD,zSDD
 C
         aa = -0.3978D0
-	bb = 0.9175D0
+      bb = 0.9175D0
 C
         y1 = aa*zS-bb*yS
-	y2 = bb*xS
-	y3 = -aa*xS
+      y2 = bb*xS
+      y3 = -aa*xS
 C
         det = xS*y2*bb+zS*y1*aa-xS*y3*aa-yS*y1*bb
 C
-	xGEI =  (y2*bb-y3*aa)*xGSE(1) - (ys*bb-zS*aa)*xGSE(2)
+      xGEI =  (y2*bb-y3*aa)*xGSE(1) - (ys*bb-zS*aa)*xGSE(2)
      &        + (yS*y3-zS*y2)*xGSE(3)
-	yGEI = - y1*bb*xGSE(1) + xS*bb*xGSE(2) - (xS*y3-zS*y1)*xGSE(3)
+      yGEI = - y1*bb*xGSE(1) + xS*bb*xGSE(2) - (xS*y3-zS*y1)*xGSE(3)
         zGEI =   y1*aa*xGSE(1) - xS*aa*xGSE(2) + (xS*y2-yS*y1)*xGSE(3)
 C
         xGEI = xGEI/det
         yGEI = yGEI/det
         zGEI = zGEI/det
 C
-	xGEO(1) =  cgst*xGEI + sgst*yGEI
-	xGEO(2) = -sgst*xGEI + cgst*yGEI
+      xGEO(1) =  cgst*xGEI + sgst*yGEI
+      xGEO(2) = -sgst*xGEI + cgst*yGEI
         xGEO(3) =  zGEI
 C
         RETURN
@@ -859,9 +859,9 @@ C
        END
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	SUBROUTINE SUN(iyr,iday,secs,gst,Slong,Srasn,Sdec)
+      SUBROUTINE SUN(iyr,iday,secs,gst,Slong,Srasn,Sdec)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
 C program to calculate sideral, time and position of the Sun
 C good for years 1901 through 2099. accuracy 0.006 degree
@@ -870,44 +870,44 @@ C output is Greenwich mean sidereal time (gst) in degrees,
 C longitude along ecliptic (Slong), and apparent right ascension
 C and declination (Srasn,Sdec) of the Sun, all in degrees.
 C
-	INTEGER*4 iyr,iday
-	INTEGER*4 iaux
-	REAL*8    secs,gst,Slong,Srasn,Sdec
+      INTEGER*4 iyr,iday
+      INTEGER*4 iaux
+      REAL*8    secs,gst,Slong,Srasn,Sdec
 C
         REAL*8 aux
         REAL*8 dj,fday
-	REAL*8 t,vl,g,obliq,slp,sind,cosd
+      REAL*8 t,vl,g,obliq,slp,sind,cosd
         REAL*8     pi,rad
         common /rconst/rad,pi
 C
-	IF (iyr.LT.1901 .OR. iyr.GT.2099) RETURN
+      IF (iyr.LT.1901 .OR. iyr.GT.2099) RETURN
 C
-	fday = secs/86400.D0
-	dj   = 365.D0*(iyr-1900.D0) + INT((iyr-1901)/4)
+      fday = secs/86400.D0
+      dj   = 365.D0*(iyr-1900.D0) + INT((iyr-1901)/4)
      &       + iday + fday - 0.5D0
         t    = dj/36525.D0
-	aux = 279.696678D0 + 0.9856473354D0*dj
-	iaux = INT(aux/360.D0)
-	vl = aux-360.D0*iaux
-	aux = 279.690983D0 + 0.9856473354D0*dj + 360.D0*fday + 180.D0
-	iaux = INT(aux/360.D0)
-	gst = aux-360.D0*iaux
-	aux = 358.475845D0 + 0.985600267D0*dj
-	iaux = INT(aux/360.D0)
-	g = (aux-360.D0*iaux)*rad
+      aux = 279.696678D0 + 0.9856473354D0*dj
+      iaux = INT(aux/360.D0)
+      vl = aux-360.D0*iaux
+      aux = 279.690983D0 + 0.9856473354D0*dj + 360.D0*fday + 180.D0
+      iaux = INT(aux/360.D0)
+      gst = aux-360.D0*iaux
+      aux = 358.475845D0 + 0.985600267D0*dj
+      iaux = INT(aux/360.D0)
+      g = (aux-360.D0*iaux)*rad
 C
         Slong = vl + (1.91946D0-0.004789D0*t)*SIN(g)
      &         + 0.020094D0*SIN(2.D0*g)
-	obliq = (23.45229D0 - 0.0130125D0*t) * rad
+      obliq = (23.45229D0 - 0.0130125D0*t) * rad
         slp   = (Slong - 0.005686D0) * rad
-	sind  = SIN(obliq) * SIN(slp)
-	cosd  = SQRT(1.D0 - sind*sind)
+      sind  = SIN(obliq) * SIN(slp)
+      cosd  = SQRT(1.D0 - sind*sind)
         Sdec  = ATAN(sind/cosd) / rad
         Srasn = 180.D0
      &    - ATAN2(sind/(cosd*TAN(obliq)), -COS(slp)/cosd) / rad
 C
-	gst   = gst   * rad
-	Slong = Slong * rad
+      gst   = gst   * rad
+      Slong = Slong * rad
         Sdec  = Sdec  * rad
         Srasn = Srasn * rad
 C
@@ -916,21 +916,21 @@ C
 C
 !C----------------------------------------------------------------------
 !C
-!	subroutine get_igrf_coeffs(year,g,h,ierr)
+!      subroutine get_igrf_coeffs(year,g,h,ierr)
 !c
-!C	SET UP TO ACCEPT DATES BETWEEN 1965 AND 2005; COEFFICIENTS
-!C	THROUGH 1985 ARE FROM DGRF MODELS COEFFICIENTS FOR 1990
+!C      SET UP TO ACCEPT DATES BETWEEN 1965 AND 2005; COEFFICIENTS
+!C      THROUGH 1985 ARE FROM DGRF MODELS COEFFICIENTS FOR 1990
 !C       FROM IGRF
-!C	[EOS TRANS. AGU APRIL 21, 1992, P. 182]. INTERPOLATION IS USED
-!C	FOR YEARS BETWEEN DGRF MODELS, AND EXTRAPOLATION FOR YEARS
-!C	BETWEEN 1990 AND 2000.
+!C      [EOS TRANS. AGU APRIL 21, 1992, P. 182]. INTERPOLATION IS USED
+!C      FOR YEARS BETWEEN DGRF MODELS, AND EXTRAPOLATION FOR YEARS
+!C      BETWEEN 1990 AND 2000.
 !C       Coefficients for 1995 were added by D. Boscher
 !C       Modified by Paul O'Brien: ierr set, but uses nearest date limit
 !c       Date limits are 1965 to 2015
 !c
-!c		Mauricio Peredo
-!c		Hughes STX at NASA/GSFC
-!c		June 29, 1995
+!c            Mauricio Peredo
+!c            Hughes STX at NASA/GSFC
+!c            June 29, 1995
 !c               bidouille Daniel Boscher Fev 20,1997
 !c               bidouille Daniel Boscher May 02,2001
 !c
@@ -942,10 +942,10 @@ C
 !C  iyr - YEAR NUMBER (FROM 1965 UP TO 2000)
 !C----- OUTPUT PARAMETERS:
 !C  g,h - coefficients for the igrf model interpolated (or extrapolated)
-!c	 to the epoch of iyr
+!c       to the epoch of iyr
 !C
 !C
-!	IMPLICIT NONE
+!      IMPLICIT NONE
 !C
 !      REAL*8 F1,F2,DT,G(66),H(66),G65(66),H65(66),G70(66),H70(66),
 !     *G75(66),H75(66),G80(66),H80(66),G85(66),H85(66),G90(66),
@@ -953,7 +953,7 @@ C
 !     *G2010(66),H2010(66),
 !     *DG2010(45),DH2010(45)
 !
-!	INTEGER*4 N,ierr
+!      INTEGER*4 N,ierr
 !        REAL*8    year
 !        INTEGER*4 year_error_reported ! only report year error once
 !        save year_error_reported
@@ -1211,26 +1211,26 @@ C
 !     * /
 !c
 !C
-!	if ( (year.lt.1965.D0).or.(year.gt.2015.D0) ) then
-!	   ierr=1
+!      if ( (year.lt.1965.D0).or.(year.gt.2015.D0) ) then
+!         ierr=1
 !           if (year_error_reported .eq. 0) then
 !              write(*,999) year
 !              year_error_reported = 1
 !           endif
-!c	   goto 300 ! continue, just throw an error
-!	endif
+!c         goto 300 ! continue, just throw an error
+!      endif
 !c
-!      IF (year.LT.1970.D0) GOTO 50	!INTERPOLATE BETWEEN 1965 - 1970
-!      IF (year.LT.1975.D0) GOTO 60	!INTERPOLATE BETWEEN 1970 - 1975
-!      IF (year.LT.1980.D0) GOTO 70	!INTERPOLATE BETWEEN 1975 - 1980
-!      IF (year.LT.1985.D0) GOTO 80    	!INTERPOLATE BETWEEN 1980 - 1985
-!      IF (year.LT.1990.D0) GOTO 90	!INTERPOLATE BETWEEN 1985 - 1990
-!      IF (year.LT.1995.D0) GOTO 100   	!INTERPOLATE BETWEEN 1990 - 1995
-!      IF (year.LT.2000.D0) GOTO 110   	!INTERPOLATE BETWEEN 1995 - 2000
-!      IF (year.LT.2005.D0) GOTO 120   	!INTERPOLATE BETWEEN 2000 - 2005
-!      IF (year.LT.2010.D0) GOTO 130   	!INTERPOLATE BETWEEN 2005 - 2010
+!      IF (year.LT.1970.D0) GOTO 50      !INTERPOLATE BETWEEN 1965 - 1970
+!      IF (year.LT.1975.D0) GOTO 60      !INTERPOLATE BETWEEN 1970 - 1975
+!      IF (year.LT.1980.D0) GOTO 70      !INTERPOLATE BETWEEN 1975 - 1980
+!      IF (year.LT.1985.D0) GOTO 80          !INTERPOLATE BETWEEN 1980 - 1985
+!      IF (year.LT.1990.D0) GOTO 90      !INTERPOLATE BETWEEN 1985 - 1990
+!      IF (year.LT.1995.D0) GOTO 100         !INTERPOLATE BETWEEN 1990 - 1995
+!      IF (year.LT.2000.D0) GOTO 110         !INTERPOLATE BETWEEN 1995 - 2000
+!      IF (year.LT.2005.D0) GOTO 120         !INTERPOLATE BETWEEN 2000 - 2005
+!      IF (year.LT.2010.D0) GOTO 130         !INTERPOLATE BETWEEN 2005 - 2010
 !C
-!C	EXTRAPOLATE BETWEEN 2010 - 2020
+!C      EXTRAPOLATE BETWEEN 2010 - 2020
 !C
 !      DT=year-2010.D0
 !      if (DT.gt.10.D0) then
@@ -1246,7 +1246,7 @@ C
 !      GOTO 300
 !C
 !C
-!C	INTERPOLATE BETWEEEN 1965 - 1970
+!C      INTERPOLATE BETWEEEN 1965 - 1970
 !C
 !50    if (year.gt.1965.D0) then
 !        F2=(year-1965.D0)/5.D0
@@ -1260,7 +1260,7 @@ C
 !      GOTO 300
 !C
 !C
-!C	INTERPOLATE BETWEEN 1970 - 1975
+!C      INTERPOLATE BETWEEN 1970 - 1975
 !C
 !60    F2=(year-1970.D0)/5.D0
 !      F1=1.D0-F2
@@ -1270,7 +1270,7 @@ C
 !      GOTO 300
 !C
 !C
-!C	INTERPOLATE BETWEEN 1975 - 1980
+!C      INTERPOLATE BETWEEN 1975 - 1980
 !C
 !70    F2=(year-1975.D0)/5.D0
 !      F1=1.D0-F2
@@ -1280,7 +1280,7 @@ C
 !      GOTO 300
 !C
 !C
-!C	INTERPOLATE BETWEEN 1980 - 1985
+!C      INTERPOLATE BETWEEN 1980 - 1985
 !C
 !80    F2=(year-1980.D0)/5.D0
 !      F1=1.D0-F2
@@ -1290,7 +1290,7 @@ C
 !      GOTO 300
 !C
 !C
-!C	INTERPOLATE BETWEEN 1985 - 1990
+!C      INTERPOLATE BETWEEN 1985 - 1990
 !C
 !90    F2=(year-1985.D0)/5.D0
 !      F1=1.D0-F2
@@ -1300,7 +1300,7 @@ C
 !      GOTO 300
 !C
 !C
-!C	INTERPOLATE BETWEEN 1990 - 1995
+!C      INTERPOLATE BETWEEN 1990 - 1995
 !C
 !100   F2=(year-1990.D0)/5.
 !      F1=1.D0-F2
@@ -1310,7 +1310,7 @@ C
 !      GOTO 300
 !C
 !C
-!C	INTERPOLATE BETWEEN 1995 - 2000
+!C      INTERPOLATE BETWEEN 1995 - 2000
 !C
 !110   F2=(year-1995.D0)/5.D0
 !      F1=1.D0-F2
@@ -1319,7 +1319,7 @@ C
 !115      H(N)=H95(N)*F1+H00(N)*F2
 !      GOTO 300
 !C
-!C	INTERPOLATE BETWEEN 2000 - 2005
+!C      INTERPOLATE BETWEEN 2000 - 2005
 !C
 !120   F2=(year-2000.D0)/5.D0
 !      F1=1.D0-F2
@@ -1328,7 +1328,7 @@ C
 !125      H(N)=H00(N)*F1+H05(N)*F2
 !      GOTO 300
 !C
-!C	INTERPOLATE BETWEEN 2005 - 2010
+!C      INTERPOLATE BETWEEN 2005 - 2010
 !C
 !130   F2=(year-2005.D0)/5.D0
 !      F1=1.D0-F2
@@ -1338,55 +1338,55 @@ C
 !      GOTO 300
 !C
 !C
-!300	continue
+!300      continue
 !c
 !C
-!999	format(//1x,
+!999      format(//1x,
 !     *   '*** WARNING -- Input year = ',F7.2,/
 !     *   ' is out of valid range 1965-2015. Using nearest ***'//)
 !c
-!	return
-!	end
+!      return
+!      end
 !C
 C---------------------------------------------------------------------
 C
 c
-	subroutine get_terms(g,h,alpha,beta,x0,y0,z0,b0)
+      subroutine get_terms(g,h,alpha,beta,x0,y0,z0,b0)
 c
-	implicit none
+      implicit none
 c
-	REAL*8 g(66),h(66),alpha,beta,x0,y0,z0
-	REAL*8 g10,g11,h11,g20,g21,g22,h21,h22
-	REAL*8 b02,b0,sq3,l0,l1,l2,e
+      REAL*8 g(66),h(66),alpha,beta,x0,y0,z0
+      REAL*8 g10,g11,h11,g20,g21,g22,h21,h22
+      REAL*8 b02,b0,sq3,l0,l1,l2,e
 c
-	g10 = g(2)
-	g11 = g(3)
-	h11 = h(3)
-	g20 = g(4)
-	g21 = g(5)
-	g22 = g(6)
-	h21 = h(5)
-	h22 = h(6)
+      g10 = g(2)
+      g11 = g(3)
+      h11 = h(3)
+      g20 = g(4)
+      g21 = g(5)
+      g22 = g(6)
+      h21 = h(5)
+      h22 = h(6)
 c
-	b02 = g10*g10 + g11*g11 + h11*h11
-	b0 = sqrt(b02)
-c	write(6,*)b0
-	alpha = acos(-g10/b0)
-	beta = atan(h11/g11)
+      b02 = g10*g10 + g11*g11 + h11*h11
+      b0 = sqrt(b02)
+c      write(6,*)b0
+      alpha = acos(-g10/b0)
+      beta = atan(h11/g11)
 c
-	sq3 = sqrt(3.D0)
-	l0 = 2.D0*g10*g20 + sq3*(g11*g21 + h11*h21)
-	l1 = -g11*g20 + sq3*(g10*g21 + g11*g22 + h11*h22)
-	l2 = -h11*g20 + sq3*(g10*h21 - h11*g22 + g11*h22)
-	e = (l0*g10 + l1*g11 + l2*h11)/(4.*b02)
+      sq3 = sqrt(3.D0)
+      l0 = 2.D0*g10*g20 + sq3*(g11*g21 + h11*h21)
+      l1 = -g11*g20 + sq3*(g10*g21 + g11*g22 + h11*h22)
+      l2 = -h11*g20 + sq3*(g10*h21 - h11*g22 + g11*h22)
+      e = (l0*g10 + l1*g11 + l2*h11)/(4.*b02)
 c
-	z0 = (l0 - g10*e)/(3.D0*b02)
-	x0 = (l1 - g11*e)/(3.D0*b02)
-	y0 = (l2 - h11*e)/(3.D0*b02)
-!	write(6,*)alpha*180.d0/3.14d0,beta*180.d0/3.14d0
+      z0 = (l0 - g10*e)/(3.D0*b02)
+      x0 = (l1 - g11*e)/(3.D0*b02)
+      y0 = (l2 - h11*e)/(3.D0*b02)
+!      write(6,*)alpha*180.d0/3.14d0,beta*180.d0/3.14d0
 c
-	return
-	end
+      return
+      end
 C
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
@@ -1420,25 +1420,25 @@ C
       I=2
       F0= -1.D0
       DO 9 N=1,10
-	X = N
-      	F0 = F0 * X * X / (4.D0 * X - 2.D0)
+        X = N
+        F0 = F0 * X * X / (4.D0 * X - 2.D0)
         F0 = F0 * (2.D0 * X - 1.D0) / X
-	F = F0 * 0.5D0 * SQRT(2.D0)
-	GH1(I) = GH(I-1) * F0
-	I = I+1
-      DO 9 M=1,N
-      	F = F * (X + M) / (X - M + 1.D0)
-        F = F * SQRT((X - M + 1.D0) / (X + M))
-	GH1(I) = GH(I-1) * F
-	GH1(I+1) = GH(I) * F
-        I=I+2
+        F = F0 * 0.5D0 * SQRT(2.D0)
+        GH1(I) = GH(I-1) * F0
+        I = I+1
+        DO 9 M=1,N
+          F = F * (X + M) / (X - M + 1.D0)
+          F = F * SQRT((X - M + 1.D0) / (X + M))
+          GH1(I) = GH(I-1) * F
+          GH1(I+1) = GH(I) * F
+          I=I+2
 9     CONTINUE
 C
       RETURN
       END
 C
 C*********************************************************************
-	SUBROUTINE RLL_GDZ (rr,lati,longi,alti)
+      SUBROUTINE RLL_GDZ (rr,lati,longi,alti)
 C rr adimensionne, alti en km, longi en degres, lati en degres
 C
         IMPLICIT NONE
@@ -1447,7 +1447,7 @@ C
         REAL*8 alti,rr
         REAL*8 CT,ST,CP,SP
         REAL*8 D
-	REAL*8 bb,cc
+      REAL*8 bb,cc
         REAL*8 ERA,AQUAD,BQUAD
 C
         COMMON/GENER/ERA,AQUAD,BQUAD
@@ -1465,8 +1465,8 @@ C
         cc = (BQUAD*BQUAD*CT*CT+AQUAD*AQUAD*ST*ST)/D/D-rr*rr*ERA*ERA
         alti = -bb+DSQRT(bb*bb-cc)
 C
-	RETURN
-	END
+      RETURN
+      END
 C
 C*********************************************************************
 C alti en km
@@ -1507,14 +1507,14 @@ C x,y,z en adimensionne
 C lati,longi en degres
 C alti en km
 C
-	SUBROUTINE GEO_GDZ(xx,yy,zz,lati,longi,alti)
+      SUBROUTINE GEO_GDZ(xx,yy,zz,lati,longi,alti)
 C
-	IMPLICIT NONE
+      IMPLICIT NONE
 C
-	REAL*8 precision
-	PARAMETER (precision = 1.D-5) ! increase precision to 1E-5
+      REAL*8 precision
+      PARAMETER (precision = 1.D-5) ! increase precision to 1E-5
 C
-	REAL*8 lati,longi,lat0
+      REAL*8 lati,longi,lat0
         REAL*8 alti,xx,yy,zz,alt0
         REAL*8 D,RHO
         REAL*8 ERA,AQUAD,BQUAD
@@ -1525,74 +1525,74 @@ C
         common /rconst/rad,pi
 C
         CALL INITIZE
-	longi = ATAN2(yy,xx)/rad
-	RHO = SQRT(xx*xx+yy*yy)
-	lati = ATAN2(zz,RHO)
-	D = COS(lati)
-	IF (D.LT.1.D-15)THEN
-	  lati = lati/rad
-	  alti = (zz-1.D0)*SQRT(BQUAD)
-	ELSE
-	  alti = RHO/D - 1.D0
+      longi = ATAN2(yy,xx)/rad
+      RHO = SQRT(xx*xx+yy*yy)
+      lati = ATAN2(zz,RHO)
+      D = COS(lati)
+      IF (D.LT.1.D-15)THEN
+        lati = lati/rad
+        alti = (zz-1.D0)*SQRT(BQUAD)
+      ELSE
+        alti = RHO/D - 1.D0
 C
       i=0
-10	  CONTINUE
-	  alt0 = alti
-	  lat0 = lati
-	  D = SQRT(AQUAD-(AQUAD-BQUAD)*sin(lat0)*sin(lat0))
-	  lati = ATAN2(zz*(alt0+AQUAD/D/ERA),RHO*(alt0+BQUAD/D/ERA))
-	  alti = RHO/cos(lati) - AQUAD/D/ERA
-	  i=i+1
-	  if (i .gt. 1000) then
-	    alti=0.
-	    lati=0.
+10        CONTINUE
+        alt0 = alti
+        lat0 = lati
+        D = SQRT(AQUAD-(AQUAD-BQUAD)*sin(lat0)*sin(lat0))
+        lati = ATAN2(zz*(alt0+AQUAD/D/ERA),RHO*(alt0+BQUAD/D/ERA))
+        alti = RHO/cos(lati) - AQUAD/D/ERA
+        i=i+1
+        if (i .gt. 1000) then
+          alti=0.
+          lati=0.
         !write(6,*)'geo2gdz ',i,alti
-	    return
-	  endif
-	  IF (ABS(alti - alt0).GT. precision .OR. ABS(lati -
+          return
+        endif
+        IF (ABS(alti - alt0).GT. precision .OR. ABS(lati -
      &     lat0) .GT. precision) GOTO 10 ! keep looping until BOTH are within precision
           alti = alti*ERA
-	  lati = lati/rad
+        lati = lati/rad
         ENDIF
         !write(6,*)'geo2gdz ',i,alti
-	RETURN
-	END
+      RETURN
+      END
 C
 C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
-	SUBROUTINE INITIZE
+      SUBROUTINE INITIZE
 C----------------------------------------------------------------
 C Initializes the parameters in COMMON/GENER/
 C
-C	UMR     = ATAN(1.0)*4./180.   <DEGREE>*UMR=<RADIANT>
-C	ERA	EARTH RADIUS FOR NORMALIZATION OF CARTESIAN
-C			COORDINATES (6371.2 KM)
-C	EREQU	MAJOR HALF AXIS FOR EARTH ELLIPSOID (6378.160 KM)
-C	ERPOL	MINOR HALF AXIS FOR EARTH ELLIPSOID (6356.775 KM)
-C	AQUAD	SQUARE OF MAJOR HALF AXIS FOR EARTH ELLIPSOID
-C	BQUAD   SQUARE OF MINOR HALF AXIS FOR EARTH ELLIPSOID
+C      UMR     = ATAN(1.0)*4./180.   <DEGREE>*UMR=<RADIANT>
+C      ERA      EARTH RADIUS FOR NORMALIZATION OF CARTESIAN
+C                  COORDINATES (6371.2 KM)
+C      EREQU      MAJOR HALF AXIS FOR EARTH ELLIPSOID (6378.160 KM)
+C      ERPOL      MINOR HALF AXIS FOR EARTH ELLIPSOID (6356.775 KM)
+C      AQUAD      SQUARE OF MAJOR HALF AXIS FOR EARTH ELLIPSOID
+C      BQUAD   SQUARE OF MINOR HALF AXIS FOR EARTH ELLIPSOID
 C
 C ERA, EREQU and ERPOL as recommended by the INTERNATIONAL
 C ASTRONOMICAL UNION .
 C-----------------------------------------------------------------
         IMPLICIT NONE
-	REAL*8 ERA,AQUAD,BQUAD,EREQU,ERPOL
-      	COMMON/GENER/ERA,AQUAD,BQUAD
-	real*8 rad,pi
-	common/rconst/rad,pi
-	ERA=6371.2D0
+      REAL*8 ERA,AQUAD,BQUAD,EREQU,ERPOL
+            COMMON/GENER/ERA,AQUAD,BQUAD
+      real*8 rad,pi
+      common/rconst/rad,pi
+      ERA=6371.2D0
 c WGS84 World Geodetic System 84 (GPS)
-	EREQU=6378.137D0
-	ERPOL=6356.752314D0
+      EREQU=6378.137D0
+      ERPOL=6356.752314D0
 c Older World Geodetic System
-c	EREQU=6378.16D0
-c	ERPOL=6356.775D0
+c      EREQU=6378.16D0
+c      ERPOL=6356.775D0
 c
-	AQUAD=EREQU*EREQU
-	BQUAD=ERPOL*ERPOL
+      AQUAD=EREQU*EREQU
+      BQUAD=ERPOL*ERPOL
 
        pi = 4.D0*ATAN(1.D0)
        rad = pi/180.D0
 
-	RETURN
-	END
+      RETURN
+      END
