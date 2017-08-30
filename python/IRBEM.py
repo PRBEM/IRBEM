@@ -209,10 +209,10 @@ class MagFields:
                 ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), 
                 ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal),
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt));
-        self.lstar1_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
+        self.make_lstar_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
             'bmin':bmin[:], 'Lstar':lstar[:], 'xj':xj[:]}  
         #del X
-        return self.lstar1_output
+        return self.make_lstar_output
         
     def drift_shell(self, X, maginput):
         """
@@ -312,7 +312,7 @@ class MagFields:
                 
         self.mirror_point_output = {'blocal':blocal.value, 'bmin':bmin.value, \
                 'POSIT':posit[:]}
-        return self.mirror_point_output
+        return self.find_mirror_point_output
     
     def find_foot_point(self, X, maginput, stopAlt, hemiFlag):
         """
@@ -413,10 +413,10 @@ class MagFields:
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(posit), \
                 ctypes.byref(Nposit))
                 
-        self.trace_field_line2_output = {'POSIT':np.array(posit[:Nposit.value]), \
+        self.trace_field_line_output = {'POSIT':np.array(posit[:Nposit.value]), \
         "Nposit":Nposit.value, 'lm':lm.value, 'blocal':np.array(blocal[:Nposit.value]), \
         'bmin':bmin.value, 'xj':xj.value}        
-        return self.trace_field_line2_output
+        return self.trace_field_line_output
         
     def find_magequator(self, X, maginput):
         """
@@ -682,7 +682,7 @@ class MagFields:
 
         X2 = copy.deepcopy(X)
         self.make_lstar(X2, maginput)
-        inputblocal = self.lstar1_output['blocal'][0]
+        inputblocal = self.make_lstar_output['blocal'][0]
         
         out = self.trace_field_line(X, maginput)
         if out['Nposit'] == -9999:

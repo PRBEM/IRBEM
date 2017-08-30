@@ -36,7 +36,7 @@ def testLStarOutput(test_datetime = True):
         LLA['dateTime'] = ['2015-02-02T06:12:43', '2015-02-02T06:12:43']
     maginput = {'Kp':[40.0, 50]}
     model.make_lstar(LLA, maginput)
-    print(model.lstar1_output)
+    print(model.make_lstar_output)
 
 def footPointTest():
     """
@@ -237,8 +237,8 @@ def test_bounce_period():
     E = np.arange(200, 1000)
     Tb = model.bounce_period(X, maginput, E)
     model.make_lstar(X, maginput)
-    L = np.abs(model.lstar1_output['Lm'][0])
-    MLT = model.lstar1_output['MLT'][0]
+    L = np.abs(model.make_lstar_output['Lm'][0])
+    MLT = model.make_lstar_output['MLT'][0]
    
     # Plot the bounce period, and compare to the analytic result from Shulz and
     # Lanzerotti.
@@ -272,10 +272,10 @@ if __name__ == '__main__':
     testLStarOutput()
     print('Running test: footPointTest')
     footPointTest()
-    print('Running test: azimuthalFieldLineVisualization')
-    azimuthalFieldLineVisualization(dLon = 5)
-    print('Running test: testDriftShell')
-    testDriftShell()
+    #print('Running test: azimuthalFieldLineVisualization')
+    #azimuthalFieldLineVisualization(dLon = 5)
+    #print('Running test: testDriftShell')
+    #testDriftShell()
     print('Running test: test_find_magequator')
     test_find_magequator()
     print('Running test: test_bounce_period')
