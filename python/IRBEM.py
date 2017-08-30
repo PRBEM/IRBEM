@@ -1,4 +1,4 @@
-import os, sys, glob, copy
+import os, glob, copy
 import ctypes
 import numpy as np
 import datetime
@@ -14,12 +14,12 @@ c = 3.0E8 # m/s
 extModels = ['None', 'MF75', 'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 
     'OM97', 'T01', 'T04', 'A00']
 
-class IRBEM:
+class MagFields:
     """
     Copyright 2017, Mykhaylo Shumko
     
-    IRBEM wrapper class for Python. Source code credit goes to the 
-    IRBEM-LIB development team.
+    IRBEM magnetic coordinates and fields wrapper class for Python. Source code
+    credit goes to the IRBEM-LIB development team.
 
     ***************************************************************************
     IRBEM-LIB is free software: you can redistribute it and/or modify
@@ -54,7 +54,7 @@ class IRBEM:
     Python wrapper error value is -9999.
     
     TESTING IRBEM:
-    Run IRBEM_tests_and_visalization.py. There may be buffer warnings, but 
+    Run magfields_tests_and_visalization.py. There may be buffer warnings, but 
     otherwise they should run.
     
     Functions wrapped and tested:
@@ -74,7 +74,6 @@ class IRBEM:
     
     Please contact me at msshumko at gmail.com if you have questions/comments
     or you would like me to wrap a particular function.
-    
     """
     def __init__(self, **kwargs):
         self.compiledIRBEMdir = kwargs.get('IRBEMdir', None)
@@ -84,20 +83,12 @@ class IRBEM:
         # Unless the shared object location is specified, look for it
         # in the source directory of IRBEM.
         if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
-            self.compiledIRBEMdir = os.path.abspath(os.path.join(
-                os.path.dirname( __file__ ), '..', 'source'))
-            
-            # Check if the user runs on a mac, and load correct shared libarary.
-            if sys.platform == 'darwin':
-                soExt = '*.dylib'
-            elif sys.platform == 'win32':
-                soExt = '*.dll'
-            else:
-                soExt = '*.so'            
-            
-            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir, soExt))
-            assert len(fullPaths) == 1, ('Either none or multiple .so files '
-            'found in the sources folder!')
+            self.compiledIRBEMdir = \
+            os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
+            '..', 'source'))
+            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
+            assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
+            'found in the sources folder!'
             self.compiledIRBEMname = os.path.basename(fullPaths[0])
             
         self.__author__ = 'Mykhaylo Shumko'
@@ -125,7 +116,6 @@ class IRBEM:
                     "'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 'OM97'",
                     "'T01', 'T04', 'A00'")
                 raise
-
         else:
             self.kext = ctypes.c_int(kext)
         
@@ -145,16 +135,15 @@ class IRBEM:
         
     def make_lstar(self, X, maginput):
         """
-        NAME: make_lstar(self, X, maginput)
+        NAME: call_make_lstar(self, X, maginput)
         USE:  Runs make_lstar1() from the IRBEM-LIB library. This function 
               returns McLlwain L, L*, blocal, bmin, xj, and MLT from the 
               position from input location.
         INPUT: X, a dictionary of positions in the specified coordinate  
              system. a 'dateTime' key and values must be provided as well.
         AUTHOR: Mykhaylo Shumko
-        RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary. Or 
-                 class instance self.make_lstar_output
-        MOD:     2017-05-26
+        RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary.
+        MOD:     2017-05-21
         """
         # Deep copy so if the single inputs get encapsulated in an array,
         # it wont be propaged back to the user.
@@ -215,16 +204,15 @@ class IRBEM:
         if self.TMI: print("Running IRBEM-LIB make_lstar")
 
         self.irbem.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), 
-                ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
-                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut),
-                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), 
-                ctypes.byref(maginput), ctypes.byref(lm), ctypes.byref(lstar),
-                ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(xj),
-                ctypes.byref(mlt));
-        self.make_lstar_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
+                ctypes.byref(self.options), ctypes.byref(self.sysaxes), ctypes.byref(iyear),
+                ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), 
+                ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), 
+                ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal),
+                ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt));
+        self.lstar1_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
             'bmin':bmin[:], 'Lstar':lstar[:], 'xj':xj[:]}  
         #del X
-        return self.make_lstar_output
+        return self.lstar1_output
         
     def drift_shell(self, X, maginput):
         """
@@ -251,9 +239,7 @@ class IRBEM:
                nposit structure: long integer array (48) providing the number 
                of points along the field line for each field line traced in 
                2nd element of POSIT max 1000.
-
-               Also in class instance drift_shell_output
-        MOD:   2017-05-26
+        MOD:     2017-01-09
         """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
@@ -299,12 +285,11 @@ class IRBEM:
         INPUTS: X is a dictionary with  single, non-array values in the 
               'dateTime', 'x1', 'x2', and 'x3' keys. maginput
               is the standard dictionary with the same keys as explained in the
-              html doc. Alpha is the local pitch angle.
+              html doc.
         RETURNS: A dictionary with scalar values of blocal and bmin, and POSIT,
-              the GEO coordinates of the mirror point. Also in a class instance
-              find_mirror_point_output
+              the GEO coordinates of the mirror point
         AUTHOR: Mykhaylo Shumko
-        MOD:    2017-05-26
+        MOD:     2017-01-05
         """
         a = ctypes.c_double(alpha)
         
@@ -325,9 +310,9 @@ class IRBEM:
                 ctypes.byref(a), ctypes.byref(self.maginput), \
                 ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(posit))     
                 
-        self.find_mirror_point_output = {'blocal':blocal.value, 
-            'bmin':bmin.value,'POSIT':posit[:]}
-        return self.find_mirror_point_output
+        self.mirror_point_output = {'blocal':blocal.value, 'bmin':bmin.value, \
+                'POSIT':posit[:]}
+        return self.mirror_point_output
     
     def find_foot_point(self, X, maginput, stopAlt, hemiFlag):
         """
@@ -348,13 +333,12 @@ class IRBEM:
                  XFOOT = location of foot point, GDZ coordinates
                  BFOOT = magnetic field vector at foot point, GEO, nT
                  BFOOTMAG = magnetic field magnitude at foot point, GEO,nT unit
-                 Also class instance of find_foot_point_output
         AUTHOR: Mykhaylo Shumko
         MOD:     2016-11-09
         """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
-        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)        
+        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)      
         
         stop_alt = ctypes.c_double(stopAlt)
         hemi_flag = ctypes.c_int(hemiFlag)
@@ -375,9 +359,9 @@ class IRBEM:
                 ctypes.byref(hemi_flag), ctypes.byref(self.maginput), \
                 ctypes.byref(XFOOT), ctypes.byref(BFOOT), \
                 ctypes.byref(BFOOTMAG))
-        self.find_foot_point_output = {'XFOOT':XFOOT[:], 'BFOOT':BFOOT[:], \
+        self.foot_point_output = {'XFOOT':XFOOT[:], 'BFOOT':BFOOT[:], \
         'BFOOTMAG':BFOOTMAG[:]}
-        return self.find_foot_point_output
+        return self.foot_point_output
         
     def trace_field_line(self, X, maginput, R0 = 1):
         """
@@ -396,9 +380,9 @@ class IRBEM:
         RETURNS: A dictionary with the following key:values
                  'POSIT', 'Nposit', 'lm', 'blocal', 'bmin', 'xj'. 
                  POSIT is an array(3, 3000) of GDZ locations of the field line
-                 at 3000 points. Also a class instance trace_field_line_output
+                 at 3000 points.
         AUTHOR: Mykhaylo Shumko
-        MOD:     2017-05-26
+        MOD:     2017-01-09
         """        
         # specifies radius of reference surface between which field line is 
         # traced.
@@ -420,19 +404,19 @@ class IRBEM:
         if self.TMI: print("Running trace_field_line. Python may",
             "temporarily stop responding")
         
-        self.irbem.trace_field_line2_1_(ctypes.byref(self.kext),
-            ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
-            ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
-            ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), 
-            ctypes.byref(self.maginput), ctypes.byref(R0), ctypes.byref(lm),
-            ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(xj), 
-            ctypes.byref(posit), ctypes.byref(Nposit))
+        self.irbem.trace_field_line2_1_(ctypes.byref(self.kext), \
+                ctypes.byref(self.options),\
+                ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
+                ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
+                ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(self.maginput), \
+                ctypes.byref(R0), ctypes.byref(lm), ctypes.byref(blocal), \
+                ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(posit), \
+                ctypes.byref(Nposit))
                 
-        self.trace_field_line_output = {'POSIT':np.array(posit[:Nposit.value]), 
-            "Nposit":Nposit.value, 'lm':lm.value, 
-            'blocal':np.array(blocal[:Nposit.value]),
-            'bmin':bmin.value, 'xj':xj.value}        
-        return self.trace_field_line_output
+        self.trace_field_line2_output = {'POSIT':np.array(posit[:Nposit.value]), \
+        "Nposit":Nposit.value, 'lm':lm.value, 'blocal':np.array(blocal[:Nposit.value]), \
+        'bmin':bmin.value, 'xj':xj.value}        
+        return self.trace_field_line2_output
         
     def find_magequator(self, X, maginput):
         """
@@ -444,9 +428,8 @@ class IRBEM:
               with model key:input pairs.
         RETURNS: Dictionary of bmin and XGEO. bmin is the magntitude of the 
               magnetic field at equator. XGEO is an array of [xGEO,yGEO,zGEO].
-              Contents are also stored in self.find_magequator_output
         AUTHOR: Mykhaylo Shumko
-        MOD:     2017-05-26
+        MOD:     2017-02-02
         """ 
         
         # Prep the magnetic field model inputs and samping spacetime location.
@@ -460,11 +443,11 @@ class IRBEM:
         
         if self.TMI: print('Running IRBEM find_magequator')
 
-        self.irbem.find_magequator1_(ctypes.byref(self.kext), 
-                ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
-                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
-                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), 
-                ctypes.byref(self.maginput), ctypes.byref(bmin), 
+        self.irbem.find_magequator1_(ctypes.byref(self.kext), \
+                ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
+                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
+                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
+                ctypes.byref(self.maginput), ctypes.byref(bmin), \
                 ctypes.byref(XGEO))
         self.find_magequator_output = {'bmin':bmin.value, 'XGEO':np.array(XGEO)}
         return self.find_magequator_output
@@ -488,8 +471,8 @@ class IRBEM:
                Default is 100000, a good balance between speed and accuracy.
         AUTHOR: Mykhaylo Shumko
         RETURNS: Bounce period value or values, depending if E is an array or
-                a single value, or class instance self.bounce_period_output
-        MOD:     2017-05-26        
+                a single value.
+        MOD:     2017-04-06        
         """
         Erest = kwargs.get('Erest', 511)
         R0 = kwargs.get('R0', 1)
@@ -527,13 +510,12 @@ class IRBEM:
         
         # This is basically an integral of ds/v||.
         if type(E) is np.ndarray or type(E) is list:
-            self.bounce_period_output = [2*np.sum(np.divide(ds[1:-1], 
-                vparalel(Ei, fLine['inputB'], dB, Erest = Erest)[1:-1])) 
-                for Ei in E]
+            self.Tb = [2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['inputB'], dB, 
+                                              Erest = Erest)[1:-1])) for Ei in E]
         else:
-            self.bounce_period_output = 2*np.sum(np.divide(ds[1:-1],
-                vparalel(E, fLine['inputB'], dB, Erest = Erest)[1:-1]))
-        return self.bounce_period_output
+            self.Tb = 2*np.sum(np.divide(ds[1:-1], vparalel(E, fLine['inputB'], dB, 
+                                             Erest = Erest)[1:-1]))
+        return self.Tb
         
     def mirror_point_altitude(self, X, maginput, **kwargs):
         """"
@@ -549,16 +531,16 @@ class IRBEM:
                of the magnetic field line tracing at Earth's surface. Changing 
                this is useful if the mirror point is below the ground 
                (unphysical, but may be useful in certain applications).
-        RETURNS: Mirror point in the opposite hemisphere, 
-               self.mirror_point_altitude_output
+        RETURNS: Mirror point in the opposite hemisphere.
         AUTHOR: Mykhaylo Shumko
-        MOD:     2017-05-26        
+        MOD:     2017-04-06        
         """
         R0 = kwargs.get('R0', 1)
         
         if self.TMI: print('IRBEM: Calculating mirror point altitude')
             
-        fLine = self._interpolate_field_line(X, maginput, R0 = R0)
+        fLine = self._interpolate_field_line(X, maginput, R0 = R0, 
+                                             verbose = verbose)
                                              
         # If the mirror point is below the ground, Scipy will error, try 
         # to change the R0 parameter...
@@ -569,7 +551,7 @@ class IRBEM:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                if self.TMI:
+                if verbose:
                      raise ValueError('Mirror point below the ground!, Change R0' +
                      ' or catch this error and assign it a value.', 
                      '\n Original error: ', err)
@@ -580,15 +562,38 @@ class IRBEM:
         # hemisphere, so take the opposite.
         self.mirrorAlt = {}
         if fLine['fz'](startInd) > 0:
-            self.mirror_point_altitude_output = Re*(np.sqrt(
-                fLine['fx'](endInd)**2 + fLine['fy'](endInd)**2 + 
-                fLine['fz'](endInd)**2)-1)
+            self.mirrorAlt = Re*(np.sqrt(fLine['fx'](endInd)**2 + 
+            fLine['fy'](endInd)**2 + fLine['fz'](endInd)**2)-1)
         else:
-            self.mirror_point_altitude_output = Re*(np.sqrt(
-                fLine['fx'](startInd)**2 + fLine['fy'](startInd)**2 + 
-                fLine['fz'](startInd)**2)-1)
-        return self.mirror_point_altitude_output
+            self.mirrorAlt = Re*(np.sqrt(fLine['fx'](startInd)**2 + 
+            fLine['fy'](startInd)**2 + fLine['fz'](startInd)**2)-1)
+        return self.mirrorAlt
         
+    def _prepTimeLoc(self, Xloc):
+        """
+        NAME:  _prepTimeLoc(self, Xloc)
+        USE:   Prepares spacetime outputs.
+        INPUT: A dictionary, Xloc containing the time and sampling location. 
+               Input keys must be 'dateTime', 'x1', 'x2', 'x3'.
+        AUTHOR: Mykhaylo Shumko
+        RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
+        MOD:     2017-01-12
+        """
+        if self.TMI: print('Prepping time and space input variables')
+
+        if type(Xloc['dateTime']) is datetime.datetime:
+            t = Xloc['dateTime']
+        else:
+            t = dateutil.parser.parse(Xloc['dateTime'])
+        iyear = ctypes.c_int(t.year)
+        idoy = ctypes.c_int(t.timetuple().tm_yday)
+        ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)
+        x1 = ctypes.c_double(Xloc['x1']) 
+        x2 = ctypes.c_double(Xloc['x2'])
+        x3 = ctypes.c_double(Xloc['x3'])
+        if self.TMI: print('Done prepping time and space input variables')
+        return iyear, idoy, ut, x1, x2, x3
+    
     def _prepMagInput(self, inputDict = None):
         """
         NAME:  _prepMagInput(self, inputDict)
@@ -620,7 +625,7 @@ class IRBEM:
         
         # If the model inputs are arrays
         if magType in [np.ndarray, list]:
-            nTimePy = len(list(inputDict.keys())[0])
+            nTimePy = len(inputDict[list(inputDict.keys())[0]])
             magInputType = ((ctypes.c_double * nTimePy) * 25)
             self.maginput = magInputType()
             
@@ -656,32 +661,7 @@ class IRBEM:
 
         if self.TMI: print('Done prepping magnetic field inputs.')
 
-        return self.maginput
-        
-    def _prepTimeLoc(self, Xloc):
-        """
-        NAME:  _prepTimeLoc(self, Xloc)
-        USE:   Prepares spacetime outputs.
-        INPUT: A dictionary, Xloc containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'.
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
-        MOD:     2017-01-12
-        """
-        if self.TMI: print('Prepping time and space input variables')
-
-        if type(Xloc['dateTime']) is datetime.datetime:
-            t = Xloc['dateTime']
-        else:
-            t = dateutil.parser.parse(Xloc['dateTime'])
-        iyear = ctypes.c_int(t.year)
-        idoy = ctypes.c_int(t.timetuple().tm_yday)
-        ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)
-        x1 = ctypes.c_double(Xloc['x1']) 
-        x2 = ctypes.c_double(Xloc['x2'])
-        x3 = ctypes.c_double(Xloc['x3'])
-        if self.TMI: print('Done prepping time and space input variables')
-        return iyear, idoy, ut, x1, x2, x3
+        return self.maginput  
         
     def _interpolate_field_line(self, X, maginput, R0 = 1):
         """
@@ -702,7 +682,7 @@ class IRBEM:
 
         X2 = copy.deepcopy(X)
         self.make_lstar(X2, maginput)
-        inputblocal = self.make_lstar_output['blocal'][0]
+        inputblocal = self.lstar1_output['blocal'][0]
         
         out = self.trace_field_line(X, maginput)
         if out['Nposit'] == -9999:
@@ -723,6 +703,226 @@ class IRBEM:
         if self.TMI: print('Done interpolating magnetic field line.')
         return {'S':S, 'fB':fB, 'fx':fx, 'fy':fy, 'fz':fz, 'inputB':inputblocal}
         
+        
+class Coords:
+    """
+    Copyright 2017, Mykhaylo Shumko
+    
+    IRBEM geographic coordinate transform wrapper class for Python. Source code
+    credit goes to the IRBEM-LIB development team.
+
+    ***************************************************************************
+    IRBEM-LIB is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    
+    IRBEM-LIB is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
+    ***************************************************************************
+    
+    USE
+    When initializing the instance, you can provide the directory 
+    'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
+    of the  compiled FORTRAN shared object (so) file, otherwise, it will 
+    search for a .so file in the ./../sources/ directory.
+    
+    When creating the instance object, you can use the 'options' kwarg to 
+    set the options, dafault is 0,0,0,0,0. Kwarg 'kext' sets the external B 
+    field as is set to default of 4 (T89c model), and 'sysaxes' kwarg sets the 
+    input coordinate system, and is set to GDZ (lat, long, alt). 
+    
+    verbose keyword, set to False by default, will print too much information 
+    (TMI)! Usefull for debugging and for knowing too much. Set it to True if
+    Python quietly crashes (probably an input to Fortran issue)
+    
+    Python wrapper error value is -9999.
+    
+    TESTING IRBEM: Run coords_tests_and_visalization.py (FORTRAN coord_trans_vec1)
+    Rough validation was done with "Heliospheric Coordinate Systems" by Franz and 
+    Harper 2017.
+    
+    WRAPPED_FUNCTION: 
+        coords_transform(self, time, pos, sysaxesIn, sysaxesOut)
+    
+    Please contact me at msshumko at gmail.com if you have questions/comments
+    or you would like me to wrap a particular function.
+    """
+    def __init__(self, **kwargs):
+        self.compiledIRBEMdir = kwargs.get('IRBEMdir', None)
+        self.compiledIRBEMname = kwargs.get('IRBEMname', None)    
+        self.TMI = kwargs.get('verbose', False)
+        
+        # Unless the shared object location is specified, look for it
+        # in the source directory of IRBEM.
+        if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
+            self.compiledIRBEMdir = \
+            os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
+            '..', 'source'))
+            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
+            assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
+            'found in the sources folder!'
+            self.compiledIRBEMname = os.path.basename(fullPaths[0])
+            
+        self.__author__ = 'Mykhaylo Shumko'
+        self.__last_modified__ = '2017-01-12'
+        self.__credit__ = 'IRBEM-LIB development team'
+        
+        # Open the shared object file.
+        try:
+            self.irbem = ctypes.cdll.LoadLibrary(os.path.join(\
+            self.compiledIRBEMdir, self.compiledIRBEMname))
+        except OSError:
+            print('Error, cannot find the IRBEM shared object file. Please' + \
+            ' correct "IRBEMdir" and "IRBEMname" kwargs to the IRBEM instance.')
+            raise
+        return 
+        
+    def coords_transform(self, time, pos, sysaxesIn, sysaxesOut):
+        """
+        NAME:  coords_transform(self, X, sysaxesIn, sysaxesOut)
+        USE:   This function transforms coordinate systems from a point at time
+               time and position pos from a coordinate system sysaxesIn to 
+               sysaxesOut.
+        INPUT:  time - Either datetime object or ISO formatted time string 
+                       (or arrays/lists containing them)
+                pos - A (nT x 3) array where nT is the number of points to transform.
+                
+                Avaliable coordinate transformations (either as an integer or 
+                3 letter keyword will work as arguments)
+                
+                0: GDZ (alti, lati, East longi - km,deg.,deg)
+                1: GEO (cartesian) - Re
+                2: GSM (cartesian) - Re
+                3: GSE (cartesian) - Re
+                4: SM (cartesian) - Re
+                5: GEI (cartesian) - Re
+                6: MAG (cartesian) - Re
+                7: SPH (geo in spherical) - (radial distance, lati, East 
+                    longi - Re, deg., deg.)
+                8: RLL  (radial distance, lati, East longi - Re, deg., 
+                    deg. - prefered to 7)    
+        AUTHOR: Mykhaylo Shumko
+        RETURNS: Transformed positions as a 1d or 2d array.
+        MOD:     2017-07-17
+        """
+        # Create the position arrays
+        if hasattr(time, '__len__'):
+            pos = np.array(pos)
+            pos = pos.reshape((len(time), 3))
+            posArrType = ((ctypes.c_double * 3) * len(time))
+            nTime = ctypes.c_int(len(time))
+        else: 
+            pos = np.array([pos])
+            posArrType = ((ctypes.c_double * 3) * 1)
+            nTime = ctypes.c_int(1)   
+        posInArr = posArrType()
+        posOutArr = posArrType()
+
+        ### Get the time entries ###
+        iyear, idoy, ut = self._cTimes(time)
+        
+        ### Lookup coordinate systems ###
+        sysIn = self._coordSys(sysaxesIn)
+        sysOut = self._coordSys(sysaxesOut)
+        
+        # Fill the positions array.
+        for nT in range(pos.shape[0]):
+            for nX in range(pos.shape[1]):
+                posInArr[nT][nX] = ctypes.c_double(pos[nT, nX])   
+       
+        self.irbem.coord_trans_vec1_(ctypes.byref(nTime), ctypes.byref(sysIn),
+           ctypes.byref(sysOut), ctypes.byref(iyear), ctypes.byref(idoy),
+           ctypes.byref(ut), ctypes.byref(posInArr), ctypes.byref(posOutArr))
+        return np.array(posOutArr[:])
+        
+    def _cTimes(self, times):
+        """
+        NAME:  _cTimes(self, times)
+        USE:   This is a helper function that takes in an array of times in ISO 
+                format or datetime format and returns it in ctypes format with 
+                iyear, idoy, and ut.
+        INPUT: times as datetime or ISO string objects. Or an array/list of those
+                objects.
+        AUTHOR: Mykhaylo Shumko
+        RETURNS: Arrays of iyear, idoy, ut.
+        MOD:     2017-07-14
+        """
+        if not hasattr(times, '__len__'): # Make an array if only one value supplied.
+            times = np.array([times])
+        N = len(times)
+        
+        # Intialize the C arrays
+        tArrType = (ctypes.c_int * N)
+        utArrType = (ctypes.c_double * N)
+        iyear, idoy = [tArrType() for i in range(2)]
+        ut = utArrType()
+        
+        # Convert to datetimes if necessary.
+        if isinstance(times[0], str): 
+            t = list(map(dateutil.parser.parse, times))
+        elif isinstance(times[0], datetime.datetime):
+            t = times
+        else:
+            raise ValueError('ERROR: Unknown time format! I can accept ISO '
+                'string, datetime objects, or arrays of those objects')   
+        
+        for nT in range(N): # Populate C arrays
+            iyear[nT] = ctypes.c_int(t[nT].year)
+            idoy[nT] = ctypes.c_int(t[nT].timetuple().tm_yday)
+            ut[nT] = ctypes.c_double(3600*t[nT].hour + 60*t[nT].minute + 
+                t[nT].second)
+        return iyear, idoy, ut
+
+    def _coordSys(self, coordSystem):
+        """
+        NAME:  _coordSys(self, axes)
+        USE:   This function looks up the IRBEM coordinate system integer, given
+               an input integer, or string representing the coordinate system.
+        INPUT: axes, a coordinate system from:
+                0: GDZ (alti, lati, East longi - km,deg.,deg)
+                1: GEO (cartesian) - Re
+                2: GSM (cartesian) - Re
+                3: GSE (cartesian) - Re
+                4: SM (cartesian) - Re
+                5: GEI (cartesian) - Re
+                6: MAG (cartesian) - Re
+                7: SPH (geo in spherical) - (radial distance, lati, East 
+                    longi - Re, deg., deg.)
+                8: RLL  (radial distance, lati, East longi - Re, deg., 
+                    deg. - prefered to 7)
+               either an integer or a 3 letter string.
+        AUTHOR: Mykhaylo Shumko
+        RETURNS: IRBEM sysaxes integer
+        MOD:     2017-07-14
+        """
+        lookupTable = {'GDZ':0, 'GEO':1, 'GSM':2, 'GSE':3, 'SM':4, 'GEI':5, 
+            'MAG':6, 'SPH':7, 'RLL':8}
+        
+        if isinstance(coordSystem, str):
+            assert coordSystem.upper() in lookupTable.keys(), ('ERROR: Unknown'
+                ' coordinate system! Choose from GDZ, GEO, GSM, GSE, SM, GEI, '
+                'MAG, SPH, RLL.')
+            return ctypes.c_int(lookupTable[coordSystem])
+        elif isinstance(coordSystem, int):
+            return ctypes.c_int(coordSystem)
+        else:
+            raise ValueError('Error, coordinate axis can only be a string or int!')
+
+
+def IRBEM(*args, **kwargs):
+    """
+    Warn user that IRBEM class is depricated.
+    """
+    from warnings import warn
+    warn("\n \n The IRBEM class is depricated, functionality has moved to MagFields.\n")
+    return MagFields(*args, **kwargs)
+
 """
 These are helper functions to calculate relativistic velocity, 
 parallel velocity, and relativistic gamma factor.
@@ -736,7 +936,7 @@ gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
 vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))
 
 ############### PACKAGE INFO #############################
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __author__ = 'Mykhaylo Shumko'
 __contact__ = 'msshumko@gmail.com'
 __license__ = """Copyright 2017, Mykhaylo Shumko
