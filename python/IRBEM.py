@@ -1,3 +1,27 @@
+############### PACKAGE INFO #############################
+__version__ = '0.2.0'
+__author__ = 'Mykhaylo Shumko'
+__contact__ = 'msshumko@gmail.com'
+__license__ = """Copyright 2017, Mykhaylo Shumko
+    
+IRBEM wrapper class for Python. Source code credit goes to the 
+IRBEM-LIB development team.
+
+***************************************************************************
+IRBEM-LIB is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+IRBEM-LIB is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import os, glob, copy
 import ctypes
 import numpy as np
@@ -934,27 +958,3 @@ These functions should be used with caution in your own applications!
 beta = lambda Ek, Erest = 511: np.sqrt(1-((Ek/Erest)+1)**(-2)) # Ek,a dErest must be in keV
 gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
 vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))
-
-############### PACKAGE INFO #############################
-__version__ = '0.2.0'
-__author__ = 'Mykhaylo Shumko'
-__contact__ = 'msshumko@gmail.com'
-__license__ = """Copyright 2017, Mykhaylo Shumko
-    
-IRBEM wrapper class for Python. Source code credit goes to the 
-IRBEM-LIB development team.
-
-***************************************************************************
-IRBEM-LIB is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-IRBEM-LIB is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
-"""
