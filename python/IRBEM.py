@@ -361,9 +361,9 @@ class MagFields:
                 ctypes.byref(hemi_flag), ctypes.byref(self.maginput), \
                 ctypes.byref(XFOOT), ctypes.byref(BFOOT), \
                 ctypes.byref(BFOOTMAG))
-        self.foot_point_output = {'XFOOT':XFOOT[:], 'BFOOT':BFOOT[:], \
+        self.find_foot_point_output = {'XFOOT':XFOOT[:], 'BFOOT':BFOOT[:], \
         'BFOOTMAG':BFOOTMAG[:]}
-        return self.foot_point_output
+        return self.find_foot_point_output
         
     def trace_field_line(self, X, maginput, R0 = 1):
         """
@@ -471,6 +471,7 @@ class MagFields:
                (unphysical, but may be useful in certain applications).
                interpNum is the number of samples to take along the field line.
                Default is 100000, a good balance between speed and accuracy.
+               alpha is the local pitch angle
         AUTHOR: Mykhaylo Shumko
         RETURNS: Bounce period value or values, depending if E is an array or
                 a single value.
@@ -478,11 +479,12 @@ class MagFields:
         """
         Erest = kwargs.get('Erest', 511)
         R0 = kwargs.get('R0', 1)
+        alpha = kwargs.get('alpha', 90)
         interpNum = kwargs.get('interpNum', 100000)
         
         if self.TMI: print('IRBEM: Calculating bounce periods')
         
-        fLine = self._interpolate_field_line(X, maginput, R0 = R0)
+        fLine = self._interpolate_field_line(X, maginput, R0=R0, alpha=alpha)
                                              
         # If the mirror point is below the ground, Scipy will error, try 
         # to change the R0 parameter...
@@ -508,14 +510,14 @@ class MagFields:
         dy = np.convolve(fLine['fy'](sInterp), [-1,1], mode = 'same')
         dz = np.convolve(fLine['fz'](sInterp), [-1,1], mode = 'same')
         ds = 6.371E6*np.sqrt(dx**2 + dy**2 + dz**2)
-        dB = fLine['fB'](sInterp) + fLine['inputB']
+        dB = fLine['fB'](sInterp) + fLine['mirrorB']
         
         # This is basically an integral of ds/v||.
-        if type(E) is np.ndarray or type(E) is list:
-            self.Tb = [2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['inputB'], dB, 
+        if isinstance(E, (np.ndarray, list)):
+            self.Tb = [2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['mirrorB'], dB, 
                                               Erest = Erest)[1:-1])) for Ei in E]
         else:
-            self.Tb = 2*np.sum(np.divide(ds[1:-1], vparalel(E, fLine['inputB'], dB, 
+            self.Tb = 2*np.sum(np.divide(ds[1:-1], vparalel(E, fLine['mirrorB'], dB, 
                                              Erest = Erest)[1:-1]))
         return self.Tb
         
@@ -541,8 +543,7 @@ class MagFields:
         
         if self.TMI: print('IRBEM: Calculating mirror point altitude')
             
-        fLine = self._interpolate_field_line(X, maginput, R0 = R0, 
-                                             verbose = verbose)
+        fLine = self._interpolate_field_line(X, maginput, R0=R0)
                                              
         # If the mirror point is below the ground, Scipy will error, try 
         # to change the R0 parameter...
@@ -665,16 +666,18 @@ class MagFields:
 
         return self.maginput  
         
-    def _interpolate_field_line(self, X, maginput, R0 = 1):
+    def _interpolate_field_line(self, X, maginput, R0 = 1, alpha = 90):
         """
         NAME:  _interpolate_field_line(self, X, maginput)
         USE:   This function cubic spline interpolates a magnetic field line 
                that crosses the input location down to a radius, R0 from Earth 
-               center. R0 = 1 (Earth's surface) by default.
-               
-        INPUT: A dictionary, X containing the time and sampling location. 
+               center.               
+        INPUT: A dictionary, X containing the time and and location. 
                Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
-               dictionary provides model parameters.
+               dictionary contains model parameters.
+               Optionally, R0 = 1 (Earth's surface) can be changed.
+               alpha = 90 is the local pitch angle (for bounce period 
+               calculation).
         AUTHOR: Mykhaylo Shumko
         RETURNS: Interpolate objects of the B field, B field path coordinate S,
                  X, Y, Z GEO coordinates, and B field at input location.
@@ -697,13 +700,15 @@ class MagFields:
         S = range(len(out['blocal'][:out['Nposit']]))
         
         # Interpolate the magnetic field, as well as GEO coordinates.
-        fB = scipy.interpolate.interp1d(S, \
-        np.subtract(out['blocal'][:out['Nposit']], inputblocal), kind = 'cubic')
+        fB = scipy.interpolate.interp1d(S, 
+            np.subtract(out['blocal'][:out['Nposit']], inputblocal/np.sin(
+            np.deg2rad(alpha))**2), kind = 'cubic')
         fx = scipy.interpolate.interp1d(S, xGEO, kind = 'cubic')
         fy = scipy.interpolate.interp1d(S, yGEO, kind = 'cubic')
         fz = scipy.interpolate.interp1d(S, zGEO, kind = 'cubic')
         if self.TMI: print('Done interpolating magnetic field line.')
-        return {'S':S, 'fB':fB, 'fx':fx, 'fy':fy, 'fz':fz, 'inputB':inputblocal}
+        return {'S':S, 'fB':fB, 'fx':fx, 'fy':fy, 'fz':fz, 
+            'mirrorB':inputblocal/np.sin(np.deg2rad(alpha))**2}
         
         
 class Coords:

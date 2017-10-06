@@ -252,7 +252,7 @@ def test_bounce_period():
     str('%.1f' % MLT) + ' kp = ' + str(kp//10)+ ' L = '+ '%.1f' % L), 
     xlabel = 'Electron kinetic energy (KeV)', ylabel = 'Bounce time (s)')
     tbPlt.set_xlim([np.min(E), np.max(E)])
-    tbPlt.set_ylim([0.5, 1])
+    #tbPlt.set_ylim([0.5, 1])
     gs.tight_layout(fig)
     
 def test_mirror_point_alt():
