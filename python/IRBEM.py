@@ -1,11 +1,12 @@
-############### PACKAGE INFO #############################
-__version__ = '0.2.0'
 __author__ = 'Mykhaylo Shumko'
-__contact__ = 'msshumko@gmail.com'
-__license__ = """Copyright 2017, Mykhaylo Shumko
+__last_modified__ = '2017-10-05'
+__credit__ = 'IRBEM-LIB development team'
+
+"""
+Copyright 2017, Mykhaylo Shumko
     
-IRBEM wrapper class for Python. Source code credit goes to the 
-IRBEM-LIB development team.
+IRBEM magnetic coordinates and fields wrapper class for Python. Source code
+credit goes to the IRBEM-LIB development team.
 
 ***************************************************************************
 IRBEM-LIB is free software: you can redistribute it and/or modify
@@ -20,6 +21,7 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
+***************************************************************************
 """
 
 import os, glob, copy
@@ -39,27 +41,7 @@ extModels = ['None', 'MF75', 'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96',
     'OM97', 'T01', 'T04', 'A00']
 
 class MagFields:
-    """
-    Copyright 2017, Mykhaylo Shumko
-    
-    IRBEM magnetic coordinates and fields wrapper class for Python. Source code
-    credit goes to the IRBEM-LIB development team.
-
-    ***************************************************************************
-    IRBEM-LIB is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    
-    IRBEM-LIB is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
-    ***************************************************************************
-    
+    """  
     USE
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
@@ -114,10 +96,6 @@ class MagFields:
             assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
             'found in the sources folder!'
             self.compiledIRBEMname = os.path.basename(fullPaths[0])
-            
-        self.__author__ = 'Mykhaylo Shumko'
-        self.__last_modified__ = '2017-01-12'
-        self.__credit__ = 'IRBEM-LIB development team'
         
         # Open the shared object file.
         try:
@@ -730,26 +708,6 @@ class MagFields:
         
 class Coords:
     """
-    Copyright 2017, Mykhaylo Shumko
-    
-    IRBEM geographic coordinate transform wrapper class for Python. Source code
-    credit goes to the IRBEM-LIB development team.
-
-    ***************************************************************************
-    IRBEM-LIB is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-    
-    IRBEM-LIB is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
-    ***************************************************************************
-    
     USE
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
@@ -813,7 +771,7 @@ class Coords:
         USE:   This function transforms coordinate systems from a point at time
                time and position pos from a coordinate system sysaxesIn to 
                sysaxesOut.
-        INPUT:  time - Either datetime object or ISO formatted time string 
+        INPUT:  time - datetime.datetime objects
                        (or arrays/lists containing them)
                 pos - A (nT x 3) array where nT is the number of points to transform.
                 
@@ -835,7 +793,7 @@ class Coords:
         RETURNS: Transformed positions as a 1d or 2d array.
         MOD:     2017-07-17
         """
-        # Create the position arrays
+        # Create the position arrays        
         if hasattr(time, '__len__'):
             pos = np.array(pos)
             pos = pos.reshape((len(time), 3))
@@ -958,3 +916,27 @@ These functions should be used with caution in your own applications!
 beta = lambda Ek, Erest = 511: np.sqrt(1-((Ek/Erest)+1)**(-2)) # Ek,a dErest must be in keV
 gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
 vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))
+
+############### PACKAGE INFO #############################
+__version__ = '0.2.0'
+__author__ = 'Mykhaylo Shumko'
+__contact__ = 'msshumko@gmail.com'
+__license__ = """Copyright 2017, Mykhaylo Shumko
+    
+IRBEM wrapper class for Python. Source code credit goes to the 
+IRBEM-LIB development team.
+
+***************************************************************************
+IRBEM-LIB is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+IRBEM-LIB is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
+"""
