@@ -4,7 +4,7 @@ C
 C Tested by A. C. Kellerman against the original, output was identical
 C for 10,000 points R = 1:10 across 24 MLT sectors
 C=======================================================================
-        SUBROUTINE  SHTBNORM_Ej(K,L,X,Y,Z,FX,FY,FZ) ! modified SHTBNORM_E
+        SUBROUTINE  SHTBNORM_E_2015(K,L,X,Y,Z,FX,FY,FZ) ! modified SHTBNORM_E
         IMPLICIT  REAL * 8  (A - H, O - Z)
         DIMENSION AK(5)
         DIMENSION AJM(0:14),AJMD(0:14)
@@ -42,7 +42,7 @@ C=======================================================================
            CHZ=dcosh(Z*AKN)
            SHZ=dsinh(Z*AKN)
 
-           AJM(0)=bessJJ(14,AKNR, AJM(1)) !!! get all n in one call
+           AJM(0)=BESSJJ_2015(14,AKNR, AJM(1)) !!! get all n in one call
            DO 3 m=1,14
               AJMD(m)=AJM(m-1)-m*AJM(m)*AKNRI
   3        CONTINUE
@@ -69,7 +69,7 @@ C=======================================================================
       RETURN
       END
 C==---------------------------------------------------------------------
-        SUBROUTINE  SHTBNORM_Oj(K,L,X,Y,Z,FX,FY,FZ) ! modified SHTBNORM_O
+        SUBROUTINE  SHTBNORM_O_2015(K,L,X,Y,Z,FX,FY,FZ) ! modified SHTBNORM_O
         IMPLICIT  REAL * 8  (A - H, O - Z)
         DIMENSION AK(5)
         DIMENSION AJM(0:14),AJMD(0:14)
@@ -107,7 +107,7 @@ C==---------------------------------------------------------------------
            CHZ=dcosh(Z*AKN)
            SHZ=dsinh(Z*AKN)
 
-           AJM(0)=bessJJ(14,AKNR, AJM(1)) !!! get all n in one call
+           AJM(0)=BESSJJ_2015(14,AKNR, AJM(1)) !!! get all n in one call
            DO 3 m=1,14
               AJMD(m)=AJM(m-1)-m*AJM(m)*AKNRI
   3        CONTINUE
@@ -134,7 +134,7 @@ C==---------------------------------------------------------------------
         RETURN
         END
 C==---------------------------------------------------------------------
-        SUBROUTINE  SHTBNORM_Sj(K,X,Y,Z,FX,FY,FZ) ! modified SHTBNORM_S
+        SUBROUTINE  SHTBNORM_S_2015(K,X,Y,Z,FX,FY,FZ) ! modified SHTBNORM_S
         IMPLICIT  REAL * 8  (A - H, O - Z)
         DIMENSION AK(5)
         DIMENSION AJM(0:14),AJMD(0:14)
@@ -172,7 +172,7 @@ C==---------------------------------------------------------------------
            CHZ=dcosh(Z*AKN)
            SHZ=dsinh(Z*AKN)
 
-           AJM(0)=bessJJ(14,AKNR, AJM(1)) !!! get all n in one call
+           AJM(0)=BESSJJ_2015(14,AKNR, AJM(1)) !!! get all n in one call
            DO 3 m=1,14
               AJMD(m)=AJM(m-1)-m*AJM(m)*AKNRI
     3      CONTINUE
@@ -199,23 +199,23 @@ C==---------------------------------------------------------------------
         RETURN
         END
 C==---------------------------------------------------------------------
-      DOUBLE PRECISION FUNCTION bessJJ(n,x, bessJ)
+      DOUBLE PRECISION FUNCTION BESSJJ_2015(n,x, bessJ)
       IMPLICIT REAL*8 (A-H,O-Z)
-      dimension bessJ(n) ! bessJJ returns J0, bessJ holds J1 to Jn
+      dimension bessJ(n) ! BESSJJ_2015 returns J0, bessJ holds J1 to Jn
       PARAMETER (IACC=40,BIGNO=1.D10,BIGNI=1.D-10)
 CU    USES bessj0,bessj1
       if(n.lt.2) then
-         print *,' *** bad argument n in bessJJ'
+         print *,' *** bad argument n in BESSJJ_2015'
          stop
       endif
       ax=Dabs(x)
       if(ax.eq.0.D0)then
-        bessJJ=0.
+        BESSJJ_2015=0.
       else if(ax.gt.Dfloat(n))then
         tox=2.D0/ax
         bjm=bessj0(ax)
         bj =bessj1(ax)
-        bessJJ  =bjm ! J0(x)
+        BESSJJ_2015  =bjm ! J0(x)
         bessJ(1)=bj  ! J1(x)
         do 11 j=1,n-1
           bjp=j*tox*bj-bjm
@@ -257,7 +257,7 @@ CU    USES bessj0,bessj1
          do i=1,n
             bessJ(i)=bessJ(i)/sum
          enddo
-         bessJJ=bj/sum ! J0(x)
+         BESSJJ_2015=bj/sum ! J0(x)
       endif
 
       if (x .lt. 0.D0) then

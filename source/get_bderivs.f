@@ -102,7 +102,7 @@ C
 c
       CALL INITIZE
 
-      if (k_ext .eq. 13) then
+      if (k_ext .eq. 13 .or. k_ext .eq. 14) then
         call INIT_TS07D_TLPR
       endif
 
@@ -125,7 +125,7 @@ c
      6        alti, lati, longi, xGEO )
 
          call set_magfield_inputs ( k_ext, maginput(1,isat), ifail)
-         if (k_ext .eq. 13) then
+         if (k_ext .eq. 13 .or. k_ext .eq. 14) then
             call INIT_TS07D_COEFFS(iyearsat(isat),idoy(isat),
      &      UT(isat),ifail)
          endif

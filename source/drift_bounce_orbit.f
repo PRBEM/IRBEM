@@ -177,7 +177,7 @@ c
 	call set_magfield_inputs ( kext, maginput, ifail )
 	
 	if ( ifail.lt.0 ) RETURN
-      if (kext .eq. 13) then !special script to read files and
+      if (kext .eq. 13 .or. kext .eq. 14) then !special script to read files and
          call INIT_TS07D_COEFFS(iyearsat,idoy,ut,ifail)
          call INIT_TS07D_TLPR
 	     if ( ifail.lt.0 ) RETURN

@@ -113,7 +113,7 @@ c
  
 	if ( ifail.lt.0 ) goto 999
 
-        if (k_ext .eq. 13) then 
+        if (k_ext .eq. 13 .or. k_ext .eq. 14) then 
             call INIT_TS07D_COEFFS(iyearsat,idoy,ut,ifail)
             call INIT_TS07D_TLPR
 	        if ( ifail.lt.0 ) goto 999

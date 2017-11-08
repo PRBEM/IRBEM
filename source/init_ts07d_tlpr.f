@@ -1,17 +1,19 @@
-      ! Adapted for IRBEM by A. C. Kellerman, loads tail par files
-      ! these only need to be loaded once
-      ! TODO: introduce a parameter when this is loaded, so we don't
-      ! call it in the GET_FIELD1 and GET_MULTI1 scripts for each call
+c     Adapted for IRBEM by A. C. Kellerman, loads tail par files
+c     these only need to be loaded once
+c     TODO: introduce a parameter when this is loaded, so we don't
+c     call it in the GET_FIELD1 and GET_MULTI1 scripts for each call
+
+c     revised Nov 8 2017 in preparation for 2017 TS07d model inclusion - A.C.K
       
-      subroutine INIT_TS07D_TLPR
+      SUBROUTINE INIT_TS07D_TLPR
 
-      INCLUDE 'ts07d.inc'
+      IMPLICIT NONE
 
-      REAL*8 TSS,TSO,TSE ! tail pars
+      REAL*8    ::  TSS,TSO,TSE
 
-      INTEGER i,TS7LEN ! dir length 
+      INTEGER i,TS7LEN,IREAD,KREAD,KK ! dir length 
 
-      CHARACTER*200 filename,FMT
+      CHARACTER*200 filename,FFMT
       CHARACTER*255 TS7DIR
       CHARACTER*255 ts07d_env
 
@@ -23,7 +25,8 @@
       if (LEN_TRIM(ts07d_env).ne.0) then
         TS7DIR=TRIM(ts07d_env)
       else
-        TS7DIR=TRIM(TS07D_DIR)
+        write(*,*) "error, TS07_DATA_PATH global variable not set"
+        stop
       endif
 
       i=len(TS7DIR)
@@ -33,8 +36,8 @@
       TS7LEN=i
 
       DO 1001 IREAD=1,5
-        WRITE(FMT,'("(A", I0, ",A20,I0,A4)")') TS7LEN
-        WRITE(filename,FMT) TS7DIR(1:TS7LEN),'/TAIL_PAR/tailamebhr'
+        WRITE(FFMT,'("(A", I0, ",A20,I0,A4)")') TS7LEN
+        WRITE(filename,FFMT) TS7DIR(1:TS7LEN),'/TAIL_PAR/tailamebhr'
      *,IREAD,'.par'
       OPEN (UNIT=1,FILE=filename)
       READ (1,200) (TSS(KK,IREAD),KK=1,80)
@@ -43,8 +46,8 @@
 
       DO 1002 IREAD=1,5
         DO 1003 KREAD=1,4
-        WRITE(FMT,'("(A", I0, ",A21,I0,I0,A4)")') TS7LEN
-        WRITE(filename,FMT)TS7DIR(1:TS7LEN),'/TAIL_PAR/tailamhr_o_'
+        WRITE(FFMT,'("(A", I0, ",A21,I0,I0,A4)")') TS7LEN
+        WRITE(filename,FFMT)TS7DIR(1:TS7LEN),'/TAIL_PAR/tailamhr_o_'
      *,IREAD,KREAD,'.par'
       OPEN (UNIT=1,FILE=filename)
       READ (1,200) (TSO(KK,IREAD,KREAD),KK=1,80)
@@ -53,8 +56,8 @@
 
       DO 1004 IREAD=1,5
         DO 1005 KREAD=1,4
-        WRITE(FMT,'("(A", I0, ",A21,I0,I0,A4)")') TS7LEN
-        WRITE(filename,FMT)TS7DIR(1:TS7LEN),'/TAIL_PAR/tailamhr_e_'
+        WRITE(FFMT,'("(A", I0, ",A21,I0,I0,A4)")') TS7LEN
+        WRITE(filename,FFMT)TS7DIR(1:TS7LEN),'/TAIL_PAR/tailamhr_e_'
      *,IREAD,KREAD,'.par'
       OPEN (UNIT=1,FILE=filename)
       READ (1,200) (TSE(KK,IREAD,KREAD),KK=1,80)

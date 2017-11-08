@@ -20,7 +20,7 @@ echo "done"
 
 echo 'Downloading coefficient files'
 #download all the coefficient files
-wget -N http://rbspgway.jhuapl.edu/models/magneticfieldmodeling/ts07d/coeffs/2016/all.tgz
+wget -N http://rbspgway.jhuapl.edu/models/magneticfieldmodeling/ts07d/coeffs/2017/all.tgz
 echo "done"
 
 #unpack them

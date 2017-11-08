@@ -279,6 +279,7 @@ C
 c Case for Tsyganenko and Sitnov 07d mag model (use of GSM coordinates)
 c input is Pdyn
 c
+c      2015 version, new bess calls in external file TS07j_2015.f (previously TS07j.f)
        IF (k_ext .eq. 13) THEN 
 c M. Sitnov and G. Stephens recommend limiting the valid output to 20 Re and
 c less based on the current (at the time) expansion:
@@ -289,7 +290,25 @@ c less based on the current (at the time) expansion:
           ENDIF
 
           CALL GEO_GSM(xGEO,xSM)
-          CALL TS07D (xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
+          CALL TS07D_2015 (xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
+     &      BxSM(3)) ! note that no solar wind input is necessary as it is
+                    ! included through the TS07D common block
+          CALL GSM_GEO(BxSM,Bxext)
+       endif
+
+c      2017 version, new bess calls implemented directly in Tsy_and_Sit_Jul2017.f code
+c      Code is double precision by design
+       IF (k_ext .eq. 14) THEN 
+c M. Sitnov and G. Stephens recommend limiting the valid output to 20 Re and
+c less based on the current (at the time) expansion:
+       IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3)
+     &    .GT.400.D0) THEN 
+             Ifail=-1
+             RETURN
+          ENDIF
+
+          CALL GEO_GSM(xGEO,xSM)
+          CALL TS07D_JULY_2017 (xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
      &      BxSM(3)) ! note that no solar wind input is necessary as it is
                     ! included through the TS07D common block
           CALL GSM_GEO(BxSM,Bxext)
