@@ -355,7 +355,7 @@ all.sunos.gnu32: all.build
 all.sunos.gnu64: all.build
 
 
-all.build: version.fortran ntime_max ts07d
+all.build: version.fortran ntime_max 
 	@cd $(SOURCEDIR); \
 cp wrappers_$(WRAPPER_$(OS)_$(ENV)).inc wrappers.inc;\
 echo "Building non-sharable object \
