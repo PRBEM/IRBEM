@@ -787,7 +787,8 @@ c Declare internal variables
       INTEGER*4    isat,iyear,Iint,ifail
       REAL*8     xMAG(3)
       real*8     alti,lati,longi
-      real*8     BxGEO(3),xGeop(3)
+      real*8     BxGEO(3),xGeop(3,25),myalpha(25)
+      real*8     MyBmir(25)
 c
 c Declare output variables
         REAL*8     BLOCAL,xGEO(3),BMIR
@@ -837,11 +838,13 @@ c          CALL CHAMP(Iint,xGEO,BxGEO,Blocal,Ifail) ! Iint is superfluous
         RETURN
       endif
 c
-        CALL find_bm_nalpha(xGeo,1,alpha
-     &     ,BLOCAL,BMIR,xGEOp)
-        xGEO(1)=xGeop(1)
-        xGEO(2)=xGeop(2)
-        xGEO(3)=xGeop(3)
+       myalpha(1)=alpha
+        CALL find_bm_nalpha(xGeo,1,myalpha
+     &     ,BLOCAL,myBMIR,xGEOp)
+        xGEO(1)=xGeop(1,1)
+        xGEO(2)=xGeop(2,1)
+        xGEO(3)=xGeop(3,1)
+        Bmir=MyBmir(1)
       END
 
 
@@ -1363,7 +1366,7 @@ c
              lati=xIN2
              longi=xIN3
              CALL RLL_GDZ(xMAG(1),lati,longi,alti)
-               CALL GDZ_GEO(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
+             CALL GDZ_GEO(lati,longi,alti,xGEO(1),xGEO(2),xGEO(3))
          endif
 
          return
