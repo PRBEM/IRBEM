@@ -1,0 +1,72 @@
+<!-- %***************************************************************************************************
+% Copyright 2006, S. Bourdarie, T.P. O'Brien, M. S. Shumko
+%
+% This file is part of IRBEM-LIB.
+%
+%    IRBEM-LIB is free software: you can redistribute it and/or modify
+%    it under the terms of the GNU Lesser General Public License as published by
+%    the Free Software Foundation, either version 3 of the License, or
+%    (at your option) any later version.
+%
+%    IRBEM-LIB is distributed in the hope that it will be useful,
+%    but WITHOUT ANY WARRANTY; without even the implied warranty of
+%    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%    GNU Lesser General Public License for more details.
+%
+%    You should have received a copy of the GNU Lesser General Public License
+%    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
+% -->
+<html>
+<head>
+</head>
+<body>
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">INTRODUCTION</font></font> 
+    </h2>
+    <p>
+        <font face="ARIAL, HELVETICA"><font size=+1>We provide a set of Python wrappers for
+        the IRBEM Fortran library through the use of a shared library file (.so on Unix). 
+        The wrapper is found in python/IRBEM.py. Python interfaces with the compiled shared 
+        library file with ctypes.</font></font> 
+    </p>
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">INSTALLATION</font></font> 
+    </h2>
+    <p>
+	  <el>
+        <font size=+1>
+	    <li> Compile the Fortran source as instructed by the README.install file. 
+        This will create the shared object file, "onera_desp_lib_linux....so" in the  
+        source firectory.</li>
+      <li>Change directory into the python folder and add the Python wrapper paths 
+          with "sudo python3 setup.py install"</li>
+      <li>Check that the installation worked by running the provided test scripts 
+        (...tests_and_visualizations.py).</li>
+      <li>If the wrapper crashes with the error "Either none or multiple .so files
+         found in the sources folder!", check that the shared object exists in the 
+         source folder.</li>
+         </font>
+	  </el>
+
+    </p>
+
+    <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">HOW TO USE</font></font> 
+    </h2>
+    <p>
+    </p>
+    <p>
+        <font face="ARIAL, HELVETICA"><font size=+1>
+        The Python wrapper IRBEM.py currently consists of two classes that load the shared object file. 
+        This class interface is used to avoid redudant user input formatting code. IRBEM.py currently
+        contains wrappers for the magnetic field library via the "MagFields" class and coordinate 
+        transformation library via the "Coords" class. The two classes contain methods which interface
+        with the various IRBEM functions e.g. make_lstar. The output from each IRBEM wrapped function 
+        can be accesed with the usual return statement and "**FUNCTION_NAME**_output" class attributes.
+        <br />
+        <br />
+        Current wrapped magnetic field functions are make_lstar, drift_shell, find_mirror_point,
+        find_foot_point, trace_field_line, and find_magequator. For more documentation, call help(FUNCTION_NAME).
+        <br />
+        <br />
+        Example code can be found in the ...test_and_visualizations.py files.
+    </p>
+</body>
+</html>

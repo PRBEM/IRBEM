@@ -210,7 +210,7 @@ class MagFields:
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), 
                 ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), 
                 ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal),
-                ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt));
+                ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt))
         self.make_lstar_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
             'bmin':bmin[:], 'Lstar':lstar[:], 'xj':xj[:]}  
         #del X
@@ -264,7 +264,7 @@ class MagFields:
                 ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(self.maginput), \
                 ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal), \
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(posit), \
-                ctypes.byref(nposit));
+                ctypes.byref(nposit))
         # Format the output into a dictionary, and convert ctypes arrays into
         # native Python format.
         self.drift_shell_output = {'Lm':lm.value, 'blocal':np.array(blocal),
@@ -312,7 +312,7 @@ class MagFields:
                 ctypes.byref(a), ctypes.byref(self.maginput), \
                 ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(posit))     
                 
-        self.mirror_point_output = {'blocal':blocal.value, 'bmin':bmin.value, \
+        self.find_mirror_point_output = {'blocal':blocal.value, 'bmin':bmin.value, \
                 'POSIT':posit[:]}
         return self.find_mirror_point_output
     
@@ -554,7 +554,7 @@ class MagFields:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                if verbose:
+                if self.TMI:
                      raise ValueError('Mirror point below the ground!, Change R0' +
                      ' or catch this error and assign it a value.', 
                      '\n Original error: ', err)
