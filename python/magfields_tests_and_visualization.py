@@ -57,7 +57,7 @@ def footPointTest():
     stopAlt = 100
     hemiFlag = 0
     model.find_foot_point(LLA, maginput, stopAlt, hemiFlag)
-    print(model.foot_point_output)
+    print(model.find_foot_point_output)
     
 def testDriftShell(pltDensity = 10):
     """

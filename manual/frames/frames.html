@@ -442,6 +442,14 @@
     </h3>
     <font face="ARIAL, HELVETICA">call make_lstar1(ntime,kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput, lm,lstar,blocal,bmin,xj,mlt)</font> 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">EXAMPLE CALLING SEQUENCE FROM PYTHON:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">
+            model = MagFields() <br />
+            LLA = {'x1':651, 'x2':63, 'x3':20, 'dateTime':'2015-02-02T06:12:43'} <br />
+            maginput = {'Kp':40} <br />
+            output_dictionary = model.make_lstar(LLA, maginput) <br />
+    </font> 
     <p>
         <hr><a name="LANDI2LSTAR"></a> 
     <h2><font face="ARIAL, HELVETICA"><font color="#0000ff">LANDI2LSTAR</font></font> 
@@ -701,6 +709,14 @@
     </h3>
     <font face="ARIAL, HELVETICA">call drift_shell1(kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput, lm,lstar,blocal,bmin,xj,posit,Nposit)</font> 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">EXAMPLE CALLING SEQUENCE FROM PYTHON:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">
+            model = MagFields() <br />
+            LLA = {'x1':651, 'x2':63, 'x3':20, 'dateTime':'2015-02-02T06:12:43'} <br />
+            maginput = {'Kp':40} <br />
+            output_dictionary = model.drift_shell(LLA, maginput) <br />
+    </font> 
     <p>
         <br />
         <hr><a name="DRIFT_BOUNCE_ORBIT"></a> 
@@ -816,6 +832,15 @@
     </h3>
     <font face="ARIAL, HELVETICA">call find_mirror_point1(kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3,alpha, maginput,blocal,bmir,posit)</font> 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">EXAMPLE CALLING SEQUENCE FROM PYTHON:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">
+            model = MagFields() <br />
+            LLA = {'x1':651, 'x2':63, 'x3':20, 'dateTime':'2015-02-02T06:12:43'} <br />
+            maginput = {'Kp':40} <br />
+            alpha = 90 <br />
+            output_dictionary = model.find_mirror_point(LLA, maginput, alpha) <br />
+    </font> 
     <p>
         <br />
         <hr><a name="FIND_MAGEQUATOR"></a> 
@@ -863,6 +888,14 @@
     </h3>
     <font face="ARIAL, HELVETICA">call find_magequator1(kext,options,sysaxes,iyear,idoy,ut,&nbsp;
     x1,x2,x3, maginput,bmin,posit)</font> 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">EXAMPLE CALLING SEQUENCE FROM PYTHON:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">
+            model = MagFields() <br />
+            LLA = {'x1':651, 'x2':63, 'x3':20, 'dateTime':'2015-02-02T06:12:43'} <br />
+            maginput = {'Kp':40} <br />
+            output_dictionary = model.find_magequator(LLA, maginput) <br />
+    </font> 
     <p>
         <br />
         <hr><a name="FIND_FOOT_POINT"></a> 
@@ -920,7 +953,17 @@
     </h3>
     <font face="ARIAL, HELVETICA">
         call find_foot_point1(kext,options,sysaxes,iyearsat,idoy,UT,xIN1,xIN2,xIN3,stop_alt,hemi_flag,maginput,XFOOT,BFOOT,BFOOTMAG)
-</font> 
+    </font> 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">EXAMPLE CALLING SEQUENCE FROM PYTHON:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">
+            model = MagFields() <br />
+            LLA = {'x1':651, 'x2':63, 'x3':20, 'dateTime':'2015-02-02T06:12:43'} <br />
+            maginput = {'Kp':40} <br />
+            stopAlt = 100 <br />
+            hemiFlag = 0 <br />
+            output_dictionary = model.find_foot_point(LLA, maginput, stopAlt, hemiFlag) <br />
+    </font> 
     <p>
         <br />
         <hr><a name="GET_FIELD"></a> 
@@ -1141,6 +1184,14 @@
     </h3>
     <font face="ARIAL, HELVETICA">call trace_field_line2_1(kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput,R0, lm,blocal,bmin,xj,posit,Nposit)</font> 
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">EXAMPLE CALLING SEQUENCE FROM PYTHON:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">
+            model = MagFields() <br />
+            LLA = {'x1':651, 'x2':63, 'x3':20, 'dateTime':'2015-02-02T06:12:43'} <br />
+            maginput = {'Kp':40} <br />
+            output_dictionary = model.trace_field_line(LLA, maginput) <br />
+    </font> 
     <p>
         <br />
         <hr><a name="TRACE_FIELD_LINE_TOWARD_EARTH"></a> 
@@ -3995,7 +4046,7 @@
     <p>
         <font face="ARIAL, HELVETICA">This function allows one to fly any MEO GNSS type spacecraft
         in&nbsp;MEO ONERA models.
-        The use of the model is limited to GPS altitude (~20000 km - 55° inclination) as it is based on LANL-GPS&nbsp;
+        The use of the model is limited to GPS altitude (~20000 km - 55ï¿½ inclination) as it is based on LANL-GPS&nbsp;
         bird series (1990 to 2006). Two versions of the model are provided: </font>
     </p>
     <div style="MARGIN-LEFT: 40px"><font face="ARIAL, HELVETICA">1: known as MEO-V1, it&nbsp;covers electron energies
