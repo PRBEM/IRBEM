@@ -152,7 +152,8 @@ c
       UT_dip=0.d0
       DO isat = 1,ntime
          ! need to reinitialize sun for GEI to GEO coordinate transforms
-         CALL INIT_GSM(iyear(isat),idoy(isat),UT(isat),psi) ! compute sun among other things
+         ! INIT_GSM: compute sun among other things
+         CALL INIT_GSM(iyear(isat),idoy(isat),UT(isat),psi)
          tilt = psi/rad ! in common block dip_ang
 
 	    call get_coordinates ( sysaxes, 
@@ -218,16 +219,18 @@ c
       INCLUDE 'ntime_max.inc'
 c
       REAL*8       xMinP_L, xMaxP_L, XMinE_L, xMaxE_L
-c  minimum and maximum Lshells to calculate proton fluxes
+c  minimum and maximum Lshell to calculate proton fluxes
       PARAMETER   (xMINP_L = 1.0)
       PARAMETER   (xMAXP_L = 11.0)
-c  minimum and maximum Lshells to calculate electron fluxes
+c  minimum and maximum Lshell to calculate electron fluxes
       PARAMETER   (xMINE_L = 1.2)
       PARAMETER   (xMAXE_L = 12.0)
 
       INTEGER*4   ntmax,i,nene,ieny
-      INTEGER*4   whichm  !1=AE8min 2=AE8max 3=AP8min 4=AP8max
-      INTEGER*4   whatf  !1=diff 2=E range 3=int
+      !model flags: 1=AE8min 2=AE8max 3=AP8min 4=AP8max
+      INTEGER*4   whichm
+      !flux flags: 1=diff 2=E range 3=int
+      INTEGER*4   whatf
       INTEGER*4 MAPPMIN(16582), MAPPMAX(16291),
      &           MAPEMIN(13168), MAPEMAX(13548)
       REAL*8      energy(2,25)
@@ -263,7 +266,7 @@ c loop on energies
      &                    energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                   Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
-                     if (energy(1,ieny) .lt. 0.04D0 .or.
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
      &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -282,9 +285,9 @@ c loop on energies
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                  Flux(i,ieny) = (FL1-10.D0** FL)/
      &                          (energy(2,ieny)-energy(1,ieny))
-                     if (energy(1,ieny) .lt. 0.04D0 .or.
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
      &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
-                     if (energy(2,ieny) .lt. 0.04D0 .or.
+                     if (energy(2,ieny) .lt. 0.05D0 .or.
      &               energy(2,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -298,7 +301,7 @@ c loop on energies
                      CALL TRARA(IHEADEMIN,MAPEMIN,L(i),BBo(i),
      &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
-                     if (energy(1,ieny) .lt. 0.04D0 .or.
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
      &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
@@ -322,7 +325,7 @@ c loop on energies
      &                        energy(1,ieny)+0.001D0,FL, whichm)
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/0.002D0
-                     if (energy(1,ieny) .lt. 0.04D0 .or.
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
      &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
@@ -342,9 +345,9 @@ c loop on energies
                      if (FL1.GT.1.D0 .AND. FL.GT.0.D0)
      &                     Flux(i,ieny) = (FL1-10.D0** FL)/
      &                    (energy(2,ieny)-energy(1,ieny))
-                     if (energy(1,ieny) .lt. 0.04D0 .or.
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
      &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
-                     if (energy(2,ieny) .lt. 0.04D0 .or.
+                     if (energy(2,ieny) .lt. 0.05D0 .or.
      &               energy(2,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
 c             if (Flux(i,ieny).LE.0.D0) Flux(i,ieny)=baddata
                   enddo
@@ -359,7 +362,7 @@ c loop on energies
                      CALL TRARA(IHEADEMAX,MAPEMAX,L(i),BBo(i),
      &                        energy(1,ieny),FL, whichm)
                      if (FL.GT.0.D0) Flux(i,ieny) = 10.D0** FL
-                     if (energy(1,ieny) .lt. 0.04D0 .or.
+                     if (energy(1,ieny) .lt. 0.05D0 .or.
      &               energy(1,ieny) .gt. 7.D0) Flux(i,ieny)=baddata
                   enddo
                endif
