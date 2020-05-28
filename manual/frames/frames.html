@@ -1021,7 +1021,20 @@
     <font face="ARIAL, HELVETICA">call GET_FIELD_MULTI(ntime,kext,options,sysaxes,iyear,idoy,ut,
     x1,x2,x3, maginput,Bgeo,Bl)</font> 
     <p>
+
+    &nbsp;
+    <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">EXAMPLE CALLING SEQUENCE FROM PYTHON:</font></font> 
+    </h3>
+    <font face="ARIAL, HELVETICA">
+            model = MagFields() <br />
+            LLA = {'x1':651, 'x2':63, 'x3':20, 'dateTime':'2015-02-02T06:12:43'} <br />
+            maginput = {'Kp':40} <br />
+            output_dictionary = model.get_field_multi(LLA, maginput) <br />
+    </font> 
+    <p>
         <br />
+
+    
 
         <hr><a name="GET_BDERIVS"></a> 
     </p>

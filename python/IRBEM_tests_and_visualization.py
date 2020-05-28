@@ -1,20 +1,15 @@
-# -*- coding: utf-8 -*-
 """
-Created on Fri Jan  6 19:26:04 2017
-
-@author: mike
+This program contains a few visualization and test scripts. A more
+thorough test suite is in test_IRBEM.py
 """
-
-# IRBEM test and visualization functions.
-#from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pylab as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import datetime
+import dateutil.parser
 from mpl_toolkits.mplot3d import Axes3D
-from IRBEM import IRBEM
+import IRBEM
 
-# A few test and visualization scripts.
 def testLStarOutput(test_datetime = True):
     """
     This test function will test is the make_lstar1() function works correctly.
@@ -24,14 +19,14 @@ def testLStarOutput(test_datetime = True):
     'Lm': [4.631806704496794], 'bmin': [268.5087756309121], 
     'blocal': [39730.828875776126]}
     """
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = [651, 651]
-    LLA['x2'] = [63, 61]
-    LLA['x3'] = [15.9, 1]
+    LLA['x2'] = [63, 63]
+    LLA['x3'] = [15.9, 15.9]
     if test_datetime:
         LLA['dateTime'] = [datetime.datetime(2015, 2, 2, 6, 12,43), 
-        datetime.datetime(2015, 2, 2, 6,12, 43)]
+                            datetime.datetime(2015, 2, 2, 6,12, 43)]
     else:
         LLA['dateTime'] = ['2015-02-02T06:12:43', '2015-02-02T06:12:43']
     maginput = {'Kp':[40.0, 50]}
@@ -47,7 +42,7 @@ def footPointTest():
     'BFOOT': [-30667.04604376155, -7651.837684485317, -39138.97550317413],
     'BFOOTMAG': [50307.82977269011, -9999.0, -9999.0]}
     """
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 63.97
@@ -58,6 +53,34 @@ def footPointTest():
     hemiFlag = 0
     model.find_foot_point(LLA, maginput, stopAlt, hemiFlag)
     print(model.find_foot_point_output)
+
+def get_field_multi_test():
+    """
+    Test script for the get_field_multi function.
+    
+    {'BxGEO': array([-25406.63883895]), 'ByGEO': array([-6604.45858536]), 
+    'BzGEO': array([-30072.32190048]), 'Bl': array([39918.17524367])}
+
+    {'BxGEO': array([-25406.63883895, -25406.63883895, -25406.63883895, -25406.63883895,
+       -25406.63883895, -25406.63883895, -25406.63883895, -25406.63883895,
+       -25406.63883895, -25406.63883895]), 'ByGEO': array([-6604.45858536, -6604.45858536, -6604.45858536, -6604.45858536,
+       -6604.45858536, -6604.45858536, -6604.45858536, -6604.45858536,
+       -6604.45858536, -6604.45858536]), 'BzGEO': array([-30072.32190048, -30072.32190048, -30072.32190048, -30072.32190048,
+       -30072.32190048, -30072.32190048, -30072.32190048, -30072.32190048,
+       -30072.32190048, -30072.32190048]), 'Bl': array([39918.17524367, 39918.17524367, 39918.17524367, 39918.17524367,
+       39918.17524367, 39918.17524367, 39918.17524367, 39918.17524367,
+       39918.17524367, 39918.17524367])}
+    """
+    model = IRBEM.MagFields(options=[0,0,0,0,0], verbose=True)
+    LLA = {}
+    LLA['x1'] = 651
+    LLA['x2'] = 63.97
+    LLA['x3'] = 15.9
+    LLA['dateTime'] = '2015-02-02T06:12:43'
+    maginput = {'Kp':40.0} 
+    output = model.get_field_multi(LLA, maginput)
+    print(output)
+    return
     
 def testDriftShell(pltDensity = 10):
     """
@@ -67,7 +90,7 @@ def testDriftShell(pltDensity = 10):
     You may get a PEP 3118 buffer warning.
     """
     print('Under construction')
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 34
@@ -111,7 +134,7 @@ def test_find_mirror_point():
     {'blocal': 39730.828875776126, 'POSIT': [0.4828763104086329, 
     0.13755093538265498, 0.9794110012635103], 'bmin': 39730.828875776126}
     """
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 63
@@ -125,7 +148,7 @@ def testTraceFieldLine(pltDensity = 10):
     """
     Test function to plot a fieldline and a sphere.
     """
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     LLA = {}
     LLA['x1'] = 651
     LLA['x2'] = 63
@@ -163,7 +186,7 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
     defines at what inerval to plot the field lines, since it is very 
     computationaly expensive to plot. 
     """
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     startLon = 0
     endLon = 360
     
@@ -207,7 +230,7 @@ def azimuthalFieldLineVisualization(lat = 55, dLon = 20, pltDensity = 10):
     return
     
 def test_find_magequator():
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     X = {}
     X['x1'] = 651
     X['x2'] = 63
@@ -226,7 +249,7 @@ Tsl = lambda L, alpha0, v: 4*6.371E6*np.divide(L, v) * \
 beta = lambda Ek: np.sqrt(1-((Ek/511)+1)**(-2))
 
 def test_bounce_period():
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     X = {}
     kp = 40
     X['x1'] = 651
@@ -256,7 +279,7 @@ def test_bounce_period():
     gs.tight_layout(fig)
     
 def test_mirror_point_alt():
-    model = IRBEM(options = [0,0,0,0,0], verbose = True)
+    model = IRBEM.MagFields(options = [0,0,0,0,0], verbose = True)
     X = {}
     kp = 40
     X['x1'] = 651
@@ -272,6 +295,8 @@ if __name__ == '__main__':
     testLStarOutput()
     print('Running test: footPointTest')
     footPointTest()
+    print('Running test: get_field_multi_test')
+    get_field_multi_test()
     print('Running test: azimuthalFieldLineVisualization')
     azimuthalFieldLineVisualization(dLon = 5)
     print('Running test: testDriftShell')

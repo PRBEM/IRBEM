@@ -32,6 +32,16 @@ import dateutil.parser
 import scipy.interpolate
 import scipy.optimize
 
+pandas_imported = False
+try:
+    import pandas as pd
+    pandas_imported = True
+except ModuleNotFoundError as err:
+    if str(err) == "No module named 'pandas'":
+        pass
+    else:
+        raise
+
 # Physical constants
 Re = 6371 #km
 c = 3.0E8 # m/s
@@ -70,6 +80,7 @@ class MagFields:
     find_foot_point()
     trace_field_line()
     find_magequator()
+    get_field_multi()
     
     Functions wrapped and not tested:
     None
@@ -133,6 +144,10 @@ class MagFields:
                 self.options[i] = kwargs['options'][i]
         else:
             self.options = optionsType(0,0,0,0,0)
+            
+        # Get the NTIME_MAX value
+        self.NTIME_MAX = ctypes.c_int(-1)
+        self.irbem.get_irbem_ntime_max1_(ctypes.byref(self.NTIME_MAX))
         return
         
     def make_lstar(self, X, maginput):
@@ -147,60 +162,14 @@ class MagFields:
         RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary.
         MOD:     2017-05-21
         """
-        # Deep copy so if the single inputs get encapsulated in an array,
-        # it wont be propaged back to the user.
-        X2 = copy.deepcopy(X)
-        
-        # Check if function arguments are not lists/arrays. Convert them to 
-        # size 1 arrays. This is different than other functions because
-        # you can feed an array of positions and times to make_lstar().
-        if( not isinstance(X2['dateTime'], list) and 
-                not isinstance(X2['dateTime'], np.ndarray) ):
-            X2['dateTime'] = np.array([X2['dateTime']])
-            X2['x1'] = np.array([X2['x1']])
-            X2['x2'] = np.array([X2['x2']])
-            X2['x3'] = np.array([X2['x3']])
+        # Convert the satellite time and position into c objects.
+        ntime, iyear, idoy, ut, x1, x2, x3 = self._prepTimeLocArray(X)       
 
-        nTimePy = len(X2['dateTime'])
-        if nTimePy > 50000:
-            print('Warning, more than 50,000 data points fed to IRBEM. '+
-            'It may crash without warning!')
-        ntime = ctypes.c_int(nTimePy)        
-        
-        # Convert times to datetime objects.
-        
-        if type(X2['dateTime'][0]) is datetime.datetime:
-            t = X2['dateTime']
-        else:
-            t = nTimePy * [None]
-            for i in range(nTimePy):
-                t[i] = dateutil.parser.parse(X2['dateTime'][i])
-            
-        nTimePy = len(X2['dateTime'])
-        ntime = ctypes.c_int(nTimePy)
-        
-        # C arrays are statically defined with the following procedure.
-        # There are a few ways of doing this...
-        intArrType = ctypes.c_int * nTimePy
-        iyear = intArrType()
-        idoy = intArrType()
-        
-        doubleArrType = ctypes.c_double * nTimePy
-        ut, x1, x2, x3 = [doubleArrType() for i in range(4)]
-        
-        # Prep magentic field model inputs        
+        # Convert the model parameters into c objects.     
         maginput = self._prepMagInput(maginput)
-        
-        # Now fill the input time and model sampling (s/c location) parameters.
-        for dt in range(nTimePy):
-            iyear[dt] = t[dt].year
-            idoy[dt] = t[dt].timetuple().tm_yday
-            ut[dt] = 3600*t[dt].hour + 60*t[dt].minute + t[dt].second
-            x1[dt] = X2['x1'][dt]
-            x2[dt] = X2['x2'][dt] 
-            x3[dt] = X2['x3'][dt]
                 
         # Model outputs
+        doubleArrType = ctypes.c_double * ntime.value
         lm, lstar, blocal, bmin, xj, mlt = [doubleArrType() for i in range(6)]
         
         if self.TMI: print("Running IRBEM-LIB make_lstar")
@@ -213,7 +182,6 @@ class MagFields:
                 ctypes.byref(bmin), ctypes.byref(xj), ctypes.byref(mlt))
         self.make_lstar_output = {'Lm':lm[:], 'MLT':mlt[:], 'blocal':blocal[:],
             'bmin':bmin[:], 'Lstar':lstar[:], 'xj':xj[:]}  
-        #del X
         return self.make_lstar_output
         
     def drift_shell(self, X, maginput):
@@ -271,10 +239,9 @@ class MagFields:
             'bmin':bmin.value, 'lstar':lstar.value, 'xj':xj.value, 
             'POSIT':np.array(posit), 'Nposit':np.array(nposit)} 
         return self.drift_shell_output
-            
-            
+                   
     def drift_bounce_orbit(self):
-        print('Under construction and not tested!')
+        raise NotImplementedError()
         return
     
     def find_mirror_point(self, X, maginput, alpha):
@@ -453,7 +420,70 @@ class MagFields:
                 ctypes.byref(XGEO))
         self.find_magequator_output = {'bmin':bmin.value, 'XGEO':np.array(XGEO)}
         return self.find_magequator_output
+
+    def get_field_multi(self, X, maginput):
+        """
+        This function computes the GEO vector of the magnetic field at input 
+        location for a set of internal/external magnetic field to be selected. 
+
+        Parameters
+        ----------
+        X : dict
+            The dictionary specifying the time and location.  
+        maginput : dict
+            The magnetic field inpit parameter dictionary.
+
+        Returns
+        -------
+        A dictionary with the following key-value pairs:
+        BxGEO: array
+            X component of the magnetic field (nT)
+        ByGEO: array
+            Y component of the magnetic field (nT)
+        BzGEO: array
+            Z component of the magnetic field (nT)
+        Bl: array
+            Magnitude of magnetic field (nT)
         
+        Example
+        -------
+        model = IRBEM.MagFields(options=[0,0,0,0,0], verbose=True)
+        LLA = {}
+        LLA['x1'] = 651
+        LLA['x2'] = 63.97
+        LLA['x3'] = 15.9
+        LLA['dateTime'] = '2015-02-02T06:12:43'
+        maginput = {'Kp':40.0} 
+        output = model.get_field_multi(LLA, maginput)
+        print(output)
+        """
+        # Prep the time and position variables.
+        ntime, iyear, idoy, ut, x1, x2, x3 = self._prepTimeLocArray(X)
+
+        # Prep magnetic field model inputs        
+        maginput = self._prepMagInput(maginput)
+
+        # Model output types
+        Bl_type = ctypes.c_double * ntime.value
+        Bgeo_type = ( (ctypes.c_double * 3) * ntime.value )
+        # Model output arrays
+        Bgeo = Bgeo_type()
+        Bl = Bl_type()
+        
+        if self.TMI: print("Running IRBEM-LIB get_field_multi")
+
+        self.irbem.get_field_multi_(
+                ctypes.byref(ntime), ctypes.byref(self.kext), 
+                ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
+                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
+                ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), 
+                ctypes.byref(maginput), ctypes.byref(Bgeo), ctypes.byref(Bl)
+                )
+        Bgeo_np = np.array(Bgeo)
+        self.get_field_multi_output = {'BxGEO':Bgeo_np[:,0], 'ByGEO':Bgeo_np[:,1], 
+            'BzGEO':Bgeo_np[:,2], 'Bl':np.array(Bl)}
+        return self.get_field_multi_output
+
     def bounce_period(self, X, maginput, E, **kwargs):
         """
         NAME:  bounce_period(self, X, maginput, E, **kwargs)
@@ -572,31 +602,111 @@ class MagFields:
             fLine['fy'](startInd)**2 + fLine['fz'](startInd)**2)-1)
         return self.mirrorAlt
         
-    def _prepTimeLoc(self, Xloc):
+    def _prepTimeLoc(self, X):
         """
-        NAME:  _prepTimeLoc(self, Xloc)
-        USE:   Prepares spacetime outputs.
-        INPUT: A dictionary, Xloc containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'.
+        NAME:  _prepTimeLoc(self, X)
+        USE:   Prepares spacetime inputs.
+        INPUT: A dictionary, X containing the time and sampling location. 
+               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. Other time keys
+               will work, as long as they contain the word 'time' (case 
+               insensitive). 
         AUTHOR: Mykhaylo Shumko
         RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
         MOD:     2017-01-12
         """
         if self.TMI: print('Prepping time and space input variables')
 
-        if type(Xloc['dateTime']) is datetime.datetime:
-            t = Xloc['dateTime']
+        # Deep copy X so if the single inputs get encapsulated in 
+        # an array, it wont be propaged back to the user.
+        Xc = copy.deepcopy(X)
+
+        time_key = [key for key in Xc.keys() if 'time' in key.lower()]
+        assert len(time_key) == 1, ('None or multiple time keys found in '
+                                    f'dictionary input \n {Xc}')
+        time_key = time_key[0]
+
+        if isinstance(Xc[time_key], datetime.datetime):
+            t = Xc[time_key]
+        elif pandas_imported and isinstance(Xc[time_key], pd.Timestamp):
+            t = pd.dt.to_pydatetime()
         else:
-            t = dateutil.parser.parse(Xloc['dateTime'])
+            t = dateutil.parser.parse(Xc[time_key])
         iyear = ctypes.c_int(t.year)
         idoy = ctypes.c_int(t.timetuple().tm_yday)
         ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)
-        x1 = ctypes.c_double(Xloc['x1']) 
-        x2 = ctypes.c_double(Xloc['x2'])
-        x3 = ctypes.c_double(Xloc['x3'])
+        x1 = ctypes.c_double(Xc['x1']) 
+        x2 = ctypes.c_double(Xc['x2'])
+        x3 = ctypes.c_double(Xc['x3'])
         if self.TMI: print('Done prepping time and space input variables')
         return iyear, idoy, ut, x1, x2, x3
     
+    def _prepTimeLocArray(self, X):
+        """
+        NAME:  _prepTimeLocArray(self, X)
+        USE:   Prepares spacetime inputs used for IRBEM functions accepting
+                array inputs.
+        INPUT: A dictionary, X, containing the time and sampling location. 
+               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. Other time keys
+               will work, as long as they contain the word 'time' (case 
+               insensitive). 
+        AUTHOR: Mykhaylo Shumko
+        RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
+        MOD:     2020-05-26
+        """
+        # Deep copy X so if the single inputs get encapsulated in 
+        # an array, it wont be propaged back to the user.
+        Xc = copy.deepcopy(X)
+
+        # identify the time key.
+        time_keys = [key for key in Xc.keys() if 'time' in key.lower()]
+        assert len(time_keys) == 1, ('None or multiple time keys found in '
+                                    f'dictionary input \n {Xc}')
+        time_key = time_keys[0]
+
+        # Check if function arguments are lists or arrays and convert them
+        # to numpy arrays if they are not.
+        if not isinstance(Xc[time_key], (list, np.ndarray)):
+            for key in Xc.keys():
+                Xc[key] = np.array([Xc[key]])
+
+        # Check that the input array length does not exceed NTIME_MAX.
+        nTimePy = len(Xc[time_key])
+        if nTimePy > self.NTIME_MAX.value:
+            raise ValueError(f"Input array length {nTimePy} is longer "
+                             f"than IRBEM's NTIME_MAX = {self.NTIME_MAX.value}. "
+                             f"Use a for loop.")
+        ntime = ctypes.c_int(nTimePy)
+
+        # Check that the times are datetime objects, and convert otherwise.
+        if isinstance(Xc[time_key][0], datetime.datetime):
+            t = Xc[time_key]
+        elif pandas_imported and isinstance(Xc[time_key][0], pd.Timestamp):
+            t = pd.dt.to_pydatetime()
+        else:
+            t = [dateutil.parser.parse(t_i) for t_i in Xc[time_key]]
+
+        nTimePy = len(Xc[time_key])
+        ntime = ctypes.c_int(nTimePy)
+        
+        # C arrays are statically defined with the following procedure.
+        # There are a few ways of doing this...
+        intArrType = ctypes.c_int * nTimePy
+        iyear = intArrType()
+        idoy = intArrType()
+        
+        doubleArrType = ctypes.c_double * nTimePy
+        ut, x1, x2, x3 = [doubleArrType() for i in range(4)]
+
+        # Now fill the input time and model sampling (s/c location) parameters.
+        for dt in range(nTimePy):
+            iyear[dt] = t[dt].year
+            idoy[dt] = t[dt].timetuple().tm_yday
+            ut[dt] = 3600*t[dt].hour + 60*t[dt].minute + t[dt].second
+            x1[dt] = Xc['x1'][dt]
+            x2[dt] = Xc['x2'][dt] 
+            x3[dt] = Xc['x3'][dt]
+        return ntime, iyear, idoy, ut, x1, x2, x3
+
     def _prepMagInput(self, inputDict = None):
         """
         NAME:  _prepMagInput(self, inputDict)
@@ -613,7 +723,7 @@ class MagFields:
         if self.TMI: print('Prepping magnetic field inputs.')
 
         # If no model inputs (statis magnetic field model)
-        if inputDict == None:
+        if inputDict is None:
             magInputType = (ctypes.c_double * 25)
             self.maginput = magInputType()
             for i in range(25):
@@ -629,7 +739,7 @@ class MagFields:
         # If the model inputs are arrays
         if magType in [np.ndarray, list]:
             nTimePy = len(inputDict[list(inputDict.keys())[0]])
-            magInputType = ((ctypes.c_double * nTimePy) * 25)
+            magInputType = ((ctypes.c_double * 25) * nTimePy)
             self.maginput = magInputType()
             
             # Loop over potential keys.
@@ -639,9 +749,10 @@ class MagFields:
                     # For every key provided by user, populate the maginput 
                     # C array.
                     if orderedKeys[i] in list(inputDict.keys()):
-                        self.maginput[i][dt] = inputDict[orderedKeys[i]][dt]
+                        # maginput(25,ntime_max)
+                        self.maginput[dt][i] = inputDict[orderedKeys[i]][dt]
                     else:
-                        self.maginput[i][dt] = ctypes.c_double(-9999) 
+                        self.maginput[dt][i] = ctypes.c_double(-9999) 
                         
         # If model inputs are integers or doubles.
         elif magType in [int, float, np.float64]:
