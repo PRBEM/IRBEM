@@ -1,5 +1,5 @@
 # setup.py
-from setuptools import setup, find_packages
+from setuptools import setup
 
 # To install in linux, type in terminal "sudo python3 setup.py install"
 
@@ -13,6 +13,7 @@ setup(name = 'IRBEM',
     author_email = 'msshumko@gmail.com',
     url = 'https://sourceforge.net/projects/irbem/',
     version = '0.1.0',
-    packages = find_packages(),
-    install_requires = ['wheel', 'python-dateutil', 'numpy >= 1.12', 'scipy >= 0.14']
+    packages = ['IRBEM'],
+    install_requires = ['wheel', 'python-dateutil', 
+                        'numpy >= 1.12', 'scipy >= 0.14']
     )

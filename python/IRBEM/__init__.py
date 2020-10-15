@@ -1,2 +1,2 @@
-from .IRBEM import MagFields as MagFields
-from .IRBEM import Coords as Coords
+from .IRBEM import MagFields
+from .IRBEM import Coords
