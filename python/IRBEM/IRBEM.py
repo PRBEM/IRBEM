@@ -28,6 +28,7 @@ import os, glob, copy
 import ctypes
 import datetime
 import dateutil.parser
+from warnings import warn
 
 import numpy as np
 import scipy.interpolate
@@ -117,10 +118,13 @@ class MagFields:
             ' correct "IRBEMdir" and "IRBEMname" kwargs to the IRBEM instance.')
             raise
         
-        # global model parameters, default is T89 model with GDZ coordinate
-        # system.
-        # If kext is a string, find the corresponding integer value
-        kext = kwargs.get('kext', 4)
+        # global model parameters, default is OPQ77 model with GDZ coordinate
+        # system. If kext is a string, find the corresponding integer value.
+        if 'kext' not in kwargs:
+            warn('\n\nThe default external model kwarg, kext, was changed from '
+                 '"T89" to "OPQ77" to be consistant with the rest of IRBEM-lib. '
+                 'This warning will be removed in a future release in 2021.\n\n')
+        kext = kwargs.get('kext', 5)
         if isinstance(kext, str):
             try:
                 self.kext = ctypes.c_int(extModels.index(kext))
@@ -861,7 +865,7 @@ class Coords:
         if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
             self.compiledIRBEMdir = \
             os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', 'source'))
+            '..', '..', 'source'))
             fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
             assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
             'found in the sources folder!'
@@ -1018,7 +1022,8 @@ def IRBEM(*args, **kwargs):
     Warn user that IRBEM class is depricated.
     """
     from warnings import warn
-    warn("\n \n The IRBEM class is depricated, functionality has moved to MagFields.\n")
+    warn("\n \n The IRBEM class is depricated, functionality has moved to the "
+        "MagFields and Coords clases.\n")
     return MagFields(*args, **kwargs)
 
 """

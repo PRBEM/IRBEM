@@ -1,11 +1,8 @@
-# setup.py
+### The IRBEM-LIB Python3 wrapper ###
+# Only tested on Linux and Python > 3.6
+# To install in linux, run: "python3 -m pip install -e ."
+
 from setuptools import setup
-
-# To install in linux, type in terminal "sudo python3 setup.py install"
-
-# For developer install, use "sudo python3 setup.py develop" to install 
-# and "sudo python3 setup.py develop -u" to remove. Note that you can 
-# install the Python wrapper on Python 2.7 and Python 3.X.
 
 setup(name = 'IRBEM',
     description = 'Python wrapper for IRBEM',

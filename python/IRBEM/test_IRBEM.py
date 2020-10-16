@@ -22,7 +22,7 @@ class TestIRBEM(unittest.TestCase):
     and checks that the outputs are approximately equal.
     """
     def setUp(self):
-        self.model = IRBEM.MagFields(options=[0,0,0,0,0], verbose=False)
+        self.model = IRBEM.MagFields(options=[0,0,0,0,0], verbose=False, kext='T89')
         # Create four sets of model inputs: one set of input values, 
         # array of input values, one input value with a string 
         # datetime object, and array of inputs including a 
@@ -161,16 +161,25 @@ class TestIRBEM(unittest.TestCase):
 
     def assertAlmostEqualDict(self, A, B):
         """
-        Wrapper for unittests assertAlmostEqual that catches the TypeError 
-        when comparing dictionaries and returns a more meaningfull ValueError.
+        Wrapper for unittests assertAlmostEqual that compares each value in 
+        each key between dicts A and B.
         """
-        try:
-            self.assertAlmostEqual(A, B)
-        except TypeError as err:
-            if "unsupported operand type(s)" in str(err):
-                raise ValueError('The input and output dictionaries are not almost equal')
+        # Loop over the dict A keys
+        for key, values in A.items():
+            if not hasattr(values, '__len__'):
+                # If this key contains one value then compare it now:
+                self.assertAlmostEqual(values, B[key])
             else:
-                raise
+                # Otherwise loop over each array item in the dicts A and B key.
+                for value_A, value_B in zip(values, B[key]):
+                    try:
+                        self.assertAlmostEqual(value_A, value_B)
+                    except:
+                        print('\nDictionary unit test failed on the ', key, 'key')
+                        print('Dict A and B values:', value_A, value_B, '\n\n')
+                        raise
+        return
+
 
 
 def get_dummy_model_inputs(n=1, datetime_obj=True, maginput=False):
