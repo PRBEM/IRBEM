@@ -60,19 +60,18 @@ class MagFields:
     search for a .so file in the ./../sources/ directory.
     
     When creating the instance object, you can use the 'options' kwarg to 
-    set the options, dafault is 0,0,0,0,0. Kwarg 'kext' sets the external B 
-    field as is set to default of 4 (T89c model), and 'sysaxes' kwarg sets the 
-    input coordinate system, and is set to GDZ (lat, long, alt). 
+    set the options, default is 0,0,0,0,0. Kwarg 'kext' sets the external B 
+    field as is set to default of 5 (OPQ77 model), and 'sysaxes' kwarg sets the 
+    input coordinate system, and is by default set to GDZ (lat, long, alt). 
     
     verbose keyword, set to False by default, will print too much information 
     (TMI)! Usefull for debugging and for knowing too much. Set it to True if
     Python quietly crashes (probably an input to Fortran issue)
     
-    Python wrapper error value is -9999.
+    Python wrapper error value is -9999 (IRBEM-Lib's Fortan error value is -1E31).
     
     TESTING IRBEM:
-    Run magfields_tests_and_visalization.py. There may be buffer warnings, but 
-    otherwise they should run.
+    Run test_IRBEM.py to run the unit test suite.
     
     Functions wrapped and tested:
     make_lstar()
@@ -82,6 +81,7 @@ class MagFields:
     trace_field_line()
     find_magequator()
     get_field_multi()
+    get_mlt()
     
     Functions wrapped and not tested:
     None
@@ -136,8 +136,6 @@ class MagFields:
         else:
             self.kext = ctypes.c_int(kext)
         
-        
-        #self.kext = ctypes.c_int(kwargs.get('kext', 4))
         self.sysaxes = ctypes.c_int(kwargs.get('sysaxes', 0))
         
         # If options are not supplied, assume they are all 0's.
@@ -488,6 +486,38 @@ class MagFields:
             'BzGEO':Bgeo_np[:,2], 'Bl':np.array(Bl)}
         return self.get_field_multi_output
 
+    def get_mlt(self, X):
+        """
+        Method to get Magnetic Local Time (MLT) from a Cartesian GEO 
+        position and date.
+
+        Parameters
+        ----------
+        X: dict
+            The dictionary specifying the time and location in GEO coordinates. 
+        Returns
+        -------
+        MLT : float
+            The MLT value (hours).
+        """
+        # Inputs
+        iyear, idoy, ut, _, _, _ = self._prepTimeLoc(X)
+        coordsType =  ctypes.c_double * 3
+        geo_coords = coordsType(X['x1'], X['x2'], X['x3'])
+
+        # Model output variable
+        MLT = ctypes.c_double(-9999)
+        
+        if self.TMI: print("Running IRBEM-LIB get_mlt")
+
+        self.irbem.get_mlt1_( 
+                ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
+                ctypes.byref(geo_coords), ctypes.byref(MLT)
+                )
+        self.get_mlt_output = MLT.value
+        return self.get_mlt_output
+
+    ### Non-IRBEM methods.
     def bounce_period(self, X, maginput, E, **kwargs):
         """
         NAME:  bounce_period(self, X, maginput, E, **kwargs)

@@ -41,7 +41,7 @@ class TestIRBEM(unittest.TestCase):
             self.X_array_pd['dateTime'] = pd.to_datetime(self.X_array_pd['dateTime'])
 
         self.l_star_true_dict = {
-                    'Lm': [3.5579374952779204], 'MLT': [10.169456256499693], 
+                    'Lm': [3.5579374952779204], 'MLT': [], 
                     'blocal': [42262.312614335955], 'bmin': [627.2214166228032], 
                     'Lstar': [-1e+31], 'xj': [7.015533298820233]
                     }
@@ -157,8 +157,20 @@ class TestIRBEM(unittest.TestCase):
         self.model.find_magequator_output['XGEO'] = list(self.model.find_magequator_output['XGEO'])
         self.assertAlmostEqualDict(self.model.find_magequator_output, find_magequator_true_dict)
         return
-        
 
+    def test_get_mlt(self):
+        """
+        Tests the get_mlt IRBEM function. 
+        """
+        input_dict = {'dateTime':'2015-02-02T06:12:43',
+                    'x1':2.195517156287977,
+                    'x2':2.834061428571752,
+                    'x3':0.34759070278576953}
+        true_MLT = 9.569695784106997
+        self.model.get_mlt(input_dict)
+        self.assertAlmostEqual(self.model.get_mlt_output, true_MLT)
+        return
+        
     def assertAlmostEqualDict(self, A, B):
         """
         Wrapper for unittests assertAlmostEqual that compares each value in 
@@ -179,7 +191,6 @@ class TestIRBEM(unittest.TestCase):
                         print('Dict A and B values:', value_A, value_B, '\n\n')
                         raise
         return
-
 
 
 def get_dummy_model_inputs(n=1, datetime_obj=True, maginput=False):
