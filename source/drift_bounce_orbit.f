@@ -710,6 +710,8 @@ c     Declare internal variables
       ! store or not?
       INTEGER*4 store
 
+      j = 1 ! TPO 5 Jan 2020 seems like j was never initialized
+
       ! Iflag=1 means success, set to fail until succeeded
       Iflag = 0
 

@@ -3,7 +3,8 @@ An MPI program to genereate multiple Lstar/hmin values
 From time/loc parameters from a binary file
 
 Example compile command:
-mpicc -s -O3 -L/home/tpo26062/lib -o multi_Lstar_hmin.mpix multi_Lstar_hmin.c -lonera_desp_lib_linux_x86_64
+mpicc -s -O3 -o multi_Lstar_hmin.mpix multi_Lstar_hmin.c -lgfortran -lm -loneradesp_linux_x86_64
+
  */
 
 #include <stdlib.h>
