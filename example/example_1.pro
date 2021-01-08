@@ -40,7 +40,10 @@ v = BYTARR(80)
 result = call_external(lib_name, 'irbem_fortran_release_', v)
 print,''
 print,'Release version: ', STRTRIM(STRING(v))
-
+ntime_max = -1L
+result = call_external(lib_name, 'get_irbem_ntime_max_', ntime_max)
+print,''
+print,'NTIME_MAX=', ntime_max
 
 print,''
 print,'Testing make_lstar ...'
@@ -51,28 +54,27 @@ options(0)=1l
 options(1)=0l
 sysaxes=2l
 
-iyear=lonarr(100000)
+iyear=lonarr(ntime_max)
 iyear(0)=1998l
-idoy=lonarr(100000)
+idoy=lonarr(ntime_max)
 idoy(0)=100l
-UT=dblarr(100000)
+UT=dblarr(ntime_max)
 UT(0)=3600.d0
 
-x1=dblarr(100000)
+x1=dblarr(ntime_max)
 x1(0)=7.d0
-x2=dblarr(100000)
+x2=dblarr(ntime_max)
 x2(0)=0.d0
-x3=dblarr(100000)
+x3=dblarr(ntime_max)
 x3(0)=0.d0
 
-maginput=dblarr(25,100000)
-
-Lm=dblarr(100000)
-Lstar=dblarr(100000)
-Blocal=dblarr(100000)
-Bmin=dblarr(100000)
-XJ=dblarr(100000)
-MLT=dblarr(100000)
+maginput=dblarr(25,ntime_max)
+Lm=dblarr(ntime_max)
+Lstar=dblarr(ntime_max)
+Blocal=dblarr(ntime_max)
+Bmin=dblarr(ntime_max)
+XJ=dblarr(ntime_max)
+MLT=dblarr(ntime_max)
 
 
 result = call_external(lib_name, 'make_lstar_',$
@@ -95,18 +97,18 @@ options(0)=1l
 options(1)=0l
 sysaxes=2l
 
-iyear=lonarr(100000)
+iyear=lonarr(ntime_max)
 iyear(0)=1998l
-idoy=lonarr(100000)
+idoy=lonarr(ntime_max)
 idoy(0)=100l
-UT=dblarr(100000)
+UT=dblarr(ntime_max)
 UT(0)=3600.d0
 
-x1=dblarr(100000)
+x1=dblarr(ntime_max)
 x1(0)=7.d0
-x2=dblarr(100000)
+x2=dblarr(ntime_max)
 x2(0)=0.d0
-x3=dblarr(100000)
+x3=dblarr(ntime_max)
 x3(0)=0.d0
 
 alpha=dblarr(25)
@@ -117,14 +119,14 @@ alpha(3)=60.d0
 alpha(4)=80.d0
 alpha(5)=90.d0
 
-maginput=dblarr(25,100000)
+maginput=dblarr(25,ntime_max)
 
-Lm=dblarr(100000,25)
-Lstar=dblarr(100000,25)
-Blocal=dblarr(100000,25)
-Bmin=dblarr(100000)
-XJ=dblarr(100000,25)
-MLT=dblarr(100000)
+Lm=dblarr(ntime_max,25)
+Lstar=dblarr(ntime_max,25)
+Blocal=dblarr(ntime_max,25)
+Bmin=dblarr(ntime_max)
+XJ=dblarr(ntime_max,25)
+MLT=dblarr(ntime_max)
 
 result = call_external(lib_name, 'make_lstar_shell_splitting_',$
 ntime,Npa,kext,options,sysaxes,iyear,idoy,ut, x1,x2,x3,alpha,$
