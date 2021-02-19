@@ -26,11 +26,12 @@ Installation
 IRBEM requires a Fortran compiler, and can be installed on most
 environments.
 
-Quick install procedure on Linux with gfortran:
+Quick build procedure on Linux with gfortran:
 
     git clone https://github.com/PRBEM/IRBEM.git
 	cd IRBEM
-	make OS=linux ENV=gnu64 install
+	make OS=linux64 ENV=gfortran64 all
+	make OS=linux64 ENV=gfortran64 install
 
 See the `README.install` file for more details.
 
