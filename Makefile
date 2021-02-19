@@ -463,13 +463,13 @@ ntime_max:
 #------------------------------------------------------------------------------
 
 myOwnMagField1:
-	@if [ -n "$(MYOWNMAGFIELD_DIR)" ] ; then \
+	@if [ -d "$(MYOWNMAGFIELD_DIR)" ] ; then \
 		mv $(SOURCEDIR)/myOwnMagField*.f $(SOURCEDIR)/.. ; \
 		mv $(MYOWNMAGFIELD_DIR)/myOwnMagField*.f $(SOURCEDIR); \
 	fi
 
 myOwnMagField2:
-	@if [ -n "$(MYOWNMAGFIELD_DIR)" ] ; then \
+	@if [ -d "$(MYOWNMAGFIELD_DIR)" ] ; then \
 		mv $(SOURCEDIR)/myOwnMagField*.f $(MYOWNMAGFIELD_DIR) ; \
 		mv $(SOURCEDIR)/../myOwnMagField*.f $(SOURCEDIR); \
 	fi
