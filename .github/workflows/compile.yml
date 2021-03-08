@@ -18,11 +18,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install gfortran
+      run: |
+         sudo apt-get install gfortran
+
+    - name: Show gfortran version
+      run: gfortran --version
+
     - name: Build
-      working-directory: ${{github.workspace}}/build
       shell: bash
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: |
-        sudo apt-get install gfortran
         make OS=linux64 ENV=gfortran64 all
         make OS=linux64 ENV=gfortran64 install
