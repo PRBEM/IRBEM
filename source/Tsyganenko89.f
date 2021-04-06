@@ -105,10 +105,18 @@ c
 C
             ID=1
             IOP=IOPT
+            IF (IOPT.GT.7) IOP = 7
             DO 1 I=1,30
-   1        A(I)=PARAM(I,IOPT)
+   1        A(I)=PARAM(I,IOP)
 C
          ENDIF
+c       BOBERG extension to kp>6 with fixed Dst values
+c       kp7: Dst = -200 nt
+c       kp8: Dst = -225 nt
+c       kp9: Dst = -250 nt
+        IF (IOPT.GT.7) THEN
+            A(5)=-10220 - 408.5 *(200.+ 25.*(IOPT-8))
+        ENDIF
 C
         XI(1)=X
         XI(2)=Y

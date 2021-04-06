@@ -1485,7 +1485,13 @@ c Input for Tsy89
      &         maginput(1).lt.47.d0) Activ=5
              if (maginput(1).ge.47.d0 .and.
      &         maginput(1).lt.57.d0) Activ=6
-             if (maginput(1).ge.57.d0) Activ=7
+             if (maginput(1).ge.57.d0 .and.
+     &         maginput(1).lt.67.d0) Activ=7
+             if (maginput(1).ge.67.d0 .and.
+     &         maginput(1).lt.77.d0) Activ=8
+             if (maginput(1).ge.77.d0 .and.
+     &         maginput(1).lt.87.d0) Activ=9
+             if (maginput(1).ge.87.d0) Activ=10
 c
              if (maginput(1).lt.0.d0 .or.
      &         maginput(1).gt.90.d0) return
