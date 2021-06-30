@@ -2156,6 +2156,11 @@ c
       REAL*8    secs,psi,dyear
       REAL*8    xGSM(3),xSM(3)
 
+        dyear=iyr+0.5d0
+        psi=0.d0
+        call initize ! sets rad, pi used by various routines
+
+        CALL INIT_DTD(dyear)
         CALL INIT_GSM(iyr,idoy,secs,psi)
         CALL GSM_SM(xGSM,xSM)
         end
