@@ -61,6 +61,7 @@ myOwnMagField-post : $(LIB_NAME)
 compile: myOwnMagField-post
 $(SRC_DIR)/myOwnMagField.f : myOwnMagField-pre
 $(SRC_DIR)/myOwnMagField_init.f : myOwnMagField-pre
+
 #------------------------------------------------------------------------------
 #     Sources and compilation rules
 #------------------------------------------------------------------------------
@@ -84,9 +85,20 @@ $(BIN_DIR)/%.o : $(SRC_DIR)/%.c
 $(LIB_NAME) : $(F77_OBJS) $(C99_OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
+#------------------------------------------------------------------------------
+#     Install
+#------------------------------------------------------------------------------
+INSTALLDIR?=.
+install : $(LIB_NAME)
+	@echo Installing
+	@echo Creating $(INSTALLDIR)
+	mkdir -p $(INSTALLDIR)
+	@echo Installing $(LIB_NAME) to  $(INSTALLDIR)
+	cp $(LIB_NAME) $(INSTALLDIR)
+	@echo Installing done
 
 clean:
 	rm $(LIB_NAME)
 	rm $(BIN_DIR)/*.o
 
-.PHONY: clean all compile
+.PHONY: clean all compile install
