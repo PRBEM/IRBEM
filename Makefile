@@ -3,7 +3,8 @@ ENV?=gfortran64
 
 include compile/$(OS)-$(ENV).make
 
-LIB_NAME = libirbem.so
+BIN_DIR = bin
+LIB_NAME = $(BIN_DIR)/libirbem.$(OS).$(ENV).so
 all: compile
 compile: $(LIB_NAME)
 
@@ -66,7 +67,6 @@ $(SRC_DIR)/myOwnMagField_init.f : myOwnMagField-pre
 #     Sources and compilation rules
 #------------------------------------------------------------------------------
 
-BIN_DIR = bin
 
 F77_SOURCES = $(wildcard $(SRC_DIR)/*.f)
 C99_SOURCES = $(wildcard $(SRC_DIR)/*.c)
@@ -92,9 +92,9 @@ INSTALLDIR?=.
 install : $(LIB_NAME)
 	@echo Installing
 	@echo Creating $(INSTALLDIR)
-	mkdir -p $(INSTALLDIR)
-	@echo Installing $(LIB_NAME) to  $(INSTALLDIR)
-	cp $(LIB_NAME) $(INSTALLDIR)
+	@mkdir -p $(INSTALLDIR)
+	@echo Installing $(LIB_NAME) to  $(INSTALLDIR)/libirbem.so
+	@install $(LIB_NAME) $(INSTALLDIR)/libirbem.so
 	@echo Installing done
 
 clean:
