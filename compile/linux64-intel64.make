@@ -14,8 +14,8 @@ FC = ifort
 CC = icc
 LD = ifort
 
-FFLAGS=-fPIC -Bdynamic
-CFLAGS=-fPIC
+FFLAGS=-fpic
+CFLAGS=-fpic
 LDFLAGS=-shared
 
 COMPILE_LIB_NAME=libirbem.$(OS).$(ENV).so

@@ -98,7 +98,7 @@ install : $(LIB_NAME)
 	@echo Installing done
 
 clean:
-	rm $(LIB_NAME)
-	rm $(BIN_DIR)/*.o
+	rm -f $(BIN_DIR)/*.o
+	rm -f $(LIB_NAME)
 
 .PHONY: clean all compile install
