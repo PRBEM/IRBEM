@@ -4,7 +4,7 @@ ENV?=gfortran64
 include compile/$(OS)-$(ENV).make
 
 BIN_DIR = bin
-LIB_NAME = $(BIN_DIR)/libirbem.$(OS).$(ENV).so
+LIB_NAME = $(BIN_DIR)/$(COMPILE_LIB_NAME)
 all: compile
 compile: $(LIB_NAME)
 
@@ -93,8 +93,8 @@ install : $(LIB_NAME)
 	@echo Installing
 	@echo Creating $(INSTALLDIR)
 	@mkdir -p $(INSTALLDIR)
-	@echo Installing $(LIB_NAME) to  $(INSTALLDIR)/libirbem.so
-	@install $(LIB_NAME) $(INSTALLDIR)/libirbem.so
+	@echo Installing $(LIB_NAME) to  $(INSTALLDIR)/$(INSTALL_LIB_NAME)
+	@install $(LIB_NAME) $(INSTALLDIR)/$(INSTALL_LIB_NAME)
 	@echo Installing done
 
 clean:

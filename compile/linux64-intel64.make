@@ -6,7 +6,8 @@
 #     FFLAGS : Fortran flags
 #     CFLAGS : C Flags
 #     LDFLAGS: Linker flags
-#     LIB_NAME : Name of the library file
+#     COMPILE_LIB_NAME : Name of the compiled library file
+#     INSTALL_LIB_NAME : Name of the installed library file
 #------------------------------------------------------------------------------
 
 FC = ifort
@@ -17,3 +18,5 @@ FFLAGS=-fPIC -Bdynamic
 CFLAGS=-fPIC
 LDFLAGS=-shared
 
+COMPILE_LIB_NAME=libirbem.$(OS).$(ENV).so
+INSTALL_LIB_NAME=libirbem.so
