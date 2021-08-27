@@ -91,7 +91,7 @@ c
 
       SUBROUTINE GET_HEMI_MULTI(ntime,kext,options,sysaxes,iyearsat,
      & idoy,UT,xIN1,xIN2,xIN3,maginput,xHEMI)
-c     calls get_hemi1 multiple times (ntime, <= ntime_max)
+c     calls get_hemi1 multiple times (ntime, <= ntime)
       IMPLICIT NONE
       INCLUDE 'variables.inc'
       INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
@@ -99,14 +99,14 @@ c     calls get_hemi1 multiple times (ntime, <= ntime_max)
 c     declare inputs
       INTEGER*4    ntime,kext,options(5)
       INTEGER*4    sysaxes
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
-      real*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
-      real*8     maginput(25,ntime_max)
+      INTEGER*4    iyearsat(ntime)
+      integer*4    idoy(ntime)
+      real*8     UT(ntime)
+      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
+      real*8     maginput(25,ntime)
 
 c     declare outputs
-      integer*4     xHEMI(ntime_max)
+      integer*4     xHEMI(ntime)
 
 c     declare internal variables
       integer*4  isat

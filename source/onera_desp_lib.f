@@ -56,11 +56,11 @@ C
 c declare inputs
         INTEGER*4    kext,k_ext,k_l,options(5)
         INTEGER*4    ntime,sysaxes
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
-      real*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
-      real*8     maginput(25,ntime_max)
+      INTEGER*4    iyearsat(ntime)
+      integer*4    idoy(ntime)
+      real*8     UT(ntime)
+      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
+      real*8     maginput(25,ntime)
 c
 c Declare internal variables
       INTEGER*4    isat,iyear,kint,ifail
@@ -70,9 +70,9 @@ c Declare internal variables
       real*8     alti,lati,longi
 c
 c Declare output variables
-        REAL*8     BLOCAL(ntime_max),BMIN(ntime_max),XJ(ntime_max)
-      REAL*8     MLT(ntime_max)
-        REAL*8     Lm(ntime_max),Lstar(ntime_max)
+        REAL*8     BLOCAL(ntime),BMIN(ntime),XJ(ntime)
+      REAL*8     MLT(ntime)
+        REAL*8     Lm(ntime),Lstar(ntime)
 C
       COMMON /magmod/k_ext,k_l,kint
         COMMON /flag_L/Ilflag
@@ -173,12 +173,12 @@ c declare inputs
         INTEGER*4    kext,k_ext,k_l,options(5),Nalp,Nipa
       PARAMETER (Nalp=25)
         INTEGER*4    ntime,sysaxes
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
-      real*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+      INTEGER*4    iyearsat(ntime)
+      integer*4    idoy(ntime)
+      real*8     UT(ntime)
+      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
       real*8     alpha(Nalp)
-      real*8     maginput(25,ntime_max)
+      real*8     maginput(25,ntime)
 c
 c
 c Declare internal variables
@@ -190,8 +190,8 @@ c Declare internal variables
       real*8     alti,lati,longi
 c
 c Declare output variables
-        REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime_max)
-      REAL*8     XJ(ntime_max,Nalp),MLT(ntime_max)
+        REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime)
+      REAL*8     XJ(ntime_max,Nalp),MLT(ntime)
         REAL*8     Lm(ntime_max,Nalp),Lstar(ntime_max,Nalp)
 C
       COMMON /magmod/k_ext,k_l,kint
@@ -290,15 +290,15 @@ C
 c declare inputs
         INTEGER*4    whichinv,options(5)
         INTEGER*4    ntime
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
+      INTEGER*4    iyearsat(ntime)
+      integer*4    idoy(ntime)
 c
 c Declare internal variables
       INTEGER*4    isat,kint
         REAL*8     Bo,xc,yc,zc,ct,st,cp,sp
 c
 c Declare output variables
-        REAL*8     Phi(ntime_max),Lstar(ntime_max)
+        REAL*8     Phi(ntime),Lstar(ntime)
 C
         COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
         REAL*8     pi,rad
@@ -748,7 +748,7 @@ C-----------------------------------------------------------------------------
 
       SUBROUTINE GET_FIELD_MULTI(ntime,kext,options,sysaxes,iyearsat,
      &     idoy,UT,xIN1,xIN2,xIN3,maginput,BxGEO,Bl)
-C     Call get_field1 many times (ntime, in fact, up to ntime = ntime_max)
+C     Call get_field1 many times (ntime, in fact, up to ntime = ntime)
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
@@ -758,14 +758,14 @@ c     declare inputs
       INTEGER*4    ntime
       INTEGER*4    kext,options(5)
       INTEGER*4    sysaxes
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
-      real*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
-      real*8     maginput(25,ntime_max)
+      INTEGER*4    iyearsat(ntime)
+      integer*4    idoy(ntime)
+      real*8     UT(ntime)
+      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
+      real*8     maginput(25,ntime)
 
 c     Declare output variables
-      REAL*8     BxGEO(3,ntime_max),Bl(ntime_max)
+      REAL*8     BxGEO(3,ntime),Bl(ntime)
 C
 c     Declare internal variables
       integer*4 isat
