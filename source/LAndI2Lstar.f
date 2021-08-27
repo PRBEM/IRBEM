@@ -20513,7 +20513,6 @@ c To be used only where Lm>7.5 and I> 1.
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
-      INCLUDE 'ntime_max.inc'
 c
 c declare inputs
       INTEGER*4    kext,k_ext,k_l,options(5)
@@ -20602,12 +20601,12 @@ c declare inputs
       INTEGER*4    kext,k_ext,k_l,options(5),Nalp,Nipa
       PARAMETER (Nalp=25)
       INTEGER*4    ntime,sysaxes
-      INTEGER*4    iyearsat(ntime)
-      integer*4    idoy(ntime)
-      real*8     UT(ntime)
-      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
+      INTEGER*4    iyearsat(ntime_max)
+      integer*4    idoy(ntime_max)
+      real*8     UT(ntime_max)
+      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
       real*8     alpha(Nalp)
-      real*8     maginput(25,ntime)
+      real*8     maginput(25,ntime_max)
 c                      1: Kp
 c                      2: Dst
 c                      3: dens
@@ -20621,16 +20620,16 @@ c                     10: G3
 c
 c Declare internal variables
       INTEGER*4  option1,isat,IPA,ntime_tmp,sysaxesOUT,sysaxesIN
-      REAL*8     BLOCAL_tmp(ntime),BMIN_tmp(ntime)
-      REAL*8     XJ_tmp(ntime),MLT_tmp(ntime)
-      REAL*8     Lm_tmp(ntime),Lstar_tmp(ntime)
+      REAL*8     BLOCAL_tmp(ntime_max),BMIN_tmp(ntime_max)
+      REAL*8     XJ_tmp(ntime_max),MLT_tmp(ntime_max)
+      REAL*8     Lm_tmp(ntime_max),Lstar_tmp(ntime_max)
       REAL*8     xIN(3),xOUT(3),BL,BMIR,xGEO(3)
       REAL*8     maginput_tmp(25)
       INTEGER*4  imagin
 c
 c Declare output variables
-      REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime)
-      REAL*8     XJ(ntime_max,Nalp),MLT(ntime)
+      REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime_max)
+      REAL*8     XJ(ntime_max,Nalp),MLT(ntime_max)
       REAL*8     Lm(ntime_max,Nalp),Lstar(ntime_max,Nalp)
 C
 c     This method to compute L* is only available for IGRF + Olson-Pfitzer quiet
