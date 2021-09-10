@@ -31,3 +31,15 @@ jobs:
       run: |
         make OS=linux64 ENV=gfortran64 all
         make OS=linux64 ENV=gfortran64 install
+
+  test_python:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Run Python tests
+      run: |
+        cd python
+        python3 -m pip install -r requirements.txt
+        python3 -m pip install pytest
+        pytest
