@@ -4,3 +4,4 @@ source/*.o
 source/wrappers.inc
 source/fortran_*.inc
 __pycache__
+settings.json
