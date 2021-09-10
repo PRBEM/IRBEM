@@ -1,5 +1,6 @@
-source/*.so
-source/*.a
+*.so
+*.a
 source/*.o
 source/wrappers.inc
 source/fortran_*.inc
+__pycache__
