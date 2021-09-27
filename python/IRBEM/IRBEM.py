@@ -49,7 +49,7 @@ c = 3.0E8 # m/s
 
 # External magnetic field model look up table.
 extModels = ['None', 'MF75', 'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 
-    'OM97', 'T01', 'T01S' 'T04', 'A00', 'T07', 'MT']
+    'OM97', 'T01', 'T01S', 'T04', 'A00', 'T07', 'MT']
 
 class MagFields:
     """  
