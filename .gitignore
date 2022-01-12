@@ -3,5 +3,6 @@
 source/*.o
 source/wrappers.inc
 source/fortran_*.inc
+libirbem.so
 __pycache__
 settings.json
