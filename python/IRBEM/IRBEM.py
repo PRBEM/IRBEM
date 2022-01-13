@@ -49,7 +49,7 @@ c = 3.0E8 # m/s
 
 # External magnetic field model look up table.
 extModels = ['None', 'MF75', 'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 
-    'OM97', 'T01', 'T01S' 'T04', 'A00', 'T07', 'MT']
+    'OM97', 'T01', 'T01S', 'T04', 'A00', 'T07', 'MT']
 
 class MagFields:
     """  
@@ -57,7 +57,7 @@ class MagFields:
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
     of the  compiled FORTRAN shared object (so) file, otherwise, it will 
-    search for a .so file in the ./../sources/ directory.
+    search for a .so file in the ./../ directory.
     
     When creating the instance object, you can use the 'options' kwarg to 
     set the options, default is 0,0,0,0,0. Kwarg 'kext' sets the external B 
@@ -99,14 +99,14 @@ class MagFields:
         self.TMI = kwargs.get('verbose', False)
         
         # Unless the shared object location is specified, look for it
-        # in the source directory of IRBEM.
+        # in the root directory of IRBEM.
         if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
             self.compiledIRBEMdir = \
             os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', '..', 'source'))
+            '..', '..'))
             fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
             assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
-            'found in the sources folder!'
+            'found in the IRBEM folder!'
             self.compiledIRBEMname = os.path.basename(fullPaths[0])
         
         # Open the shared object file.
@@ -862,7 +862,7 @@ class Coords:
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
     of the  compiled FORTRAN shared object (so) file, otherwise, it will 
-    search for a .so file in the ./../sources/ directory.
+    search for a .so file in the ./../ directory.
     
     When creating the instance object, you can use the 'options' kwarg to 
     set the options, dafault is 0,0,0,0,0. Kwarg 'kext' sets the external B 
@@ -891,14 +891,14 @@ class Coords:
         self.TMI = kwargs.get('verbose', False)
         
         # Unless the shared object location is specified, look for it
-        # in the source directory of IRBEM.
+        # in the root directory of IRBEM.
         if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
             self.compiledIRBEMdir = \
             os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', '..', 'source'))
+            '..', '..'))
             fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
             assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
-            'found in the sources folder!'
+            'found in the IRBEM folder!'
             self.compiledIRBEMname = os.path.basename(fullPaths[0])
             
         self.__author__ = 'Mykhaylo Shumko'

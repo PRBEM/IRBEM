@@ -26,7 +26,7 @@ Installation
 IRBEM requires a Fortran compiler, and can be installed on most
 environments.
 
-Quick build procedure on Linux with gfortran:
+Quick build procedure on Linux and Mac OSX with gfortran:
 
     git clone https://github.com/PRBEM/IRBEM.git
 	cd IRBEM
@@ -78,12 +78,19 @@ software made available from the library.
 
 Acknowledgments
 ---------------
-The authors wish to thanks:
+The main authors of IRBEM are Daniel Boscher and Sebastien Bourdarie 
+(ONERA-DESP, Toulouse, France).
 
+The authors wish to thank:
+
+ - Erwin De Donder, Hugh Evans, Reiner Friedel, Tim Guild, Daniel 
+   Heynderickx, Stu Huston, Adam Kellerman, Colby Lemon, Kyungguk Min, 
+   Steve Morley, Paul O'Brien, Christopher Roth, and Mykhaylo Shumko for 
+   general contributions to the IRBEM library.
  - K. Pfitzer, N. Tsyganenko, I. Alexeev and their co-authors for providing
    us magnetic field model source codes and for good discussions on how to
    use their model correctly. 
- - R. Friedel (LANL), Y. Dotan and M. Redding (Aerospace corporation) for
+ - R. Friedel (LANL), Y. Dotan and M. Redding (Aerospace Corporation) for
    good discussions, advices and bug reports which are always very helpfull
    when one attemps to develop such a tool.
  - D. Bilitza for his help regarding the use of IGRF magnetic field model
