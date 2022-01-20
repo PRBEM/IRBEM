@@ -23,15 +23,25 @@ distribution package.
 
 Installation
 ------------
-IRBEM requires a Fortran compiler, and can be installed on most
-environments.
+IRBEM requires a [Fortran compiler](https://fortran-lang.org/learn/os_setup/install_gfortran), and can be installed on modern Windows, Linux, and Mac computers.
 
-Quick build procedure on Linux and Mac OSX with gfortran:
-
+- The quick build procedure on Linux with gfortran:
+```bash
     git clone https://github.com/PRBEM/IRBEM.git
-	cd IRBEM
-	make OS=linux64 ENV=gfortran64 all
-	make OS=linux64 ENV=gfortran64 install
+    cd IRBEM
+    make OS=linux64 ENV=gfortran64 all
+    make OS=linux64 ENV=gfortran64 install
+```
+
+- The quick build procedure on Mac OSX with gfortran:
+```bash
+    git clone https://github.com/PRBEM/IRBEM.git
+    cd IRBEM
+    make OS=osx64 ENV=gfortran64 all
+    make OS=osx64 ENV=gfortran64 install
+```
+
+- The quick build procedure for Windows will be created soon. In the meanwhile, one workaround is to use the Windows Subsystem for Linux (WSL).
 
 See the `README.install` file for more details.
 
