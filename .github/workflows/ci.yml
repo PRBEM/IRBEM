@@ -62,7 +62,6 @@ jobs:
 
     - name: Build
       shell: bash
-      # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: |
         make OS=osx64 ENV=github all
         make OS=osx64 ENV=github install
