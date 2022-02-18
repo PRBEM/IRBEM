@@ -1037,11 +1037,7 @@ def _load_shared_object(path=None):
         
         # Open the shared object file.
         try:
-            # if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
-                # _irbem_obj = ctypes.WinDLL(str(path))
             _irbem_obj = ctypes.CDLL(str(path))
-            # else:
-            #     _irbem_obj = ctypes.cdll.LoadLibrary(str(path))
         except OSError as err:
             raise OSError(f'Could not load the IRBEM shared object file in {path}') from err
     return path, _irbem_obj
