@@ -1026,9 +1026,11 @@ def _load_shared_object(path=None):
             obj_ext = '*.dll'
         else:
             obj_ext = '*.so'
-        matched_object_files = list(pathlib.Path(__file__).parents[2].rglob(obj_ext))
-        assert len(matched_object_files) == 1, (f'{len(matched_object_files)}'
-        ' .so or .dll shared object files found in the IRBEM folder.')
+        matched_object_files = list(pathlib.Path(__file__).parents[2].glob(obj_ext))
+        assert len(matched_object_files) == 1, (
+            f'{len(matched_object_files)} .so or .dll shared object files found in '
+            f'{pathlib.Path(__file__).parents[2]} folder: {matched_object_files}.'
+            )
         path = matched_object_files[0]
         
         # Open the shared object file.

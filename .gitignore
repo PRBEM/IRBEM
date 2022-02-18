@@ -8,3 +8,4 @@ source/fortran_*.inc
 libirbem.so
 __pycache__
 settings.json
+*.egg-info
