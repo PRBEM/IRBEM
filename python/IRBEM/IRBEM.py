@@ -154,7 +154,7 @@ class MagFields:
         Returns
         -------
         dict
-            A dictionary containing keys Lm, MLT, blocal, bmin, LStar, and xj.
+            Contains keys Lm, MLT, blocal, bmin, LStar, and xj.
         """
         # Convert the satellite time and position into c objects.
         ntime, iyear, idoy, ut, x1, x2, x3 = self._prepTimeLocArray(X)       
@@ -180,30 +180,29 @@ class MagFields:
         
     def drift_shell(self, X, maginput):
         """
-        NAME:  drift_shell(self, X, maginput, verbose = False)
-        USE:  This function traces a full drift shell for particles that have 
-               their  mirror point at the input location. The output is a full
-               array of positions of the drift shell, usefull for plotting and 
-               visualisation (for just the points on the drift-bounce orbit, 
-               use DRIFT_BOUNCE_ORBIT). A set of internal/external field can be
-               selected.
-        
-               Note: Need to call this function for one set of ephemeris 
-               inputs at a time.
-              
-        INPUT: X, a dictionary of positions in the specified coordinate  
-               system. a 'dateTime' key and values must be provided as 
-               well.
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: A dictionary with the following keys: 'Lm', 'blocal', 'bmin',
-               'lstar', 'xj', 'POSIT', and 'Nposit'. 
-               Posit structure: 1st element: x, y, z GEO coord, 2nd element: 
-               points along field line, 3rd element: number of field lines.
-               
-               nposit structure: long integer array (48) providing the number 
-               of points along the field line for each field line traced in 
-               2nd element of POSIT max 1000.
-        MOD:     2017-01-09
+        This function traces a full drift shell for particles that have their 
+        mirror point at the input location.  The output is a full array of positions 
+        of the drift shell, usefull for plotting and visualization.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+
+        Returns
+        -------
+        dict
+            Contains keys Lm, Lstar or Φ, Blocal, Bmin, XJ, POSIT, Nposit 
+            
+            Posit structure: 1st element: x, y, z GEO coord, 2nd element: points along field 
+            line, 3rd element: number of field lines. Nposit structure: long integer array 
+            (48) providing the number of points along the field line for each field line 
+            traced in 2nd element of POSIT max 1000.
         """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
