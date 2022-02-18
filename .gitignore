@@ -1,4 +1,6 @@
 *.so
+*.o
+*.dll
 *.a
 source/*.o
 source/wrappers.inc
