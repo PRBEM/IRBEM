@@ -54,27 +54,9 @@ extModels = ['None', 'MF75', 'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96',
     'OM97', 'T01', 'T01S', 'T04', 'A00', 'T07', 'MT']
 
 class MagFields:
-    """  
-    USE
-    When initializing the instance, you can provide the directory 
-    'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
-    of the compiled FORTRAN shared object (.so or .dll) file, otherwise, it will 
-    search for the shared object file in the ./../ directory.
-    
-    When creating the instance object, you can use the 'options' kwarg to 
-    set the options, default is 0,0,0,0,0. Kwarg 'kext' sets the external B 
-    field as is set to default of 5 (OPQ77 model), and 'sysaxes' kwarg sets the 
-    input coordinate system, and is by default set to GDZ (lat, long, alt). 
-    
-    verbose keyword, set to False by default, will print too much information 
-    (TMI). Usefull for debugging and for knowing too much. Set it to True if
-    Python quietly crashes (probably an input to Fortran issue)
-    
-    Python wrapper error value is -9999 (IRBEM-Lib's Fortan error value is -1E31).
-    
-    TESTING IRBEM:
-    Run test_IRBEM.py to run the unit test suite.
-    
+    """
+    Wrappers for IRBEM's magnetic field functions. 
+        
     Functions wrapped and tested:
     make_lstar()
     drift_shell()
@@ -86,7 +68,7 @@ class MagFields:
     get_mlt()
     
     Functions wrapped and not tested:
-    None
+    None at this time
     
     Special functions not in normal IRBEM (no online documentation yet):
     bounce_period()
@@ -96,6 +78,30 @@ class MagFields:
     or you would like me to wrap a particular function.
     """
     def __init__(self, **kwargs):
+        """  
+        When initializing the IRBEM instance, you can provide the path kwarg that 
+        specifies the location of the compiled FORTRAN shared object (.so or .dll) 
+        file, otherwise, it will search for the shared object file in the top-level
+        IRBEM directory.
+
+        Python wrapper error value is -9999 (IRBEM-Lib's Fortan error value is -1E31).
+
+        Parameters
+        ----------
+        path: str or pathlib.Path
+            An optional path to the IRBEM shared object (.so or .dll). If unspecified, it
+            it will search for the shared object file in the top-level IRBEM directory.
+        options: list
+            array(5) of long integer to set some control options on computed values. See the
+            HTML documentation for more information
+        kext: str
+            The external magnetic field model, defaults to OPQ77.
+        sysaxes: str 
+            Set the input coordinate system. By default set to GDZ (alt, lat, long). 
+        verbose: bool
+            Prints a statement prior to running each function. Usefull for debugging in 
+            case Python quietly crashes (likely a wrapper or a Fortran issue).
+        """
         self.irbem_obj_path = kwargs.get('path', None)
         self.TMI = kwargs.get('verbose', False)
         
@@ -132,15 +138,23 @@ class MagFields:
         
     def make_lstar(self, X, maginput):
         """
-        NAME: call_make_lstar(self, X, maginput)
-        USE:  Runs make_lstar1() from the IRBEM-LIB library. This function 
-              returns McLlwain L, L*, blocal, bmin, xj, and MLT from the 
-              position from input location.
-        INPUT: X, a dictionary of positions in the specified coordinate  
-             system. a 'dateTime' key and values must be provided as well.
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary.
-        MOD:     2017-05-21
+        This function allows one to compute magnetic coordinate at any s/c position, 
+        i.e. L, L*, Blocal/Bmirror, Bequator. A set of internal/external field can be selected.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+
+        Returns
+        -------
+        dict
+            A dictionary containing keys Lm, MLT, blocal, bmin, LStar, and xj.
         """
         # Convert the satellite time and position into c objects.
         ntime, iyear, idoy, ut, x1, x2, x3 = self._prepTimeLocArray(X)       
@@ -719,7 +733,7 @@ class MagFields:
             x3[dt] = Xc['x3'][dt]
         return ntime, iyear, idoy, ut, x1, x2, x3
 
-    def _prepMagInput(self, inputDict = None):
+    def _prepMagInput(self, inputDict=None):
         """
         NAME:  _prepMagInput(self, inputDict)
         USE:   Prepares magnetic field model inputs.
@@ -735,7 +749,7 @@ class MagFields:
         if self.TMI: print('Prepping magnetic field inputs.')
 
         # If no model inputs (statis magnetic field model)
-        if inputDict is None:
+        if (inputDict is None) or (inputDict == {}):
             magInputType = (ctypes.c_double * 25)
             self.maginput = magInputType()
             for i in range(25):
@@ -836,7 +850,8 @@ class MagFields:
         
 class Coords:
     """
-    USE
+    Wrappers for IRBEM's coordinate transformation functions. 
+
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
     of the  compiled FORTRAN shared object (so) file, otherwise, it will 
@@ -848,7 +863,7 @@ class Coords:
     input coordinate system, and is set to GDZ (lat, long, alt). 
     
     verbose keyword, set to False by default, will print too much information 
-    (TMI)! Usefull for debugging and for knowing too much. Set it to True if
+    (TMI). Usefull for debugging and for knowing too much. Set it to True if
     Python quietly crashes (probably an input to Fortran issue)
     
     Python wrapper error value is -9999.
