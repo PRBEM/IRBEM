@@ -18,5 +18,5 @@ FFLAGS=-fpic -fno-second-underscore -std=legacy -ffixed-line-length-none -Wl,--a
 CFLAGS=-fpic
 LDFLAGS=-shared
 
-COMPILE_LIB_NAME=libirbem.$(OS).$(ENV).so
-INSTALL_LIB_NAME=libirbem.so
+COMPILE_LIB_NAME=libirbem.$(OS).$(ENV).dll
+INSTALL_LIB_NAME=libirbem.dll

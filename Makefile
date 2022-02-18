@@ -96,7 +96,6 @@ install : $(LIB_NAME)
 	@echo Installing $(LIB_NAME) to  $(INSTALLDIR)/$(INSTALL_LIB_NAME)
 	@install $(LIB_NAME) $(INSTALLDIR)/$(INSTALL_LIB_NAME)
 	@echo Installing done
-	# @echo TOP-LEVEL IRBEM DIR: $(shell ls *.dll)  # TODO: Remove
 
 clean:
 	rm -f $(BIN_DIR)/*.o
