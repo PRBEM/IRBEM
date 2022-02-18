@@ -1039,7 +1039,7 @@ def _load_shared_object(path=None):
         try:
             # if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
                 # _irbem_obj = ctypes.WinDLL(str(path))
-            _irbem_obj = ctypes.LibraryLoader(loader).LoadLibrary(str(path))
+            _irbem_obj = ctypes.CDLL(str(path))
             # else:
             #     _irbem_obj = ctypes.cdll.LoadLibrary(str(path))
         except OSError as err:
