@@ -24,7 +24,6 @@ along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
-import os
 import sys
 import copy
 import pathlib
@@ -1025,7 +1024,6 @@ def _load_shared_object(path=None):
     if path is None:
         if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
             obj_ext = '*.dll'
-            os.add_dll_directory(os.getcwd())
         else:
             obj_ext = '*.so'
         matched_object_files = list(pathlib.Path(__file__).parents[2].glob(obj_ext))
