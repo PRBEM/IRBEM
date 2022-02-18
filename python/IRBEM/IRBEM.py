@@ -1,9 +1,9 @@
 __author__ = 'Mykhaylo Shumko'
-__last_modified__ = '2020-10-14'
+__last_modified__ = '2022-02-18'
 __credit__ = 'IRBEM-LIB development team'
 
 """
-Copyright 2020, Mykhaylo Shumko
+Copyright 2022, Mykhaylo Shumko
     
 IRBEM magnetic coordinates and fields wrapper class for Python. Source code
 credit goes to the IRBEM-LIB development team.
@@ -24,11 +24,13 @@ along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
-import os, glob, copy
+import sys
+import copy
+import pathlib
 import ctypes
 import datetime
 import dateutil.parser
-from warnings import warn
+import warnings
 
 import numpy as np
 import scipy.interpolate
@@ -56,8 +58,8 @@ class MagFields:
     USE
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
-    of the  compiled FORTRAN shared object (so) file, otherwise, it will 
-    search for a .so file in the ./../ directory.
+    of the compiled FORTRAN shared object (.so or .dll) file, otherwise, it will 
+    search for the shared object file in the ./../ directory.
     
     When creating the instance object, you can use the 'options' kwarg to 
     set the options, default is 0,0,0,0,0. Kwarg 'kext' sets the external B 
@@ -65,7 +67,7 @@ class MagFields:
     input coordinate system, and is by default set to GDZ (lat, long, alt). 
     
     verbose keyword, set to False by default, will print too much information 
-    (TMI)! Usefull for debugging and for knowing too much. Set it to True if
+    (TMI). Usefull for debugging and for knowing too much. Set it to True if
     Python quietly crashes (probably an input to Fortran issue)
     
     Python wrapper error value is -9999 (IRBEM-Lib's Fortan error value is -1E31).
@@ -94,45 +96,21 @@ class MagFields:
     or you would like me to wrap a particular function.
     """
     def __init__(self, **kwargs):
-        self.compiledIRBEMdir = kwargs.get('IRBEMdir', None)
-        self.compiledIRBEMname = kwargs.get('IRBEMname', None)    
+        self.irbem_obj_path = kwargs.get('path', None)
         self.TMI = kwargs.get('verbose', False)
         
-        # Unless the shared object location is specified, look for it
-        # in the root directory of IRBEM.
-        if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
-            self.compiledIRBEMdir = \
-            os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', '..'))
-            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
-            assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
-            'found in the IRBEM folder!'
-            self.compiledIRBEMname = os.path.basename(fullPaths[0])
-        
-        # Open the shared object file.
-        try:
-            self.irbem = ctypes.cdll.LoadLibrary(os.path.join(\
-            self.compiledIRBEMdir, self.compiledIRBEMname))
-        except OSError:
-            print('Error, cannot find the IRBEM shared object file. Please' + \
-            ' correct "IRBEMdir" and "IRBEMname" kwargs to the IRBEM instance.')
-            raise
+        self.path, self._irbem_obj = _load_shared_object(self.irbem_obj_path)
         
         # global model parameters, default is OPQ77 model with GDZ coordinate
         # system. If kext is a string, find the corresponding integer value.
-        if 'kext' not in kwargs:
-            warn('\n\nThe default external model kwarg, kext, was changed from '
-                 '"T89" to "OPQ77" to be consistant with the rest of IRBEM-lib. '
-                 'This warning will be removed in a future release in 2021.\n\n')
         kext = kwargs.get('kext', 5)
         if isinstance(kext, str):
             try:
                 self.kext = ctypes.c_int(extModels.index(kext))
-            except ValueError:
-                print("Incorrect external model selected! Use 'None', 'MF75',",
+            except ValueError as err:
+                raise ValueError("Incorrect external model selected! Use 'None', 'MF75',",
                     "'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 'OM97'",
-                    "'T01', 'T04', 'A00'")
-                raise
+                    "'T01', 'T04', 'A00'") from err
         else:
             self.kext = ctypes.c_int(kext)
         
@@ -149,7 +127,7 @@ class MagFields:
             
         # Get the NTIME_MAX value
         self.NTIME_MAX = ctypes.c_int(-1)
-        self.irbem.get_irbem_ntime_max1_(ctypes.byref(self.NTIME_MAX))
+        self._irbem_obj.get_irbem_ntime_max1_(ctypes.byref(self.NTIME_MAX))
         return
         
     def make_lstar(self, X, maginput):
@@ -176,7 +154,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB make_lstar")
 
-        self.irbem.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), 
+        self._irbem_obj.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), 
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), ctypes.byref(iyear),
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), 
                 ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), 
@@ -228,7 +206,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB drift_shell")
 
-        self.irbem.drift_shell1_(ctypes.byref(self.kext), ctypes.byref(self.options),\
+        self._irbem_obj.drift_shell1_(ctypes.byref(self.kext), ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
                 ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(self.maginput), \
@@ -274,7 +252,7 @@ class MagFields:
 
         if self.TMI: print("Running IRBEM-LIB mirror_point")
             
-        self.irbem.find_mirror_point1_(ctypes.byref(self.kext), \
+        self._irbem_obj.find_mirror_point1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
                 ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
@@ -322,7 +300,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB find_foot_point")
             
-        self.irbem.find_foot_point1_(ctypes.byref(self.kext), \
+        self._irbem_obj.find_foot_point1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
@@ -375,7 +353,7 @@ class MagFields:
         if self.TMI: print("Running trace_field_line. Python may",
             "temporarily stop responding")
         
-        self.irbem.trace_field_line2_1_(ctypes.byref(self.kext), \
+        self._irbem_obj.trace_field_line2_1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
@@ -414,7 +392,7 @@ class MagFields:
         
         if self.TMI: print('Running IRBEM find_magequator')
 
-        self.irbem.find_magequator1_(ctypes.byref(self.kext), \
+        self._irbem_obj.find_magequator1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
                 ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
@@ -474,7 +452,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB get_field_multi")
 
-        self.irbem.get_field_multi_(
+        self._irbem_obj.get_field_multi_(
                 ctypes.byref(ntime), ctypes.byref(self.kext), 
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
@@ -510,7 +488,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB get_mlt")
 
-        self.irbem.get_mlt1_( 
+        self._irbem_obj.get_mlt1_( 
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
                 ctypes.byref(geo_coords), ctypes.byref(MLT)
                 )
@@ -565,7 +543,7 @@ class MagFields:
         
         # Resample S to a finer density of points.
         if len(fLine['S']) > interpNum: 
-            print('Warning: interpolating with less data than IRBEM outputs,'+
+            warn('Warning: interpolating with less data than IRBEM outputs,'+
             ' the bounce period may be inaccurate!')
         sInterp = np.linspace(startInd, endInd, num = interpNum)
         
@@ -886,33 +864,10 @@ class Coords:
     or you would like me to wrap a particular function.
     """
     def __init__(self, **kwargs):
-        self.compiledIRBEMdir = kwargs.get('IRBEMdir', None)
-        self.compiledIRBEMname = kwargs.get('IRBEMname', None)    
+        self.irbem_obj_path = kwargs.get('path', None)  
         self.TMI = kwargs.get('verbose', False)
         
-        # Unless the shared object location is specified, look for it
-        # in the root directory of IRBEM.
-        if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
-            self.compiledIRBEMdir = \
-            os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', '..'))
-            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
-            assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
-            'found in the IRBEM folder!'
-            self.compiledIRBEMname = os.path.basename(fullPaths[0])
-            
-        self.__author__ = 'Mykhaylo Shumko'
-        self.__last_modified__ = '2017-01-12'
-        self.__credit__ = 'IRBEM-LIB development team'
-        
-        # Open the shared object file.
-        try:
-            self.irbem = ctypes.cdll.LoadLibrary(os.path.join(\
-            self.compiledIRBEMdir, self.compiledIRBEMname))
-        except OSError:
-            print('Error, cannot find the IRBEM shared object file. Please' + \
-            ' correct "IRBEMdir" and "IRBEMname" kwargs to the IRBEM instance.')
-            raise
+        self.path, self._irbem_obj = _load_shared_object(self.irbem_obj_path)
         return 
         
     def coords_transform(self, time, pos, sysaxesIn, sysaxesOut):
@@ -968,7 +923,7 @@ class Coords:
             for nX in range(pos.shape[1]):
                 posInArr[nT][nX] = ctypes.c_double(pos[nT, nX])   
        
-        self.irbem.coord_trans_vec1_(ctypes.byref(nTime), ctypes.byref(sysIn),
+        self._irbem_obj.coord_trans_vec1_(ctypes.byref(nTime), ctypes.byref(sysIn),
            ctypes.byref(sysOut), ctypes.byref(iyear), ctypes.byref(idoy),
            ctypes.byref(ut), ctypes.byref(posInArr), ctypes.byref(posOutArr))
         return np.array(posOutArr[:])
@@ -1047,14 +1002,27 @@ class Coords:
             raise ValueError('Error, coordinate axis can only be a string or int!')
 
 
-def IRBEM(*args, **kwargs):
+def _load_shared_object(path=None):
     """
-    Warn user that IRBEM class is depricated.
+    Searches for and loads a shared object (.so or .dll file). If path is specified
+    it doesn't search for the file.
     """
-    from warnings import warn
-    warn("\n \n The IRBEM class is depricated, functionality has moved to the "
-        "MagFields and Coords clases.\n")
-    return MagFields(*args, **kwargs)
+    if path is None:
+        if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
+            obj_ext = '*.dll'
+        else:
+            obj_ext = '*.so'
+        matched_object_files = list(pathlib.Path(__file__).parents[2].rglob(obj_ext))
+        assert len(matched_object_files) == 1, (f'{len(matched_object_files)}'
+        ' .so or .dll shared object files found in the IRBEM folder.')
+        path = matched_object_files[0]
+        
+        # Open the shared object file.
+        try:
+            _irbem_obj = ctypes.cdll.LoadLibrary(str(path))
+        except OSError as err:
+            raise OSError(f'Can not load the IRBEM shared object file in {path}') from err
+    return path, _irbem_obj
 
 """
 These are helper functions to calculate relativistic velocity, 
@@ -1067,27 +1035,3 @@ These functions should be used with caution in your own applications!
 beta = lambda Ek, Erest = 511: np.sqrt(1-((Ek/Erest)+1)**(-2)) # Ek,a dErest must be in keV
 gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
 vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))
-
-############### PACKAGE INFO #############################
-__version__ = '0.2.0'
-__author__ = 'Mykhaylo Shumko'
-__contact__ = 'msshumko@gmail.com'
-__license__ = """Copyright 2017, Mykhaylo Shumko
-    
-IRBEM wrapper class for Python. Source code credit goes to the 
-IRBEM-LIB development team.
-
-***************************************************************************
-IRBEM-LIB is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-IRBEM-LIB is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
-"""
