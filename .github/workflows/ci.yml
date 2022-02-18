@@ -101,8 +101,8 @@ jobs:
     - name: Build
       shell: bash
       run: |
-        make OS=win4 ENV=gfortran64 all
-        make OS=win4 ENV=gfortran64 install
+        make OS=win64 ENV=gfortran64 all
+        make OS=win64 ENV=gfortran64 install
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
