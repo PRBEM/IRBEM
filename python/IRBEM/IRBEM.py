@@ -1034,6 +1034,7 @@ def _load_shared_object(path=None):
             f'{pathlib.Path(__file__).parents[2]} folder: {matched_object_files}.'
             )
         path = matched_object_files[0]
+        print(f"Mike: irbempy thinks that the shared library path is: {path}")
         
         # Open the shared object file.
         try:
