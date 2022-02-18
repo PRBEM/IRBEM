@@ -1024,8 +1024,10 @@ def _load_shared_object(path=None):
     if path is None:
         if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
             obj_ext = '*.dll'
+            loader = ctypes.WinDLL
         else:
             obj_ext = '*.so'
+            loader = ctypes.cdll
         matched_object_files = list(pathlib.Path(__file__).parents[2].glob(obj_ext))
         assert len(matched_object_files) == 1, (
             f'{len(matched_object_files)} .so or .dll shared object files found in '
@@ -1035,10 +1037,11 @@ def _load_shared_object(path=None):
         
         # Open the shared object file.
         try:
-            if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
-                _irbem_obj = ctypes.WinDLL(str(path))
-            else:
-                _irbem_obj = ctypes.cdll.LoadLibrary(str(path))
+            # if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
+                # _irbem_obj = ctypes.WinDLL(str(path))
+            _irbem_obj = ctypes.LibraryLoader(loader).LoadLibrary(str(path))
+            # else:
+            #     _irbem_obj = ctypes.cdll.LoadLibrary(str(path))
         except OSError as err:
             raise OSError(f'Could not load the IRBEM shared object file in {path}') from err
     return path, _irbem_obj
