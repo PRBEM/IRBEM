@@ -41,7 +41,14 @@ IRBEM requires a [Fortran compiler](https://fortran-lang.org/learn/os_setup/inst
     make OS=osx64 ENV=gfortran64 install
 ```
 
-- The quick build procedure for Windows will be created soon. In the meanwhile, one workaround is to use the Windows Subsystem for Linux (WSL).
+- The quick build procedure for Windows with gfortran. You must compile IRBEM using `git bash` that is accessible after installing [git](https://git-scm.com/downloads)---__command prompt and powershell will not work__.
+
+```bash
+    git clone https://github.com/PRBEM/IRBEM.git
+    cd IRBEM
+    make OS=win64 ENV=gfortran64 all
+    make OS=win64 ENV=gfortran64 install
+```
 
 See the `README.install` file for more details.
 
