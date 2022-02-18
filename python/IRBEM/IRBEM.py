@@ -557,7 +557,7 @@ class MagFields:
         
         # Resample S to a finer density of points.
         if len(fLine['S']) > interpNum: 
-            warn('Warning: interpolating with less data than IRBEM outputs,'+
+            warnings.warn('Warning: interpolating with less data than IRBEM outputs,'+
             ' the bounce period may be inaccurate!')
         sInterp = np.linspace(startInd, endInd, num = interpNum)
         
