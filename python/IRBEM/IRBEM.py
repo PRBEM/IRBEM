@@ -1023,7 +1023,7 @@ def _load_shared_object(path=None):
     """
     if path is None:
         if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
-            obj_ext = '*.dll'
+            obj_ext = '*.so'
             loader = ctypes.WinDLL
         else:
             obj_ext = '*.so'
