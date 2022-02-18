@@ -24,6 +24,7 @@ along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
+import os
 import sys
 import copy
 import pathlib
@@ -1024,6 +1025,7 @@ def _load_shared_object(path=None):
     if path is None:
         if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
             obj_ext = '*.dll'
+            os.add_dll_directory(os.getcwd())
         else:
             obj_ext = '*.so'
         matched_object_files = list(pathlib.Path(__file__).parents[2].glob(obj_ext))
@@ -1051,3 +1053,7 @@ These functions should be used with caution in your own applications!
 beta = lambda Ek, Erest = 511: np.sqrt(1-((Ek/Erest)+1)**(-2)) # Ek,a dErest must be in keV
 gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
 vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))
+
+
+if __name__ == '__main__':
+    m = MagFields()
