@@ -14,7 +14,7 @@ FC = gfortran
 CC = gcc
 LD = gfortran
 
-FFLAGS=-fpic -fno-second-underscore -std=legacy -ffixed-line-length-none -w
+FFLAGS=-fpic -fno-second-underscore -std=legacy -ffixed-line-length-none -Wl,--add-stdcall-alias -fno-second-underscore -w -m64
 CFLAGS=-fpic
 LDFLAGS=-shared
 
