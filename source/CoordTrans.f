@@ -1139,47 +1139,33 @@ c-------------------------------------------------------------------------------
 ! CALLING SEQUENCE: call coord_trans1(sysaxesIN,sysaxesOUT,iyr,idoy,secs,xIN,xOUT)
 !---------------------------------------------------------------------------------------------------
 c
-        SUBROUTINE coord_trans1(sysaxesIN,sysaxesOUT,iyr,idoy,
+      SUBROUTINE coord_trans1(sysaxesIN,sysaxesOUT,iyr,idoy,
      &   secs,xIN,xOUT)
 c
-        IMPLICIT NONE
+      IMPLICIT NONE
 c
       INTEGER*4 sysaxesIN,sysaxesOUT,iyr,idoy
       INTEGER*4 i
       REAL*8    secs,psi
       REAL*8    xIN(3),xOUT(3),xTMP(3),alti
 
-        call initize ! sets rad, pi used by various routines
+      call initize ! sets rad, pi used by various routines
 
-        if (sysaxesIN.EQ.sysaxesOUT) then
+      if (sysaxesIN.EQ.sysaxesOUT) then
 c         write(6,*)'sysaxesIN = sysaxesOUT!'
          do i=1,3
             xOUT(i)=xIN(i)
          enddo
          return
       endif
-        if (sysaxesIN.LT.0) then
+      if ((sysaxesIN.LT.0).or.(sysaxesIN.GT.14)) then
          write(6,*)'sysaxesIN out of range !'
          do i=1,3
             xOUT(i)=-1.D31
          enddo
          return
       endif
-        if (sysaxesIN.GT.13) then
-         write(6,*)'sysaxesIN out of range !'
-         do i=1,3
-            xOUT(i)=-1.D31
-         enddo
-         return
-      endif
-        if (sysaxesOUT.LT.0) then
-         write(6,*)'sysaxesOUT out of range !'
-         do i=1,3
-            xOUT(i)=-1.D31
-         enddo
-         return
-      endif
-        if (sysaxesOUT.GT.13) then
+      if ((sysaxesOUT.LT.0).or.(sysaxesOUT.GT.14)) then
          write(6,*)'sysaxesOUT out of range !'
          do i=1,3
             xOUT(i)=-1.D31
@@ -1267,6 +1253,14 @@ c input=GDZ
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
          endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call gdz_geo(xIN(2),xIN(3),xIN(1),xTMP(1),xTMP(2),xTMP(3))
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
+         endif
       endif
 c
 c input=GEO
@@ -1328,6 +1322,13 @@ c input=GEO
                xTMP(i)=xOUT(i)
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call geo2gei1(iyr,idoy,secs,xIN,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
          endif
       endif
 c
@@ -1415,6 +1416,14 @@ c input=GSM
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
          endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call gsm2geo1(iyr,idoy,secs,psi,xIN,xTMP)
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
+         endif
       endif
 c
 c input=GSE
@@ -1480,6 +1489,14 @@ c input=GSE
                xTMP(i)=xOUT(i)
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call gse2geo1(iyr,idoy,secs,xIN,xTMP)
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
          endif
       endif
 c
@@ -1567,6 +1584,14 @@ c input=SM
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
          endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call sm2geo1(iyr,idoy,secs,xIN,xTMP)
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
+         endif
       endif
 c input=GEI (which is also ECI ToD)
       if ((sysaxesIN.EQ.5).or.(sysaxesIN.EQ.12)) then
@@ -1645,13 +1670,16 @@ c input=GEI (which is also ECI ToD)
             enddo
             call hae2heeq1(iyr,idoy,secs,xTMP,xOUT)
          endif
-         if (sysaxesOUT.EQ.12) then  !ECI ToD
+         if ((sysaxesOUT.EQ.12).or.(sysaxesOUT.EQ.5)) then  !ECI ToD
             do i=1,3
                xOUT(i)=xIN(i)
             enddo
          endif
          if (sysaxesOUT.EQ.13) then  !J2000
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xIN,xOUT)
+         endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            CALL ECITOD2TEME(iyr,idoy,secs,xIN,xOUT)
          endif
       endif
 c
@@ -1741,6 +1769,14 @@ c input=MAG
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
          endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call mag2geo1(iyr,xIN,xTMP)
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
+         endif
       endif
 c
 c input=SPH
@@ -1828,6 +1864,14 @@ c input=SPH
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
          endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call SPH_CAR(xIN(1),xIN(2),xIN(3),xTMP)
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
+         endif
       endif
 c
 c input=RLL
@@ -1912,13 +1956,22 @@ c input=RLL
             call hae2heeq1(iyr,idoy,secs,xTMP,xOUT)
          endif
          if (sysaxesOUT.EQ.13) then  !J2000
-          call RLL_GDZ(xIN(1),xIN(2),xIN(3),alti)
+            call RLL_GDZ(xIN(1),xIN(2),xIN(3),alti)
             call gdz_geo(xIN(2),xIN(3),alti,xTMP(1),xTMP(2),xTMP(3))
             call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
             do i=1,3
                xTMP(i)=xOUT(i)
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call RLL_GDZ(xIN(1),xIN(2),xIN(3),alti)
+            call gdz_geo(xIN(2),xIN(3),alti,xTMP(1),xTMP(2),xTMP(3))
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
          endif
       endif
 c
@@ -2016,6 +2069,18 @@ c input=HEE
                xTMP(i)=xOUT(i)
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call hee2gse1(iyr,idoy,secs,xIN,xTMP)
+            call gse2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
          endif
       endif
 c
@@ -2152,6 +2217,22 @@ c input=HAE
                xTMP(i)=xOUT(i)
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call hae2hee1(iyr,idoy,secs,xIN,xTMP)
+            call hee2gse1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call gse2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
          endif
       endif
 c
@@ -2330,6 +2411,26 @@ c input=HEEQ
             enddo
             CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
          endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call heeq2hae1(iyr,idoy,secs,xIN,xTMP)
+            call hae2hee1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call hee2gse1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call gse2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gei1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            CALL ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
+         endif
       endif
 c
 c input=J2000
@@ -2453,10 +2554,141 @@ c input=J2000
             enddo
             call hae2heeq1(iyr,idoy,secs,xTMP,xOUT)
          endif
+         if (sysaxesOUT.EQ.14) then  !TEME
+            call ECIJ2000_2_ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call ECITOD2TEME(iyr,idoy,secs,xTMP,xOUT)
+         endif
+      endif
+c
+c input=TEME
+      if (sysaxesIN.EQ.14) then
+         if (sysaxesOUT.EQ.0) then  !GDZ
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo_gdz(xTMP(1),xTMP(2),xTMP(3),
+     &                     xOUT(2),xOUT(3),xOUT(1))
+         endif
+         if (sysaxesOUT.EQ.1) then  !GEO
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.2) then  !GSM
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gsm1(iyr,idoy,secs,psi,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.3) then  !GSE
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gse1(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.4) then  !SM
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2sm1(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if ((sysaxesOUT.EQ.5).or.(sysaxesOUT.EQ.12)) then  !GEI (TOD)
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xOUT)
+         endif
+         if (sysaxesOUT.EQ.6) then  !MAG
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2mag1(iyr,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.7) then  !SPH
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call CAR_SPH(xTMP,xOUT(1),xOUT(2),xOUT(3))
+         endif
+         if (sysaxesOUT.EQ.8) then  !RLL
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo_gdz(xTMP(1),xTMP(2),xTMP(3),
+     &                     xOUT(1),xOUT(2),xOUT(3))
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            xOUT(1)=SQRT(xIN(1)*xIN(1)+xIN(2)*xIN(2)+xIN(3)*xIN(3))
+            xOUT(2)=xTMP(1)
+            xOUT(3)=xTMP(2)
+         endif
+         if (sysaxesOUT.EQ.9) then  !HEE
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gse1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call gse2hee1(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.10) then  !HAE
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gse1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call gse2hee1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call hee2hae1(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.11) then  !HEEQ
+            call TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            call gei2geo1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call geo2gse1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call gse2hee1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call hee2hae1(iyr,idoy,secs,xTMP,xOUT)
+            do i=1,3
+               xTMP(i)=xOUT(i)
+            enddo
+            call hae2heeq1(iyr,idoy,secs,xTMP,xOUT)
+         endif
+         if (sysaxesOUT.EQ.13) then  !J2000
+            CALL TEME2ECITOD(iyr,idoy,secs,xIN,xTMP)
+            CALL ECITOD_2_ECIJ2000(iyr,idoy,secs,xTMP,xOUT)
+         endif
       endif
 c
 c
-        end
+      end
 C
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C SUBROUTINE coord_trans_vec
