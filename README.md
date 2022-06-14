@@ -25,7 +25,8 @@ Installation
 ------------
 IRBEM requires a [Fortran compiler](https://fortran-lang.org/learn/os_setup/install_gfortran), and can be installed on modern Windows, Linux, and Mac computers.
 
-- The quick build procedure on Linux with gfortran:
+## Linux
+The quick build procedure on Linux with gfortran:
 ```bash
     git clone https://github.com/PRBEM/IRBEM.git
     cd IRBEM
@@ -33,7 +34,8 @@ IRBEM requires a [Fortran compiler](https://fortran-lang.org/learn/os_setup/inst
     make OS=linux64 ENV=gfortran64 install
 ```
 
-- The quick build procedure on Mac OSX with gfortran:
+## Mac OSX
+The quick build procedure on Mac OSX with gfortran:
 ```bash
     git clone https://github.com/PRBEM/IRBEM.git
     cd IRBEM
@@ -41,14 +43,26 @@ IRBEM requires a [Fortran compiler](https://fortran-lang.org/learn/os_setup/inst
     make OS=osx64 ENV=gfortran64 install
 ```
 
-- The quick build procedure for Windows with gfortran. You must compile IRBEM using `git bash` that is accessible after installing [git](https://git-scm.com/downloads)---__command prompt and powershell will not work__.
+## Windows
+The build procedure for 64-bit Windows with gfortran is involved, mainly due to the Fortran compiler. 
 
-```bash
+1. Download and install [MSYS2](https://www.msys2.org/) and follow the [Fortran installation steps](https://www.msys2.org/#:~:text=and%20what%20for.-,Installation,-Download%20the%20installer) (summarized below). 
+   1. Run MSYS2 MSYS terminal from the start menu and update the MSYS2 packages via ```pacman -Syu``` (pacman is its package manager). Close the terminal after packages are updated. 
+   2. Run MSYS2 MSYS from the start menu again and update the rest of the packages using ```pacman -Syu```.
+   3. Install the Fortran compiler and other dependencies ([base-devel](https://packages.msys2.org/group/base-devel) and [mingw-w64-x86_64-toolchain](https://packages.msys2.org/group/mingw-w64-x86_64-toolchain)) in the MSYS terminal using ```pacman -S --needed base-devel mingw-w64-x86_64-toolchain```.
+   4. If you don't have git installed, install it using [msys2-git](https://packages.msys2.org/base/git) ```pacman -S git```.
+   5. Add the directory where `gfortran.exe` is located to the Windows path (a good place to look for it is `C:\msys64\mingw64\bin`). You can follow these [instructions](https://docs.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)#to-add-a-path-to-the-path-environment-variable) to add the path environmental variables.
+   6. Open up Command Prompt or PowerShell and confirm that the `gfortran --version` command runs. Also, check that `make` runs (it will print "make: *** No targets specified and no makefile found.  Stop."). 
+
+2. Clone and install IRBEM
+   ```bash
     git clone https://github.com/PRBEM/IRBEM.git
     cd IRBEM
     make OS=win64 ENV=gfortran64 all
     make OS=win64 ENV=gfortran64 install
-```
+    ```
+Congratulations! Now you have compiled libirbem.dll library in the root folder of IRBEM/.
+
 
 See the `README.install` file for more details.
 
