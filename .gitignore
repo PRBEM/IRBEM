@@ -9,3 +9,4 @@ libirbem.so
 __pycache__
 settings.json
 *.egg-info
+env/
