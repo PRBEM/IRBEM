@@ -116,7 +116,7 @@ class MagFields:
             try:
                 self.kext = ctypes.c_int(extModels.index(kext))
             except ValueError as err:
-                raise ValueError("Incorrect external model selected! Use 'None', 'MF75',",
+                raise ValueError("Incorrect external model selected. Valid models are 'None', 'MF75',",
                     "'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 'OM97'",
                     "'T01', 'T04', 'A00'") from err
         else:
@@ -364,7 +364,7 @@ class MagFields:
         Returns
         -------
         dict:
-            A dictionary with three keys:
+            A dictionary with six keys:
             - "POSIT" the field line locations in GEO coordinates with shape (3, 3000).
             - "Nposit" the number of points along the field line for each field line traced.
             - "lm" is the McIlwain L shell.
@@ -408,18 +408,26 @@ class MagFields:
         
     def find_magequator(self, X, maginput):
         """
-        NAME: find_magequator(self, X, maginput, verbose = False)
-        USE:  This function finds the coordinates of the magnetic equator from 
-              tracing the magntic field line from the input location.
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. maginput is a dictionary
-              with model key:input pairs.
-        RETURNS: Dictionary of bmin and XGEO. bmin is the magntitude of the 
-              magnetic field at equator. XGEO is an array of [xGEO,yGEO,zGEO].
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-02-02
-        """ 
-        
+        Find the coordinates of the magnetic equator from tracing the magntic 
+        field line from the input location.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+
+        Returns
+        -------
+        dict:
+            A dictionary with two keys:
+            - "bmin" the magntitude of the magnetic field at the equator.
+            - "XGEO" the location of the magnetic equator in GEO coordinates.
+        """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
         iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
@@ -512,9 +520,10 @@ class MagFields:
         ----------
         X: dict
             The dictionary specifying the time and location in GEO coordinates. 
+
         Returns
         -------
-        MLT : float
+        MLT: float
             The MLT value (hours).
         """
         # Inputs
@@ -535,34 +544,39 @@ class MagFields:
         return self.get_mlt_output
 
     ### Non-IRBEM methods.
-    def bounce_period(self, X, maginput, E, **kwargs):
+    def bounce_period(self, X, maginput, E, Erest=511, R0=1, alpha=90, interpNum=100000):
         """
-        NAME:  bounce_period(self, X, maginput, E, **kwargs)
-        USE:   Calculates the bounce period in an arbitary magnetic field 
-               model. The default particle is electron, but an optional Erest
-               parameter can be used to change the rest energy of the particle
-               to a proton.
-        INPUT: A dictionary, X containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
-               dictionary provides model parameters. Optional parameters
-               are Erest in keV, the rest energy of the bouncing particle, 
-               default is Erest = 511 (electron rest energy). R0 = 1, the limit
-               of the magnetic field line tracing at Earth's surface. Changing 
-               this is useful if the mirror point is below the ground 
-               (unphysical, but may be useful in certain applications).
-               interpNum is the number of samples to take along the field line.
-               Default is 100000, a good balance between speed and accuracy.
-               alpha is the local pitch angle
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: Bounce period value or values, depending if E is an array or
-                a single value.
-        MOD:     2017-04-06        
-        """
-        Erest = kwargs.get('Erest', 511)
-        R0 = kwargs.get('R0', 1)
-        alpha = kwargs.get('alpha', 90)
-        interpNum = kwargs.get('interpNum', 100000)
-        
+        Calculate the bounce period in an arbitary magnetic field model. 
+        The default particle is electron, but you can change the Erest 
+        parameter to calculate the bounce period for other particles.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        E: float, list, or np.array
+            A single or multiple values of particle energy in keV.
+        Erest: float
+            The particle's rest energy in keV.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which 
+            the line is traced.
+        alpha: float
+            The local pitch angle.
+        interpNum: int
+            The number of samples to interpolate the magnetic field line.
+            100000 is a good balance between speed and accuracy.
+
+        Returns
+        -------
+        float or np.array
+            Bounce period(s) in seconds.    
+        """        
         if self.TMI: print('IRBEM: Calculating bounce periods')
         
         fLine = self._interpolate_field_line(X, maginput, R0=R0, alpha=alpha)
@@ -576,9 +590,9 @@ class MagFields:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                 raise ValueError('Mirror point below the ground!, Change R0' +
-                 ' or catch this error and assign it a value.', 
-                 '\n Original error: ', err)
+                 raise ValueError('Mirror point below R0') from err
+            else:
+                raise
         
         # Resample S to a finer density of points.
         if len(fLine['S']) > interpNum: 
@@ -595,33 +609,34 @@ class MagFields:
         
         # This is basically an integral of ds/v||.
         if isinstance(E, (np.ndarray, list)):
-            self.Tb = [2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['mirrorB'], dB, 
-                                              Erest = Erest)[1:-1])) for Ei in E]
+            self.Tb = np.array([2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['mirrorB'], dB, 
+                                              Erest = Erest)[1:-1])) for Ei in E])
         else:
             self.Tb = 2*np.sum(np.divide(ds[1:-1], vparalel(E, fLine['mirrorB'], dB, 
                                              Erest = Erest)[1:-1]))
         return self.Tb
         
-    def mirror_point_altitude(self, X, maginput, **kwargs):
-        """"
-        NAME:  mirror_point_altitude(self, X, maginput)
-        USE:   Calculates the mirror point of locally mirroring electrons
-               in the opposite hemisphere. Similar to the find_mirror_point()
-               function, but it works in the opposite hemisphere.
-        INPUT: A dictionary, X containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
-               dictionary provides model parameters. Optional parameters
-               are Erest in keV, the rest energy of the bouncing particle, 
-               default is Erest = 511 (electron rest energy). R0 = 1, the limit
-               of the magnetic field line tracing at Earth's surface. Changing 
-               this is useful if the mirror point is below the ground 
-               (unphysical, but may be useful in certain applications).
-        RETURNS: Mirror point in the opposite hemisphere.
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-04-06        
+    def mirror_point_altitude(self, X, maginput, R0=1):
         """
-        R0 = kwargs.get('R0', 1)
+        Calculate the mirror point of locally mirroring electrons 
+        in the opposite hemisphere. Similar to the find_mirror_point()
+        method, but it works in the opposite hemisphere.
+
+        Parameters
+        ----------
+        X: dict
+            The dictionary specifying the time and location.  
+        maginput: dict
+            The magnetic field inpit parameter dictionary.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which 
+            the line is traced.
         
+        Returns
+        -------
+        float
+            The mirror point altitude in the opposite hemisphere.    
+        """        
         if self.TMI: print('IRBEM: Calculating mirror point altitude')
             
         fLine = self._interpolate_field_line(X, maginput, R0=R0)
@@ -635,12 +650,9 @@ class MagFields:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                if self.TMI:
-                     raise ValueError('Mirror point below the ground!, Change R0' +
-                     ' or catch this error and assign it a value.', 
-                     '\n Original error: ', err)
-                else: 
-                    raise ValueError('Mirror point below the ground!')
+                raise ValueError('Mirror point below R0') from err
+            else:
+                raise
                         
         # Start indicies of the magnetic field is always in the northern
         # hemisphere, so take the opposite.
@@ -655,15 +667,28 @@ class MagFields:
         
     def _prepTimeLoc(self, X):
         """
-        NAME:  _prepTimeLoc(self, X)
-        USE:   Prepares spacetime inputs.
-        INPUT: A dictionary, X containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. Other time keys
-               will work, as long as they contain the word 'time' (case 
-               insensitive). 
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
-        MOD:     2017-01-12
+        Prepares spacetime inputs.
+
+        Parameters
+        ----------
+        X: dict
+            The dictionary specifying the time and location. Keys must be 
+            'dateTime', 'x1', 'x2', 'x3'. Other time keys will work, as 
+            long as they contain the word 'time' (case insensitive). 
+        Returns
+        -------
+        ctype:
+            year
+        ctype:
+            day of year
+        ctype:
+            seconds elapsed since midnight
+        ctype:
+            First cooridnate in sysaxes coordinates
+        ctype:
+            Second cooridnate in sysaxes coordinates
+        ctype:
+            Third cooridnate in sysaxes coordinates
         """
         if self.TMI: print('Prepping time and space input variables')
 
@@ -684,7 +709,7 @@ class MagFields:
             t = dateutil.parser.parse(Xc[time_key])
         iyear = ctypes.c_int(t.year)
         idoy = ctypes.c_int(t.timetuple().tm_yday)
-        ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)
+        ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)  # Seconds of day
         x1 = ctypes.c_double(Xc['x1']) 
         x2 = ctypes.c_double(Xc['x2'])
         x3 = ctypes.c_double(Xc['x3'])
@@ -909,8 +934,12 @@ class Coords:
         
         self.path, self._irbem_obj = _load_shared_object(self.irbem_obj_path)
         return 
-        
-    def coords_transform(self, time, pos, sysaxesIn, sysaxesOut):
+    
+    def coords_transform(self, *args, **kwargs):
+        warnings.warn('Coords.coords_transform() is deprecated. Use Coords.transform instead.')
+        return self.transform(*args, **kwargs)
+
+    def transform(self, time, pos, sysaxesIn, sysaxesOut):
         """
         NAME:  coords_transform(self, X, sysaxesIn, sysaxesOut)
         USE:   This function transforms coordinate systems from a point at time
@@ -996,7 +1025,7 @@ class Coords:
         elif isinstance(times[0], datetime.datetime):
             t = times
         else:
-            raise ValueError('ERROR: Unknown time format! I can accept ISO '
+            raise ValueError('Unknown time format. Valid formats: ISO '
                 'string, datetime objects, or arrays of those objects')   
         
         for nT in range(N): # Populate C arrays
