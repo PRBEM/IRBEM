@@ -1066,8 +1066,3 @@ These functions should be used with caution in your own applications!
 beta = lambda Ek, Erest = 511: np.sqrt(1-((Ek/Erest)+1)**(-2)) # Ek,a dErest must be in keV
 gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
 vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))
-
-
-# TODO: Remove
-if __name__ == '__main__':
-    m = MagFields()
