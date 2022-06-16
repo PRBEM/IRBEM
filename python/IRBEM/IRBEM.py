@@ -1043,12 +1043,17 @@ def _load_shared_object(path=None):
             if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
                 # Some versions of ctypes (Python) need to know where msys64 binary 
                 # files are located, or ctypes is unable to load the IREBM dll.
-                os.add_dll_directory(pathlib.Path(shutil.which('gfortran.exe')).parent)
+                gfortran_path = pathlib.Path(shutil.which('gfortran.exe'))
+                os.add_dll_directory(gfortran_path.parent)  # C:\msys64\mingw64\bin
+                os.add_dll_directory(gfortran_path.parents[2] / 'usr' / 'bin')  # C:\msys64\usr\bin
                 _irbem_obj = ctypes.WinDLL(str(path))
             else:
                 _irbem_obj = ctypes.CDLL(str(path))
         except OSError as err:
-            raise OSError(f'Could not load the IRBEM shared object file in {path}') from err
+            if 'Try using the full path with constructor syntax.' in str(err):
+                raise OSError(f'Could not load the IRBEM shared object file in {path}') from err
+            else:
+                raise
     return path, _irbem_obj
 
 """
