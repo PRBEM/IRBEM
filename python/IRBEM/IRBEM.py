@@ -1,5 +1,5 @@
 __author__ = 'Mykhaylo Shumko'
-__last_modified__ = '2022-02-18'
+__last_modified__ = '2022-06-16'
 __credit__ = 'IRBEM-LIB development team'
 
 """
@@ -241,19 +241,26 @@ class MagFields:
     
     def find_mirror_point(self, X, maginput, alpha):
         """
-        NAME: find_mirror_point(self, X, maginput, alpha, verbose = False)
-        USE:  This function finds the magnitude and location of the mirror 
-              point along a field line traced from any given location and 
-              local pitch-angle for a set of internal/external field to be 
-              selected. 
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. maginput
-              is the standard dictionary with the same keys as explained in the
-              html doc.
-        RETURNS: A dictionary with scalar values of blocal and bmin, and POSIT,
-              the GEO coordinates of the mirror point
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-01-05
+        Find the magnitude and location of the mirror point along a field 
+        line traced from any given location and local pitch-angle.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        alpha: float
+            The local pitch angle in degrees.
+
+        Returns
+        -------
+        dict
+            A dictionary with "blocal" and "bmin" scalars, and "POSIT" that contains the 
+            GEO coordinates of the mirror point.
         """
         a = ctypes.c_double(alpha)
         
@@ -280,25 +287,35 @@ class MagFields:
     
     def find_foot_point(self, X, maginput, stopAlt, hemiFlag):
         """
-        NAME: find_foot_point(X, kp, stopAlt, hemiFlag)
-        USE:  This function finds the of the field line crossing a specified 
-              altitude in a specified hemisphere. Error code for IRBEMpy is 
-              -9999, IRBEM error code is -9.9999999999999996E+30.
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. stopAlt is the desired
-              altitude of the foot point (km), hemiFlag is the hemisphere where
-              to find the foot point. It can take on values:
-              
-              0    = same magnetic hemisphere as starting point
-              +1   = northern magnetic hemisphere
-              -1   = southern magnetic hemisphere
-              +2   = opposite magnetic hemisphere as starting point        
-        RETURNS: A dictionary with the following values:
-                 XFOOT = location of foot point, GDZ coordinates
-                 BFOOT = magnetic field vector at foot point, GEO, nT
-                 BFOOTMAG = magnetic field magnitude at foot point, GEO,nT unit
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2016-11-09
+        Find the footprint of a field line that passes throgh location X in
+        a given hemisphere.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        stopAlt: float
+            The footprint altitude above Earth's surface, in kilometers.
+        hemiFlag: int
+            Determines what hemisphere to find the footprint. 
+            - 0    = same magnetic hemisphere as starting point
+            - +1   = northern magnetic hemisphere
+            - -1   = southern magnetic hemisphere
+            - +2   = opposite magnetic hemisphere as starting point  
+
+        Returns
+        -------
+        dict:
+            A dictionary with three keys:
+            - "XFOOT" the footprint location in GDZ coordinates
+            - "BFOOT" the magnetic field vector at the footprint, in GEO coordinates, and in 
+            unit of nT.
+            - "BFOOTMAG" the footprint magnetic field magnitude in nT units.
         """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
@@ -327,26 +344,33 @@ class MagFields:
         'BFOOTMAG':BFOOTMAG[:]}
         return self.find_foot_point_output
         
-    def trace_field_line(self, X, maginput, R0 = 1):
+    def trace_field_line(self, X, maginput, R0=1):
         """
-        NAME: trace_field_line(self, X, maginput, R0 = 1, verbose = False)
-        USE:  This function traces a full field line which crosses the input 
-              position.  The output is a full array of positions of the field 
-              line, usefull for plotting and visualisation for a set of 
-              internal/external fields to be selected. A new option (R0) for 
-              TRACE_FIELD_LINE2 allows user to specify the radius (RE) of the 
-              reference surface between which the line is traced (R0=1 in 
-              TRACE_FIELD_LINE)  
+        Trace a full field line which crosses the input position.
 
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. R0 kwarg sets the stop 
-              altitude (Re) of the field line tracing, default is R0 = 1.
-        RETURNS: A dictionary with the following key:values
-                 'POSIT', 'Nposit', 'lm', 'blocal', 'bmin', 'xj'. 
-                 POSIT is an array(3, 3000) of GDZ locations of the field line
-                 at 3000 points.
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-01-09
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which 
+            the line is traced.
+
+        Returns
+        -------
+        dict:
+            A dictionary with three keys:
+            - "POSIT" the field line locations in GEO coordinates with shape (3, 3000).
+            - "Nposit" the number of points along the field line for each field line traced.
+            - "lm" is the McIlwain L shell.
+            - "blocal" the magnitude of the local magnetic field.
+            - "bmin" the magnitude of the minimum magnetic field.
+            - "xj" I, related to second adiabatic invariant.
         """        
         # specifies radius of reference surface between which field line is 
         # traced.
@@ -1036,23 +1060,22 @@ def _load_shared_object(path=None):
             f'{pathlib.Path(__file__).parents[2]} folder: {matched_object_files}.'
             )
         path = matched_object_files[0]
-        print(f"Mike: irbempy thinks that the shared library path is: {path}")
         
-        # Open the shared object file.
-        try:
-            if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
-                # Some versions of ctypes (Python) need to know where msys64 binary 
-                # files are located, or ctypes is unable to load the IREBM dll.
-                gfortran_path = pathlib.Path(shutil.which('gfortran.exe'))
-                os.add_dll_directory(gfortran_path.parent)  # C:\msys64\mingw64\bi
-                _irbem_obj = ctypes.WinDLL(str(path))
-            else:
-                _irbem_obj = ctypes.CDLL(str(path))
-        except OSError as err:
-            if 'Try using the full path with constructor syntax.' in str(err):
-                raise OSError(f'Could not load the IRBEM shared object file in {path}') from err
-            else:
-                raise
+    # Open the shared object file.
+    try:
+        if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
+            # Some versions of ctypes (Python) need to know where msys64 binary 
+            # files are located, or ctypes is unable to load the IREBM dll.
+            gfortran_path = pathlib.Path(shutil.which('gfortran.exe'))
+            os.add_dll_directory(gfortran_path.parent)  # e.g. C:\msys64\mingw64\bin
+            _irbem_obj = ctypes.WinDLL(str(path))
+        else:
+            _irbem_obj = ctypes.CDLL(str(path))
+    except OSError as err:
+        if 'Try using the full path with constructor syntax.' in str(err):
+            raise OSError(f'Could not load the IRBEM shared object file in {path}') from err
+        else:
+            raise
     return path, _irbem_obj
 
 """
