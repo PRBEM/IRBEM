@@ -24,10 +24,12 @@ along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
+import os
 import sys
 import copy
 import pathlib
 import ctypes
+import shutil
 import datetime
 import dateutil.parser
 import warnings
@@ -1039,6 +1041,9 @@ def _load_shared_object(path=None):
         # Open the shared object file.
         try:
             if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
+                # Some versions of ctypes (Python) need to know where msys64 binary 
+                # files are located, or ctypes is unable to load the IREBM dll.
+                os.add_dll_directory(pathlib.Path(shutil.which('gfortran.exe')).parent)
                 _irbem_obj = ctypes.WinDLL(str(path))
             else:
                 _irbem_obj = ctypes.CDLL(str(path))
