@@ -64,7 +64,7 @@ The build procedure for 64-bit Windows with gfortran is involved, mainly due to 
 Congratulations! Now you have compiled libirbem.dll library in the root folder of IRBEM/.
 
 
-See the `README.install` file for more details.
+See the `README.install` or `compile/WINDOWS_INSTRUCTIONS.md` files for more details.
 
 Contributions
 -------------
