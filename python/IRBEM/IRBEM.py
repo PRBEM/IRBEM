@@ -1044,8 +1044,10 @@ def _load_shared_object(path=None):
                 # Some versions of ctypes (Python) need to know where msys64 binary 
                 # files are located, or ctypes is unable to load the IREBM dll.
                 gfortran_path = pathlib.Path(shutil.which('gfortran.exe'))
-                os.add_dll_directory(gfortran_path.parent)  # C:\msys64\mingw64\bin
-                os.add_dll_directory(gfortran_path.parents[2] / 'usr' / 'bin')  # C:\msys64\usr\bin
+                # os.add_dll_directory(gfortran_path.parent)  # C:\msys64\mingw64\bin
+                # os.add_dll_directory(gfortran_path.parents[1] / 'usr' / 'bin')  # C:\msys64\usr\bin
+                for path in sorted(gfortran_path.parents[2].rglob('bin/')):
+                    os.add_dll_directory(path)
                 _irbem_obj = ctypes.WinDLL(str(path))
             else:
                 _irbem_obj = ctypes.CDLL(str(path))
