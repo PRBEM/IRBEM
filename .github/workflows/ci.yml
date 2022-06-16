@@ -82,7 +82,7 @@ jobs:
         pytest
 
   build-win:
-    runs-on: windows-2016
+    runs-on: windows-latest
 
     strategy:
       matrix:
