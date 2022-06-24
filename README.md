@@ -44,7 +44,7 @@ The quick build procedure on Mac OSX with gfortran:
 ```
 
 ## Windows
-The build procedure for 64-bit Windows with gfortran is involved, mainly due to the Fortran compiler. 
+Here is one way to build IRBEM for 64-bit Windows using the gfortran compiler. 
 
 1. Download and install [MSYS2](https://www.msys2.org/) and follow the [Fortran installation steps](https://www.msys2.org/#:~:text=and%20what%20for.-,Installation,-Download%20the%20installer) (summarized below). 
    1. Run MSYS2 MSYS terminal from the start menu and update the MSYS2 packages via ```pacman -Syu``` (pacman is its package manager). Close the terminal after packages are updated. 
