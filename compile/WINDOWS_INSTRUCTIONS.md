@@ -7,7 +7,7 @@ pacman -Syu
 After packages are updated, the terminal will be closed.
 3. Run `MSYS2 MSYS` from the start menu and update the rest of the packages
 ```
-pacman -Su
+pacman -Syu
 ```
 4. Install base-devel package (https://packages.msys2.org/group/base-devel)
 ```

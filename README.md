@@ -50,9 +50,9 @@ Here is one way to build IRBEM for 64-bit Windows using the gfortran compiler.
    1. Run MSYS2 MSYS terminal from the start menu and update the MSYS2 packages via ```pacman -Syu``` (pacman is its package manager). Close the terminal after packages are updated. 
    2. Run MSYS2 MSYS from the start menu again and update the rest of the packages using ```pacman -Syu```.
    3. Install the Fortran compiler and other dependencies ([base-devel](https://packages.msys2.org/group/base-devel) and [mingw-w64-x86_64-toolchain](https://packages.msys2.org/group/mingw-w64-x86_64-toolchain)) in the MSYS terminal using ```pacman -S --needed base-devel mingw-w64-x86_64-toolchain```.
-   4. If you don't have git installed, install it using [msys2-git](https://packages.msys2.org/base/git) ```pacman -S git```.
+   4. git is required for building IRBEM. If you don't have it, install it using [msys2-git](https://packages.msys2.org/base/git) ```pacman -S git```.
    5. Add the directory where `gfortran.exe` is located to the Windows path (a good place to look for it is `C:\msys64\mingw64\bin`). You can follow these [instructions](https://docs.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)#to-add-a-path-to-the-path-environment-variable) to add the path environmental variables.
-   6. Open up Command Prompt or PowerShell and confirm that the `gfortran --version` command runs. Also, check that `make` runs (it will print "make: *** No targets specified and no makefile found.  Stop."). 
+   6. Confirm that the paths are set up correctly. Run `gfortran --version` command runs. Also, check that `make` runs (it will print "make: *** No targets specified and no makefile found.  Stop."). 
 
 2. Clone and install IRBEM
    ```bash
