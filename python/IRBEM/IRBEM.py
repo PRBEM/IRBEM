@@ -1,9 +1,9 @@
 __author__ = 'Mykhaylo Shumko'
-__last_modified__ = '2020-10-14'
+__last_modified__ = '2022-06-16'
 __credit__ = 'IRBEM-LIB development team'
 
 """
-Copyright 2020, Mykhaylo Shumko
+Copyright 2022, Mykhaylo Shumko
     
 IRBEM magnetic coordinates and fields wrapper class for Python. Source code
 credit goes to the IRBEM-LIB development team.
@@ -24,11 +24,15 @@ along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
 ***************************************************************************
 """
 
-import os, glob, copy
+import os
+import sys
+import copy
+import pathlib
 import ctypes
+import shutil
 import datetime
 import dateutil.parser
-from warnings import warn
+import warnings
 
 import numpy as np
 import scipy.interpolate
@@ -52,27 +56,9 @@ extModels = ['None', 'MF75', 'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96',
     'OM97', 'T01', 'T01S', 'T04', 'A00', 'T07', 'MT']
 
 class MagFields:
-    """  
-    USE
-    When initializing the instance, you can provide the directory 
-    'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
-    of the  compiled FORTRAN shared object (so) file, otherwise, it will 
-    search for a .so file in the ./../ directory.
-    
-    When creating the instance object, you can use the 'options' kwarg to 
-    set the options, default is 0,0,0,0,0. Kwarg 'kext' sets the external B 
-    field as is set to default of 5 (OPQ77 model), and 'sysaxes' kwarg sets the 
-    input coordinate system, and is by default set to GDZ (lat, long, alt). 
-    
-    verbose keyword, set to False by default, will print too much information 
-    (TMI)! Usefull for debugging and for knowing too much. Set it to True if
-    Python quietly crashes (probably an input to Fortran issue)
-    
-    Python wrapper error value is -9999 (IRBEM-Lib's Fortan error value is -1E31).
-    
-    TESTING IRBEM:
-    Run test_IRBEM.py to run the unit test suite.
-    
+    """
+    Wrappers for IRBEM's magnetic field functions. 
+        
     Functions wrapped and tested:
     make_lstar()
     drift_shell()
@@ -84,7 +70,7 @@ class MagFields:
     get_mlt()
     
     Functions wrapped and not tested:
-    None
+    None at this time
     
     Special functions not in normal IRBEM (no online documentation yet):
     bounce_period()
@@ -94,45 +80,45 @@ class MagFields:
     or you would like me to wrap a particular function.
     """
     def __init__(self, **kwargs):
-        self.compiledIRBEMdir = kwargs.get('IRBEMdir', None)
-        self.compiledIRBEMname = kwargs.get('IRBEMname', None)    
+        """  
+        When initializing the IRBEM instance, you can provide the path kwarg that 
+        specifies the location of the compiled FORTRAN shared object (.so or .dll) 
+        file, otherwise, it will search for the shared object file in the top-level
+        IRBEM directory.
+
+        Python wrapper error value is -9999 (IRBEM-Lib's Fortan error value is -1E31).
+
+        Parameters
+        ----------
+        path: str or pathlib.Path
+            An optional path to the IRBEM shared object (.so or .dll). If unspecified, it
+            it will search for the shared object file in the top-level IRBEM directory.
+        options: list
+            array(5) of long integer to set some control options on computed values. See the
+            HTML documentation for more information
+        kext: str
+            The external magnetic field model, defaults to OPQ77.
+        sysaxes: str 
+            Set the input coordinate system. By default set to GDZ (alt, lat, long). 
+        verbose: bool
+            Prints a statement prior to running each function. Usefull for debugging in 
+            case Python quietly crashes (likely a wrapper or a Fortran issue).
+        """
+        self.irbem_obj_path = kwargs.get('path', None)
         self.TMI = kwargs.get('verbose', False)
         
-        # Unless the shared object location is specified, look for it
-        # in the root directory of IRBEM.
-        if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
-            self.compiledIRBEMdir = \
-            os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', '..'))
-            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
-            assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
-            'found in the IRBEM folder!'
-            self.compiledIRBEMname = os.path.basename(fullPaths[0])
-        
-        # Open the shared object file.
-        try:
-            self.irbem = ctypes.cdll.LoadLibrary(os.path.join(\
-            self.compiledIRBEMdir, self.compiledIRBEMname))
-        except OSError:
-            print('Error, cannot find the IRBEM shared object file. Please' + \
-            ' correct "IRBEMdir" and "IRBEMname" kwargs to the IRBEM instance.')
-            raise
+        self.path, self._irbem_obj = _load_shared_object(self.irbem_obj_path)
         
         # global model parameters, default is OPQ77 model with GDZ coordinate
         # system. If kext is a string, find the corresponding integer value.
-        if 'kext' not in kwargs:
-            warn('\n\nThe default external model kwarg, kext, was changed from '
-                 '"T89" to "OPQ77" to be consistant with the rest of IRBEM-lib. '
-                 'This warning will be removed in a future release in 2021.\n\n')
         kext = kwargs.get('kext', 5)
         if isinstance(kext, str):
             try:
                 self.kext = ctypes.c_int(extModels.index(kext))
-            except ValueError:
-                print("Incorrect external model selected! Use 'None', 'MF75',",
+            except ValueError as err:
+                raise ValueError("Incorrect external model selected. Valid models are 'None', 'MF75',",
                     "'TS87', 'TL87', 'T89', 'OPQ77', 'OPD88', 'T96', 'OM97'",
-                    "'T01', 'T04', 'A00'")
-                raise
+                    "'T01', 'T04', 'A00'") from err
         else:
             self.kext = ctypes.c_int(kext)
         
@@ -149,20 +135,28 @@ class MagFields:
             
         # Get the NTIME_MAX value
         self.NTIME_MAX = ctypes.c_int(-1)
-        self.irbem.get_irbem_ntime_max1_(ctypes.byref(self.NTIME_MAX))
+        self._irbem_obj.get_irbem_ntime_max1_(ctypes.byref(self.NTIME_MAX))
         return
         
     def make_lstar(self, X, maginput):
         """
-        NAME: call_make_lstar(self, X, maginput)
-        USE:  Runs make_lstar1() from the IRBEM-LIB library. This function 
-              returns McLlwain L, L*, blocal, bmin, xj, and MLT from the 
-              position from input location.
-        INPUT: X, a dictionary of positions in the specified coordinate  
-             system. a 'dateTime' key and values must be provided as well.
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: McLLwain L, MLT, blocal, bmin, lstar, xj in a dictionary.
-        MOD:     2017-05-21
+        This function allows one to compute magnetic coordinate at any s/c position, 
+        i.e. L, L*, Blocal/Bmirror, Bequator. A set of internal/external field can be selected.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+
+        Returns
+        -------
+        dict
+            Contains keys Lm, MLT, blocal, bmin, LStar, and xj.
         """
         # Convert the satellite time and position into c objects.
         ntime, iyear, idoy, ut, x1, x2, x3 = self._prepTimeLocArray(X)       
@@ -176,7 +170,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB make_lstar")
 
-        self.irbem.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), 
+        self._irbem_obj.make_lstar1_(ctypes.byref(ntime), ctypes.byref(self.kext), 
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), ctypes.byref(iyear),
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), 
                 ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(maginput), 
@@ -188,30 +182,29 @@ class MagFields:
         
     def drift_shell(self, X, maginput):
         """
-        NAME:  drift_shell(self, X, maginput, verbose = False)
-        USE:  This function traces a full drift shell for particles that have 
-               their  mirror point at the input location. The output is a full
-               array of positions of the drift shell, usefull for plotting and 
-               visualisation (for just the points on the drift-bounce orbit, 
-               use DRIFT_BOUNCE_ORBIT). A set of internal/external field can be
-               selected.
-        
-               Note: Need to call this function for one set of ephemeris 
-               inputs at a time.
-              
-        INPUT: X, a dictionary of positions in the specified coordinate  
-               system. a 'dateTime' key and values must be provided as 
-               well.
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: A dictionary with the following keys: 'Lm', 'blocal', 'bmin',
-               'lstar', 'xj', 'POSIT', and 'Nposit'. 
-               Posit structure: 1st element: x, y, z GEO coord, 2nd element: 
-               points along field line, 3rd element: number of field lines.
-               
-               nposit structure: long integer array (48) providing the number 
-               of points along the field line for each field line traced in 
-               2nd element of POSIT max 1000.
-        MOD:     2017-01-09
+        This function traces a full drift shell for particles that have their 
+        mirror point at the input location.  The output is a full array of positions 
+        of the drift shell, usefull for plotting and visualization.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+
+        Returns
+        -------
+        dict
+            Contains keys Lm, Lstar or Φ, Blocal, Bmin, XJ, POSIT, Nposit 
+            
+            Posit structure: 1st element: x, y, z GEO coord, 2nd element: points along field 
+            line, 3rd element: number of field lines. Nposit structure: long integer array 
+            (48) providing the number of points along the field line for each field line 
+            traced in 2nd element of POSIT max 1000.
         """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
@@ -228,7 +221,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB drift_shell")
 
-        self.irbem.drift_shell1_(ctypes.byref(self.kext), ctypes.byref(self.options),\
+        self._irbem_obj.drift_shell1_(ctypes.byref(self.kext), ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
                 ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(self.maginput), \
@@ -248,19 +241,26 @@ class MagFields:
     
     def find_mirror_point(self, X, maginput, alpha):
         """
-        NAME: find_mirror_point(self, X, maginput, alpha, verbose = False)
-        USE:  This function finds the magnitude and location of the mirror 
-              point along a field line traced from any given location and 
-              local pitch-angle for a set of internal/external field to be 
-              selected. 
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. maginput
-              is the standard dictionary with the same keys as explained in the
-              html doc.
-        RETURNS: A dictionary with scalar values of blocal and bmin, and POSIT,
-              the GEO coordinates of the mirror point
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-01-05
+        Find the magnitude and location of the mirror point along a field 
+        line traced from any given location and local pitch-angle.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        alpha: float
+            The local pitch angle in degrees.
+
+        Returns
+        -------
+        dict
+            A dictionary with "blocal" and "bmin" scalars, and "POSIT" that contains the 
+            GEO coordinates of the mirror point.
         """
         a = ctypes.c_double(alpha)
         
@@ -274,7 +274,7 @@ class MagFields:
 
         if self.TMI: print("Running IRBEM-LIB mirror_point")
             
-        self.irbem.find_mirror_point1_(ctypes.byref(self.kext), \
+        self._irbem_obj.find_mirror_point1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
                 ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
@@ -287,25 +287,35 @@ class MagFields:
     
     def find_foot_point(self, X, maginput, stopAlt, hemiFlag):
         """
-        NAME: find_foot_point(X, kp, stopAlt, hemiFlag)
-        USE:  This function finds the of the field line crossing a specified 
-              altitude in a specified hemisphere. Error code for IRBEMpy is 
-              -9999, IRBEM error code is -9.9999999999999996E+30.
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. stopAlt is the desired
-              altitude of the foot point (km), hemiFlag is the hemisphere where
-              to find the foot point. It can take on values:
-              
-              0    = same magnetic hemisphere as starting point
-              +1   = northern magnetic hemisphere
-              -1   = southern magnetic hemisphere
-              +2   = opposite magnetic hemisphere as starting point        
-        RETURNS: A dictionary with the following values:
-                 XFOOT = location of foot point, GDZ coordinates
-                 BFOOT = magnetic field vector at foot point, GEO, nT
-                 BFOOTMAG = magnetic field magnitude at foot point, GEO,nT unit
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2016-11-09
+        Find the footprint of a field line that passes throgh location X in
+        a given hemisphere.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        stopAlt: float
+            The footprint altitude above Earth's surface, in kilometers.
+        hemiFlag: int
+            Determines what hemisphere to find the footprint. 
+            - 0    = same magnetic hemisphere as starting point
+            - +1   = northern magnetic hemisphere
+            - -1   = southern magnetic hemisphere
+            - +2   = opposite magnetic hemisphere as starting point  
+
+        Returns
+        -------
+        dict:
+            A dictionary with three keys:
+            - "XFOOT" the footprint location in GDZ coordinates
+            - "BFOOT" the magnetic field vector at the footprint, in GEO coordinates, and in 
+            unit of nT.
+            - "BFOOTMAG" the footprint magnetic field magnitude in nT units.
         """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
@@ -322,7 +332,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB find_foot_point")
             
-        self.irbem.find_foot_point1_(ctypes.byref(self.kext), \
+        self._irbem_obj.find_foot_point1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
@@ -334,26 +344,33 @@ class MagFields:
         'BFOOTMAG':BFOOTMAG[:]}
         return self.find_foot_point_output
         
-    def trace_field_line(self, X, maginput, R0 = 1):
+    def trace_field_line(self, X, maginput, R0=1):
         """
-        NAME: trace_field_line(self, X, maginput, R0 = 1, verbose = False)
-        USE:  This function traces a full field line which crosses the input 
-              position.  The output is a full array of positions of the field 
-              line, usefull for plotting and visualisation for a set of 
-              internal/external fields to be selected. A new option (R0) for 
-              TRACE_FIELD_LINE2 allows user to specify the radius (RE) of the 
-              reference surface between which the line is traced (R0=1 in 
-              TRACE_FIELD_LINE)  
+        Trace a full field line which crosses the input position.
 
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. R0 kwarg sets the stop 
-              altitude (Re) of the field line tracing, default is R0 = 1.
-        RETURNS: A dictionary with the following key:values
-                 'POSIT', 'Nposit', 'lm', 'blocal', 'bmin', 'xj'. 
-                 POSIT is an array(3, 3000) of GDZ locations of the field line
-                 at 3000 points.
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-01-09
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which 
+            the line is traced.
+
+        Returns
+        -------
+        dict:
+            A dictionary with six keys:
+            - "POSIT" the field line locations in GEO coordinates with shape (3, 3000).
+            - "Nposit" the number of points along the field line for each field line traced.
+            - "lm" is the McIlwain L shell.
+            - "blocal" the magnitude of the local magnetic field.
+            - "bmin" the magnitude of the minimum magnetic field.
+            - "xj" I, related to second adiabatic invariant.
         """        
         # specifies radius of reference surface between which field line is 
         # traced.
@@ -375,7 +392,7 @@ class MagFields:
         if self.TMI: print("Running trace_field_line. Python may",
             "temporarily stop responding")
         
-        self.irbem.trace_field_line2_1_(ctypes.byref(self.kext), \
+        self._irbem_obj.trace_field_line2_1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
@@ -391,18 +408,26 @@ class MagFields:
         
     def find_magequator(self, X, maginput):
         """
-        NAME: find_magequator(self, X, maginput, verbose = False)
-        USE:  This function finds the coordinates of the magnetic equator from 
-              tracing the magntic field line from the input location.
-        INPUTS: X is a dictionary with  single, non-array values in the 
-              'dateTime', 'x1', 'x2', and 'x3' keys. maginput is a dictionary
-              with model key:input pairs.
-        RETURNS: Dictionary of bmin and XGEO. bmin is the magntitude of the 
-              magnetic field at equator. XGEO is an array of [xGEO,yGEO,zGEO].
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-02-02
-        """ 
-        
+        Find the coordinates of the magnetic equator from tracing the magntic 
+        field line from the input location.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+
+        Returns
+        -------
+        dict:
+            A dictionary with two keys:
+            - "bmin" the magntitude of the magnetic field at the equator.
+            - "XGEO" the location of the magnetic equator in GEO coordinates.
+        """
         # Prep the magnetic field model inputs and samping spacetime location.
         self._prepMagInput(maginput)
         iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
@@ -414,7 +439,7 @@ class MagFields:
         
         if self.TMI: print('Running IRBEM find_magequator')
 
-        self.irbem.find_magequator1_(ctypes.byref(self.kext), \
+        self._irbem_obj.find_magequator1_(ctypes.byref(self.kext), \
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), \
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
                 ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
@@ -474,7 +499,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB get_field_multi")
 
-        self.irbem.get_field_multi_(
+        self._irbem_obj.get_field_multi_(
                 ctypes.byref(ntime), ctypes.byref(self.kext), 
                 ctypes.byref(self.options), ctypes.byref(self.sysaxes), 
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
@@ -495,9 +520,10 @@ class MagFields:
         ----------
         X: dict
             The dictionary specifying the time and location in GEO coordinates. 
+
         Returns
         -------
-        MLT : float
+        MLT: float
             The MLT value (hours).
         """
         # Inputs
@@ -510,7 +536,7 @@ class MagFields:
         
         if self.TMI: print("Running IRBEM-LIB get_mlt")
 
-        self.irbem.get_mlt1_( 
+        self._irbem_obj.get_mlt1_( 
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), 
                 ctypes.byref(geo_coords), ctypes.byref(MLT)
                 )
@@ -518,34 +544,39 @@ class MagFields:
         return self.get_mlt_output
 
     ### Non-IRBEM methods.
-    def bounce_period(self, X, maginput, E, **kwargs):
+    def bounce_period(self, X, maginput, E, Erest=511, R0=1, alpha=90, interpNum=100000):
         """
-        NAME:  bounce_period(self, X, maginput, E, **kwargs)
-        USE:   Calculates the bounce period in an arbitary magnetic field 
-               model. The default particle is electron, but an optional Erest
-               parameter can be used to change the rest energy of the particle
-               to a proton.
-        INPUT: A dictionary, X containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
-               dictionary provides model parameters. Optional parameters
-               are Erest in keV, the rest energy of the bouncing particle, 
-               default is Erest = 511 (electron rest energy). R0 = 1, the limit
-               of the magnetic field line tracing at Earth's surface. Changing 
-               this is useful if the mirror point is below the ground 
-               (unphysical, but may be useful in certain applications).
-               interpNum is the number of samples to take along the field line.
-               Default is 100000, a good balance between speed and accuracy.
-               alpha is the local pitch angle
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: Bounce period value or values, depending if E is an array or
-                a single value.
-        MOD:     2017-04-06        
-        """
-        Erest = kwargs.get('Erest', 511)
-        R0 = kwargs.get('R0', 1)
-        alpha = kwargs.get('alpha', 90)
-        interpNum = kwargs.get('interpNum', 100000)
-        
+        Calculate the bounce period in an arbitary magnetic field model. 
+        The default particle is electron, but you can change the Erest 
+        parameter to calculate the bounce period for other particles.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects. 
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        E: float, list, or np.array
+            A single or multiple values of particle energy in keV.
+        Erest: float
+            The particle's rest energy in keV.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which 
+            the line is traced.
+        alpha: float
+            The local pitch angle.
+        interpNum: int
+            The number of samples to interpolate the magnetic field line.
+            100000 is a good balance between speed and accuracy.
+
+        Returns
+        -------
+        float or np.array
+            Bounce period(s) in seconds.    
+        """        
         if self.TMI: print('IRBEM: Calculating bounce periods')
         
         fLine = self._interpolate_field_line(X, maginput, R0=R0, alpha=alpha)
@@ -559,13 +590,13 @@ class MagFields:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                 raise ValueError('Mirror point below the ground!, Change R0' +
-                 ' or catch this error and assign it a value.', 
-                 '\n Original error: ', err)
+                 raise ValueError('Mirror point below R0') from err
+            else:
+                raise
         
         # Resample S to a finer density of points.
         if len(fLine['S']) > interpNum: 
-            print('Warning: interpolating with less data than IRBEM outputs,'+
+            warnings.warn('Warning: interpolating with less data than IRBEM outputs,'+
             ' the bounce period may be inaccurate!')
         sInterp = np.linspace(startInd, endInd, num = interpNum)
         
@@ -578,33 +609,34 @@ class MagFields:
         
         # This is basically an integral of ds/v||.
         if isinstance(E, (np.ndarray, list)):
-            self.Tb = [2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['mirrorB'], dB, 
-                                              Erest = Erest)[1:-1])) for Ei in E]
+            self.Tb = np.array([2*np.sum(np.divide(ds[1:-1], vparalel(Ei, fLine['mirrorB'], dB, 
+                                              Erest = Erest)[1:-1])) for Ei in E])
         else:
             self.Tb = 2*np.sum(np.divide(ds[1:-1], vparalel(E, fLine['mirrorB'], dB, 
                                              Erest = Erest)[1:-1]))
         return self.Tb
         
-    def mirror_point_altitude(self, X, maginput, **kwargs):
-        """"
-        NAME:  mirror_point_altitude(self, X, maginput)
-        USE:   Calculates the mirror point of locally mirroring electrons
-               in the opposite hemisphere. Similar to the find_mirror_point()
-               function, but it works in the opposite hemisphere.
-        INPUT: A dictionary, X containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. maginput
-               dictionary provides model parameters. Optional parameters
-               are Erest in keV, the rest energy of the bouncing particle, 
-               default is Erest = 511 (electron rest energy). R0 = 1, the limit
-               of the magnetic field line tracing at Earth's surface. Changing 
-               this is useful if the mirror point is below the ground 
-               (unphysical, but may be useful in certain applications).
-        RETURNS: Mirror point in the opposite hemisphere.
-        AUTHOR: Mykhaylo Shumko
-        MOD:     2017-04-06        
+    def mirror_point_altitude(self, X, maginput, R0=1):
         """
-        R0 = kwargs.get('R0', 1)
+        Calculate the mirror point of locally mirroring electrons 
+        in the opposite hemisphere. Similar to the find_mirror_point()
+        method, but it works in the opposite hemisphere.
+
+        Parameters
+        ----------
+        X: dict
+            The dictionary specifying the time and location.  
+        maginput: dict
+            The magnetic field inpit parameter dictionary.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which 
+            the line is traced.
         
+        Returns
+        -------
+        float
+            The mirror point altitude in the opposite hemisphere.    
+        """        
         if self.TMI: print('IRBEM: Calculating mirror point altitude')
             
         fLine = self._interpolate_field_line(X, maginput, R0=R0)
@@ -618,12 +650,9 @@ class MagFields:
                                        len(fLine['S'])/2, len(fLine['S'])-1)
         except ValueError as err:
             if str(err) == 'f(a) and f(b) must have different signs':
-                if self.TMI:
-                     raise ValueError('Mirror point below the ground!, Change R0' +
-                     ' or catch this error and assign it a value.', 
-                     '\n Original error: ', err)
-                else: 
-                    raise ValueError('Mirror point below the ground!')
+                raise ValueError('Mirror point below R0') from err
+            else:
+                raise
                         
         # Start indicies of the magnetic field is always in the northern
         # hemisphere, so take the opposite.
@@ -638,15 +667,28 @@ class MagFields:
         
     def _prepTimeLoc(self, X):
         """
-        NAME:  _prepTimeLoc(self, X)
-        USE:   Prepares spacetime inputs.
-        INPUT: A dictionary, X containing the time and sampling location. 
-               Input keys must be 'dateTime', 'x1', 'x2', 'x3'. Other time keys
-               will work, as long as they contain the word 'time' (case 
-               insensitive). 
-        AUTHOR: Mykhaylo Shumko
-        RETURNS: ctypes variables iyear, idoy, ut, x1, x2, x3.
-        MOD:     2017-01-12
+        Prepares spacetime inputs.
+
+        Parameters
+        ----------
+        X: dict
+            The dictionary specifying the time and location. Keys must be 
+            'dateTime', 'x1', 'x2', 'x3'. Other time keys will work, as 
+            long as they contain the word 'time' (case insensitive). 
+        Returns
+        -------
+        ctype:
+            year
+        ctype:
+            day of year
+        ctype:
+            seconds elapsed since midnight
+        ctype:
+            First cooridnate in sysaxes coordinates
+        ctype:
+            Second cooridnate in sysaxes coordinates
+        ctype:
+            Third cooridnate in sysaxes coordinates
         """
         if self.TMI: print('Prepping time and space input variables')
 
@@ -667,7 +709,7 @@ class MagFields:
             t = dateutil.parser.parse(Xc[time_key])
         iyear = ctypes.c_int(t.year)
         idoy = ctypes.c_int(t.timetuple().tm_yday)
-        ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)
+        ut = ctypes.c_double(3600*t.hour + 60*t.minute + t.second)  # Seconds of day
         x1 = ctypes.c_double(Xc['x1']) 
         x2 = ctypes.c_double(Xc['x2'])
         x3 = ctypes.c_double(Xc['x3'])
@@ -741,7 +783,7 @@ class MagFields:
             x3[dt] = Xc['x3'][dt]
         return ntime, iyear, idoy, ut, x1, x2, x3
 
-    def _prepMagInput(self, inputDict = None):
+    def _prepMagInput(self, inputDict=None):
         """
         NAME:  _prepMagInput(self, inputDict)
         USE:   Prepares magnetic field model inputs.
@@ -757,7 +799,7 @@ class MagFields:
         if self.TMI: print('Prepping magnetic field inputs.')
 
         # If no model inputs (statis magnetic field model)
-        if inputDict is None:
+        if (inputDict is None) or (inputDict == {}):
             magInputType = (ctypes.c_double * 25)
             self.maginput = magInputType()
             for i in range(25):
@@ -858,7 +900,8 @@ class MagFields:
         
 class Coords:
     """
-    USE
+    Wrappers for IRBEM's coordinate transformation functions. 
+
     When initializing the instance, you can provide the directory 
     'IRBEMdir' and 'IRBEMname' arguments to the class to specify the location 
     of the  compiled FORTRAN shared object (so) file, otherwise, it will 
@@ -870,7 +913,7 @@ class Coords:
     input coordinate system, and is set to GDZ (lat, long, alt). 
     
     verbose keyword, set to False by default, will print too much information 
-    (TMI)! Usefull for debugging and for knowing too much. Set it to True if
+    (TMI). Usefull for debugging and for knowing too much. Set it to True if
     Python quietly crashes (probably an input to Fortran issue)
     
     Python wrapper error value is -9999.
@@ -886,36 +929,17 @@ class Coords:
     or you would like me to wrap a particular function.
     """
     def __init__(self, **kwargs):
-        self.compiledIRBEMdir = kwargs.get('IRBEMdir', None)
-        self.compiledIRBEMname = kwargs.get('IRBEMname', None)    
+        self.irbem_obj_path = kwargs.get('path', None)  
         self.TMI = kwargs.get('verbose', False)
         
-        # Unless the shared object location is specified, look for it
-        # in the root directory of IRBEM.
-        if self.compiledIRBEMdir == None and self.compiledIRBEMname == None:
-            self.compiledIRBEMdir = \
-            os.path.abspath(os.path.join(os.path.dirname( __file__ ), \
-            '..', '..'))
-            fullPaths = glob.glob(os.path.join(self.compiledIRBEMdir,'*.so'))
-            assert len(fullPaths) == 1, 'Either none or multiple .so files '+\
-            'found in the IRBEM folder!'
-            self.compiledIRBEMname = os.path.basename(fullPaths[0])
-            
-        self.__author__ = 'Mykhaylo Shumko'
-        self.__last_modified__ = '2017-01-12'
-        self.__credit__ = 'IRBEM-LIB development team'
-        
-        # Open the shared object file.
-        try:
-            self.irbem = ctypes.cdll.LoadLibrary(os.path.join(\
-            self.compiledIRBEMdir, self.compiledIRBEMname))
-        except OSError:
-            print('Error, cannot find the IRBEM shared object file. Please' + \
-            ' correct "IRBEMdir" and "IRBEMname" kwargs to the IRBEM instance.')
-            raise
+        self.path, self._irbem_obj = _load_shared_object(self.irbem_obj_path)
         return 
-        
-    def coords_transform(self, time, pos, sysaxesIn, sysaxesOut):
+    
+    def coords_transform(self, *args, **kwargs):
+        warnings.warn('Coords.coords_transform() is deprecated. Use Coords.transform instead.')
+        return self.transform(*args, **kwargs)
+
+    def transform(self, time, pos, sysaxesIn, sysaxesOut):
         """
         NAME:  coords_transform(self, X, sysaxesIn, sysaxesOut)
         USE:   This function transforms coordinate systems from a point at time
@@ -968,7 +992,7 @@ class Coords:
             for nX in range(pos.shape[1]):
                 posInArr[nT][nX] = ctypes.c_double(pos[nT, nX])   
        
-        self.irbem.coord_trans_vec1_(ctypes.byref(nTime), ctypes.byref(sysIn),
+        self._irbem_obj.coord_trans_vec1_(ctypes.byref(nTime), ctypes.byref(sysIn),
            ctypes.byref(sysOut), ctypes.byref(iyear), ctypes.byref(idoy),
            ctypes.byref(ut), ctypes.byref(posInArr), ctypes.byref(posOutArr))
         return np.array(posOutArr[:])
@@ -1001,7 +1025,7 @@ class Coords:
         elif isinstance(times[0], datetime.datetime):
             t = times
         else:
-            raise ValueError('ERROR: Unknown time format! I can accept ISO '
+            raise ValueError('Unknown time format. Valid formats: ISO '
                 'string, datetime objects, or arrays of those objects')   
         
         for nT in range(N): # Populate C arrays
@@ -1047,14 +1071,41 @@ class Coords:
             raise ValueError('Error, coordinate axis can only be a string or int!')
 
 
-def IRBEM(*args, **kwargs):
+def _load_shared_object(path=None):
     """
-    Warn user that IRBEM class is depricated.
+    Searches for and loads a shared object (.so or .dll file). If path is specified
+    it doesn't search for the file.
     """
-    from warnings import warn
-    warn("\n \n The IRBEM class is depricated, functionality has moved to the "
-        "MagFields and Coords clases.\n")
-    return MagFields(*args, **kwargs)
+    if path is None:
+        if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
+            obj_ext = '*.dll'
+            loader = ctypes.WinDLL
+        else:
+            obj_ext = '*.so'
+            loader = ctypes.cdll
+        matched_object_files = list(pathlib.Path(__file__).parents[2].glob(obj_ext))
+        assert len(matched_object_files) == 1, (
+            f'{len(matched_object_files)} .so or .dll shared object files found in '
+            f'{pathlib.Path(__file__).parents[2]} folder: {matched_object_files}.'
+            )
+        path = matched_object_files[0]
+        
+    # Open the shared object file.
+    try:
+        if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
+            # Some versions of ctypes (Python) need to know where msys64 binary 
+            # files are located, or ctypes is unable to load the IREBM dll.
+            gfortran_path = pathlib.Path(shutil.which('gfortran.exe'))
+            os.add_dll_directory(gfortran_path.parent)  # e.g. C:\msys64\mingw64\bin
+            _irbem_obj = ctypes.WinDLL(str(path))
+        else:
+            _irbem_obj = ctypes.CDLL(str(path))
+    except OSError as err:
+        if 'Try using the full path with constructor syntax.' in str(err):
+            raise OSError(f'Could not load the IRBEM shared object file in {path}') from err
+        else:
+            raise
+    return path, _irbem_obj
 
 """
 These are helper functions to calculate relativistic velocity, 
@@ -1067,27 +1118,3 @@ These functions should be used with caution in your own applications!
 beta = lambda Ek, Erest = 511: np.sqrt(1-((Ek/Erest)+1)**(-2)) # Ek,a dErest must be in keV
 gamma = lambda Ek, Erest = 511:np.sqrt(1-beta(Ek, Erest = 511)**2)**(-1/2)
 vparalel = lambda Ek, Bm, B, Erest = 511:c*beta(Ek, Erest)*np.sqrt(1 - np.abs(B/Bm))
-
-############### PACKAGE INFO #############################
-__version__ = '0.2.0'
-__author__ = 'Mykhaylo Shumko'
-__contact__ = 'msshumko@gmail.com'
-__license__ = """Copyright 2017, Mykhaylo Shumko
-    
-IRBEM wrapper class for Python. Source code credit goes to the 
-IRBEM-LIB development team.
-
-***************************************************************************
-IRBEM-LIB is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-IRBEM-LIB is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
-"""
