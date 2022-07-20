@@ -1,0 +1,65 @@
+{
+    "license": "LGPL-v3", 
+    "creators": [   
+        {
+            "name": "Daniel Boscher"
+        }, 
+        {
+            "name": "Sebastien Bourdarie"
+        }, 
+        {
+            "name": "Paul O'Brien"
+        },  
+        {
+            "name": "Tim Guild"
+        },  
+        {
+            "name": "Daniel Heynderickx"
+        },  
+        {
+            "name": "Steve Morley"
+        },  
+        {
+            "name": "Adam Kellerman"
+        },  
+        {
+            "name": "Christopher Roth"
+        },  
+        {
+            "name": "Hugh Evans"
+        },  
+        {
+            "name": "Antoine Brunet"
+        },  
+        {
+            "name": "Mykhaylo Shumko"
+        }, 
+        {
+            "name": "Colby Lemon"
+        },  
+        {
+            "name": "Seth Claudepierre"
+        },  
+        {
+            "name": "Thomas Nilsson"
+        }, 
+        {
+            "name": "Erwin De Donder"
+        },  
+        {
+            "name": "Reiner Friedel"
+        },  
+        {
+            "name": "Stu Huston"
+        },  
+        {
+            "name": "Kyungguk Min"
+        },  
+        {
+            "name": "Alexander Drozdov"
+        }, 
+        {
+            "name": "IRBEM Contributor Community"
+        }  
+    ] 
+}
