@@ -2,24 +2,59 @@ IRBEM Library
 =============
 
 The International Radiation Belt Environment Modeling (IRBEM) library is
-freely distributed under the umbrella of the PRBEM COSPAR panel.
+a set of source codes dedicated to radiation belt modeling. The library 
+facilitates the calculation of magnetic coordinates and drift shells using 
+various external magnetic field models. Further routines are provided 
+for various spatial coordinate and time format transformations. The library 
+can be called from FORTRAN or C, with IDL, Python, and MATLAB wrappers 
+provided in the distribution package. 
 
-In 2003 ONERA-DESP (space environment department) decided to put together a
-set of source codes into a library dedicated to radiation belt modeling. The
-toolkit was then called ONERA-DESP-LIB. Because the project has grown along
-time, and because its development is nowadays more like an international
-collaborative effort, it has been decided in 2008, after COSPAR 2008
-Montreal assembly, to move the library name to IRBEM-LIB (which refers to
-COSPAR PRBEM panel) and to distribute it under COSPAR PRBEM umbrella (a
-neutral body).
+IRBEM was first developed and released as "ONERA-DESP-LIB" in 2003 by the DESP 
+department (the space environment department) of the French aerospace lab, 
+ONERA. As the project has grown through the years, its development is now 
+an international collaborative effort. Following the 2008 COSPAR Assembly 
+held in Montreal, it was decided to change the library's name to "IRBEM-LIB" 
+to reflect this international collaboration, and to freely distribute the 
+library under the umbrella of the COSPAR Panel on Radiation Belt Environment 
+Modeling (PRBEM), a neutral scientific body.
 
-The IRBEM Fortran library allows to compute magnetic coordinates and drift
-shells using various external magnetic field models.  Further routines are
-provided for  various coordinate and time format transformations.
+Acknowledgments
+---------------
+### Publication Acknowledgment
+When publishing research that used IRBEM, please provide appropriate credit 
+to the IRBEM team via acknowledgment:
 
-The library can be called from FORTRAN or C code and from IDL, Python or
-MATLAB code. For IDL, Python and MATLAB wrappers are provided in the
-distribution package. 
+> We acknowledge the use of the IRBEM library (XXX), the latest 
+version of which can be found at https://doi.org/10.5281/zenodo.6867553.
+
+where the "XXX" is replaced by one of the following, depending on if you are 
+using an official release library or a repository version of the library:
+
+* Official Release: XXX = "version X.Y.Z" where X.Y.Z is the version number of 
+the official release that was used (https://github.com/PRBEM/IRBEM/releases)
+
+* Repository Version: XXX = "repository version YYY" where YYY is the output 
+of `git rev-parse --short HEAD`
+
+### Community Contributors
+The IRBEM team wishes to thank:
+
+ - Daniel Boscher, Sebastien Bourdarie, Paul O'Brien, Tim Guild, Daniel 
+   Heynderickx, Steve Morley, Adam Kellerman, Christopher Roth, Hugh Evans, 
+   Antoine Brunet, Mykhaylo Shumko, Colby Lemon, Seth Claudepierre, Thomas 
+   Nilsson, Erwin De Donder, Reiner Friedel, Stu Huston, Kyungguk Min, Alexander Drozdov, and the IRBEM contributor community for general contributions 
+   to the IRBEM library.
+ - K. Pfitzer, N. Tsyganenko, I. Alexeev and their co-authors for providing
+   us magnetic field model source codes and for good discussions on how to
+   use their model correctly. 
+ - R. Friedel, Y. Dotan and M. Redding for good discussions, advice and bug 
+   reports which are always very helpful  when one attempts to develop such 
+   a tool.
+ - D. Bilitza for his help regarding the use of IGRF magnetic field model
+   and MSIS models.
+ - D. Brautigam for providing the CRRES models.
+ - D. Vallado for providing free of use source code for the orbit propagator
+   (SGP4).
 
 Installation
 ------------
@@ -106,26 +141,3 @@ the accuracy, completeness, use, or usefulness of any information,
 apparatus, product, or process disclosed in documents and software available
 from the IRBEM library or developed as a result of the use of information or
 software made available from the library.
-
-Acknowledgments
----------------
-The main authors of IRBEM are Daniel Boscher and Sebastien Bourdarie 
-(ONERA-DESP, Toulouse, France).
-
-The authors wish to thank:
-
- - Erwin De Donder, Hugh Evans, Reiner Friedel, Tim Guild, Daniel 
-   Heynderickx, Stu Huston, Adam Kellerman, Colby Lemon, Kyungguk Min, 
-   Steve Morley, Paul O'Brien, Christopher Roth, and Mykhaylo Shumko for 
-   general contributions to the IRBEM library.
- - K. Pfitzer, N. Tsyganenko, I. Alexeev and their co-authors for providing
-   us magnetic field model source codes and for good discussions on how to
-   use their model correctly. 
- - R. Friedel (LANL), Y. Dotan and M. Redding (Aerospace Corporation) for
-   good discussions, advices and bug reports which are always very helpfull
-   when one attemps to develop such a tool.
- - D. Bilitza for his help regarding the use of IGRF magnetic field model
-   and MSIS models.
- - D. Brautigam for providing us CRRES models.
- - D. Vallado for providing free of use source code for orbit propagator
-   (SGP4).
