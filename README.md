@@ -25,7 +25,7 @@ When publishing research that used IRBEM, please provide appropriate credit
 to the IRBEM team via acknowledgment:
 
 > We acknowledge the use of the IRBEM library (XXX), the latest 
-version of which can be found at https://doi.org/10.5281/zenodo.6867553.
+version of which can be found at https://doi.org/10.5281/zenodo.6867552.
 
 where the "XXX" is replaced by one of the following, depending on if you are 
 using an official release library or a repository version of the library:
