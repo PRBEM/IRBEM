@@ -143,4 +143,4 @@ IDL_SIMPLE(landi2lstar,17)
 IDL_SIMPLE(landi2lstar_shell_splitting,19)
 IDL_SIMPLE(empiricallstar,9)
 
-IDL_WRAPPER(shieldose2idl,shieldose2,28)
+IDL_WRAPPER(shieldose2idl,shieldose2,29)
