@@ -173,32 +173,72 @@
         system is provided in</font> 
         <br />
     </p>
-    <div style="MARGIN-LEFT: 40px"><font face="ARIAL, HELVETICA">0: GDZ (alti, lati, East
-        longi - km,deg.,deg)</font> 
+    <div style="MARGIN-LEFT: 40px">
+        <font face="ARIAL, HELVETICA">
+        <b>0: GDZ</b> (geodetic; altitude, latitude, East longitude) - km, deg., deg.
+        <br />Defined using a reference ellipsoid. Geodetic longitude is identical to GEO longitude. Both the altitude
+    and latitude depend on the ellipsoid used. IRBEM uses the WGS84 reference ellipsoid.
         <br />
-        <font face="ARIAL, HELVETICA">1: GEO (cartesian) - Re</font> 
+        <b>1: GEO</b> (geocentric geographic; Cartesian) - Re 
+        <br />Earth-Centered and Earth-Fixed. X lies in the Earth's equatorial plane (zero latitude) and intersects the Prime
+        Meridian (zero longitude; Greenwich, UK). Z points to True North (roughly aligned with the instantaneous rotation axis).
         <br />
-        <font face="ARIAL, HELVETICA">2: GSM (cartesian) - Re</font> 
+        <b>2: GSM</b> (geocentric solar magnetospheric; Cartesian) - Re
+        <br />X points sunward from Earth's center. The X-Z plane is defined to contain Earth's dipole axis (positive North).
         <br />
-        <font face="ARIAL, HELVETICA">3: GSE (cartesian) - Re</font> 
+        <b>3: GSE</b> (geocentric solar ecliptic; Cartesian) - Re
+        <br />X points sunward from Earth's center. Y lies in the ecliptic plane of date, pointing in the anti-orbit direction. Z is parallel
+    to the ecliptic pole of date.
         <br />
-        <font face="ARIAL, HELVETICA">4: SM (cartesian) - Re</font> 
+        <b>4: SM</b> (solar magnetic; Cartesian) - Re
+        <br />Z is aligned with the centered dipole axis of date (positive North), and Y is perpendicular to both the Sun-Earth line and
+    the dipole axis. X is therefore is not aligned with the Sun-Earth line and SM is a rotation about Y from GSM.
         <br />
-        <font face="ARIAL, HELVETICA">5: GEI (cartesian) - Re</font> 
+        <b>5: GEI</b> (geocentric equatorial inertial, of Date; Cartesian) - Re
+        <br />X points from Earth toward the equinox of date (first point of Aries; position of the Sun at the vernal equinox). Z is parallel to the instantaneous rotation axis of the Earth.
         <br />
-        <font face="ARIAL, HELVETICA">6: MAG (cartesian) - Re</font> 
+        <b>6: MAG</b> (geomagnetic; Cartesian) - Re
+        <br />Z is parallel to Earth's centered dipole axis (positive North). Y is the intersection between Earth's equator and the geographic meridian 90 degrees east of the meridan containing the dipole axis.
         <br />
-        <font face="ARIAL, HELVETICA">7: SPH (geo in spherical) - (radial distance, lati,
-        East longi - Re, deg., deg.)<br />
-        </font><font face="ARIAL, HELVETICA">8: RLL&nbsp; (radial distance, lati, East longi
-        - Re, deg., deg. - prefered to 7)</font> 
+        <b>7: SPH</b> (GEO in spherical; radial distance, latitude, East longitude) - Re, deg., deg.
+        <br />Geoecentric geographic coordinates (GEO system) expressed in spherical instead of Cartesian.
         <br />
+        <b>8: RLL</b> (geodetic; radial distance, geodetic latitude, East longitude) - Re, deg., deg.
+        <br /> A re-expression of geodetic (GDZ) coordinates using radial distance instead of altitude above the reference ellipsoid. Note that the latitude is still geodetic latitude and is therefore not interchangeable with SPH.
+        <br />
+        <b>9: HEE</b> (Heliocentric Earth ecliptic; Cartesian) - Re
+        <br />Origin is solar center; X points towards the Earth, and Z is perpendicular to the plane of Earth's orbit (positive North). This system is fixed with respect to the Earth-Sun line.
+        <br />
+        <b>10: HAE</b> (Heliocentric Aries ecliptic; Cartesian) - Re
+        <br />Origin is solar center. Z is perpendicular to the plane of Earth's orbit (positive North) and X points towards the equinox of date (first point of Aries).
+        <br />
+        <b>11: HEEQ</b> (Heliocentric Earth equatorial; Cartesian) - Re
+        <br />Origin is solar center. Z is parallel to the Sun's rotation axis (positive North) and X points towards the intersection of the solar equator and solar central meridian as seen from Earth.
+        <br />
+        <b>12: TOD</b> (True of Date; same as GEI) - Re
+        <br />This is the same as IRBEM's GEI and both are included for legacy support. TOD uses the "true" (not mean) equator of date and equinox of date to define the coordinate system.
+        <br />
+        <b>13: J2000</b> (GEI at J2000; Cartesian) - Re
+        <br />A key geocentric inertial frame. X is aligned with the mean equinox at J2000; Z is parallel to the mean rotation axis of the Earth at J2000 (that is, perpendicular to the mean equator of J2000).
+        The mean equinox of date and mean equator of date (at any epoch) correct only for precession, and not nutation.
+        <br />
+        <b>14: TEME</b> (True Equator Mean Equinox; Cartesian) - Re
+        <br />
+        <i>Notes:
+            <br>- Four geocentric equatorial inertial systems are in widespread use. These are J2000, MOD (Mean of Date), TOD, and TEME.
+            J2000 defines the axes using the equinox and pole at the J2000 epoch. Correcting for precession transforms to MOD (which is identical to J2000 at 2000-01-01T11:58:55.816 UTC), and then correcting for nutation tansforms to TOD (GEI).
+            IRBEM defines the geophysical systems (e.g., [GSE, GSM, SM]) relative to TOD, although some missions define these coordinate systems relative to a different inertial reference system
+            (usually MOD).
+            <br>- For details of the approximations used by IRBEM's coordinate transformations, including the equation for estimating the Sun vector, see <a href="http://jsoc.stanford.edu/~jsoc/keywords/Chris_Russel/Geophysical%20Coordinate%20Transformations.htm">Russell (1971)</a> and 
+            <a href="https://doi.org/10.1016/0032-0633(92)90012-D">Hapgood (1992)</a>
+            <br>- TEME is the inertial system used by the SGP4 orbit propagator.</i>
+        </font>
     </div>
     <p>
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>iyear</b>, <b>iyr</b> or <b>iyearsat</b>: array(NTIME_MAX) of long integer year when
-        measurements are given. /font> 
+        measurements are given. </font>
     <br>
         <font face="ARIAL, HELVETICA"><b>idoy:</b> array(NTIME_MAX) of long integer doy when
         measurements are given</font> 
@@ -1433,9 +1473,8 @@
     </h2>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA">Generic coordinates transformation from one Earth&nbsp;or
-    Heliospheric coordinate system to another&nbsp;</font>&nbsp;<font face="Arial">Earth&nbsp;or
-    Heliospheric coordinates system. Handle up to GET_IRBEM_NTIME_MAX() times at once.</font> 
+    <font face="ARIAL, HELVETICA">Generic coordinates transformation from one geophysical or
+    heliospheric coordinate system to another. Handles up to GET_IRBEM_NTIME_MAX() times at once.</font>
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
@@ -1444,8 +1483,8 @@
 
       <b>ntime, sysaxesIN, sysaxesOUT, iyr, idoy, secs, xIN</b> <p>
 
-      see <a href=#COMMON_ARGUMENTS>Common Argument
-      Definitions</a>
+      For definitions of the coordinate systems, and notes on transformations, see <a href=#COMMON_ARGUMENTS>Common Argument
+      Definitions</a>.
 	  <p>
 	<font face="ARIAL, HELVETICA"><b>sysaxesIN:</b> long integer&nbsp;indicating input
     coordinates system</font>&nbsp;<br />
@@ -1540,6 +1579,11 @@
                         J2000 (13) 
                     </p>
                 </td>
+                <td bgcolor="#c0c0ff" rowspan="2">
+                    <p align="center">
+                        TEME (14)
+                    </p>
+                </td>
             </tr>
             <tr>
                 <td bgcolor="#ffff80">
@@ -1554,6 +1598,8 @@
                     </p>
                 </td>
                 <td bgcolor="#ff8000">
+                </td>
+                <td bgcolor="lime">
                 </td>
                 <td bgcolor="lime">
                 </td>
@@ -1616,6 +1662,8 @@
                 </td>
                 <td bgcolor="lime">
                 </td>
+                <td bgcolor="lime">
+                </td>
             </tr>
             <tr>
                 <td bgcolor="#ffff80" colspan="2">
@@ -1628,6 +1676,8 @@
                 <td bgcolor="lime">
                 </td>
                 <td bgcolor="#ff8000">
+                </td>
+                <td bgcolor="lime">
                 </td>
                 <td bgcolor="lime">
                 </td>
@@ -1686,6 +1736,8 @@
                 </td>
                 <td bgcolor="lime">
                 </td>
+                <td bgcolor="lime">
+                </td>
             </tr>
             <tr>
                 <td bgcolor="#ffff80" colspan="2">
@@ -1702,6 +1754,8 @@
                 <td bgcolor="lime">
                 </td>
                 <td bgcolor="#ff8000">
+                </td>
+                <td bgcolor="lime">
                 </td>
                 <td bgcolor="lime">
                 </td>
@@ -1756,6 +1810,8 @@
                 </td>
                 <td bgcolor="lime">
                 </td>
+                <td bgcolor="lime">
+                </td>
             </tr>
             <tr>
                 <td bgcolor="#ffff80" colspan="2">
@@ -1776,6 +1832,8 @@
                 <td bgcolor="lime">
                 </td>
                 <td bgcolor="#ff8000">
+                </td>
+                <td bgcolor="lime">
                 </td>
                 <td bgcolor="lime">
                 </td>
@@ -1826,6 +1884,8 @@
                 </td>
                 <td bgcolor="lime">
                 </td>
+                <td bgcolor="lime">
+                </td>
             </tr>
             <tr>
                 <td bgcolor="#ffff80" colspan="2">
@@ -1850,6 +1910,8 @@
                 <td bgcolor="lime">
                 </td>
                 <td bgcolor="#ff8000">
+                </td>
+                <td bgcolor="lime">
                 </td>
                 <td bgcolor="lime">
                 </td>
@@ -1896,6 +1958,8 @@
                 </td>
                 <td bgcolor="lime">
                 </td>
+                <td bgcolor="lime">
+                </td>
             </tr>
             <tr>
                 <td bgcolor="#ffff80" colspan="2">
@@ -1924,6 +1988,8 @@
                 <td bgcolor="lime">
                 </td>
                 <td bgcolor="#ff8000">
+                </td>
+                <td bgcolor="lime">
                 </td>
                 <td bgcolor="lime">
                 </td>
@@ -1963,6 +2029,8 @@
                 </td>
                 <td bgcolor="lime">
                 </td>
+                <td bgcolor="lime">
+                </td>
             </tr>
                         <tr>
                 <td bgcolor="#ffff80" colspan="2">
@@ -1995,10 +2063,48 @@
                 </td>
                 <td bgcolor="lime">
                 </td>
+                <td bgcolor="lime">
+                </td>
             </tr>
                         <tr>
                 <td bgcolor="#ffff80" colspan="2">
                     J2000 (13)</td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="lime">
+                </td>
+                <td bgcolor="#ff8000">
+                </td>
+                <td bgcolor="lime">
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffff80" colspan="2">
+                    TEME (14)</td>
+                <td bgcolor="lime">
+                </td>
                 <td bgcolor="lime">
                 </td>
                 <td bgcolor="lime">
