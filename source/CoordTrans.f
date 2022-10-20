@@ -2720,8 +2720,8 @@ C
       INCLUDE 'variables.inc'
 
       INTEGER*4 nmax,i,ntime, sysaxesIN, sysaxesOUT
-      INTEGER*4 iyear(ntime_max),idoy(ntime_max),y,d
-      REAL*8 secs(ntime_max),xINV(3,ntime_max),xOUTV(3,ntime_max)
+      INTEGER*4 iyear(ntime),idoy(ntime),y,d
+      REAL*8 secs(ntime),xINV(3,ntime),xOUTV(3,ntime)
       ! local vars
       REAL*8 xIN(3),xOUT(3),s
 
