@@ -1078,12 +1078,12 @@ def _load_shared_object(path=None):
     """
     if path is None:
         if (sys.platform == 'win32') or (sys.platform == 'cygwin'):
-            obj_ext = '*.dll'
+            obj_name = 'libirbem.dll'
             loader = ctypes.WinDLL
         else:
-            obj_ext = '*.so'
+            obj_name = 'libirbem.so'
             loader = ctypes.cdll
-        matched_object_files = list(pathlib.Path(__file__).parents[2].glob(obj_ext))
+        matched_object_files = list(pathlib.Path(__file__).parents[2].rglob(obj_name))
         assert len(matched_object_files) == 1, (
             f'{len(matched_object_files)} .so or .dll shared object files found in '
             f'{pathlib.Path(__file__).parents[2]} folder: {matched_object_files}.'
