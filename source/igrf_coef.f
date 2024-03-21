@@ -19,6 +19,14 @@
 !
 ! VERSION: IGRF13
 !
+
+       subroutine get_igrf_version(version)
+          IMPLICIT NONE
+          INTEGER*4 version
+          version = 13
+       end
+
+
 ! [EOS TRANS. AGU APRIL 21, 1992, P. 182]
 !  Additional IGRF References:
 !  (J. GEOMAG. GEOELECTR.(1982), V.34, P.313-315,
