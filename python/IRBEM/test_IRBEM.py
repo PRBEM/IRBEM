@@ -23,6 +23,7 @@ class TestIRBEM(unittest.TestCase):
     """
     def setUp(self):
         self.model = IRBEM.MagFields(options=[0,0,0,0,0], verbose=False, kext='T89')
+        self.dipol_model = IRBEM.MagFields(options=[0,0,5,0,5], verbose=False, kext=0)
         # Create four sets of model inputs: one set of input values, 
         # array of input values, one input value with a string 
         # datetime object, and array of inputs including a 
@@ -170,6 +171,40 @@ class TestIRBEM(unittest.TestCase):
         self.model.get_mlt(input_dict)
         self.assertAlmostEqual(self.model.get_mlt_output, true_MLT)
         return
+    
+    def test_drift_shell(self):
+        """
+        Tests the drift_shell IRBEM function.
+        """
+        res = self.dipol_model.drift_shell(self.X, self.maginput)
+        Lm = res['Lm']
+        self.assertAlmostEqual(Lm, 4.326679, 2)
+        L_posit = self._compute_dipole_L_shell(res['POSIT'])
+        self.assertLessEqual(np.nanmax(np.abs(L_posit-Lm))/Lm, 1e-2)
+
+    def test_drift_bounce_orbit(self):
+        """
+        Tests the drift_bounce_orbit IRBEM function.
+        """
+        res = self.dipol_model.drift_bounce_orbit(self.X, self.maginput)
+        Lm = res['Lm']
+        self.assertAlmostEqual(Lm, 4.326679, 2)
+        alt = self.X['x1']
+        self.assertLessEqual((res['hmin']-alt)/alt, 1e-2)
+        L_posit = self._compute_dipole_L_shell(res['POSIT'])
+        self.assertLessEqual(np.nanmax(np.abs(L_posit-Lm))/Lm, 1e-2)
+
+    @staticmethod
+    def _compute_dipole_L_shell(posit):
+        """
+        Compute the dipole L-shell for each point in coordinate list.
+        """
+        x = posit[...,0]
+        y = posit[...,1]
+        z = posit[...,2]
+        r = np.sqrt(x**2+y**2+z**2)
+        theta = np.arctan2(np.sqrt(x**2+y**2),z)
+        return r/np.sin(theta)**2
         
     def assertAlmostEqualDict(self, A, B):
         """
