@@ -230,9 +230,13 @@ class MagFields:
                 ctypes.byref(nposit))
         # Format the output into a dictionary, and convert ctypes arrays into
         # native Python format.
+        posit = np.array(posit)
+        nposit = np.array(nposit)
+        for i,n in enumerate(nposit):
+            posit[i,n:,:] = np.nan
         self.drift_shell_output = {'Lm':lm.value, 'blocal':np.array(blocal),
             'bmin':bmin.value, 'lstar':lstar.value, 'xj':xj.value, 
-            'POSIT':np.array(posit), 'Nposit':np.array(nposit)} 
+            'POSIT':posit, 'Nposit':nposit} 
         return self.drift_shell_output
                    
     def drift_bounce_orbit(self, X, maginput, alpha=90, R0=1):
@@ -259,6 +263,11 @@ class MagFields:
         maginput: dict
             The magnetic field input dictionary. See the online documentation for the valid
             keys and the corresponding models.
+        alpha: float
+            The local pitch angle.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which
+            the line is traced.
 
         Returns
         -------
@@ -281,7 +290,6 @@ class MagFields:
         blocal = blocalType()
 
         if self.TMI: print("Running IRBEM-LIB drift_bounce_orbit")
-
         self._irbem_obj.drift_bounce_orbit2_1_(ctypes.byref(self.kext), ctypes.byref(self.options),\
                 ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
                 ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
@@ -291,9 +299,13 @@ class MagFields:
                 ctypes.byref(nposit), ctypes.byref(hmin), ctypes.byref(hmin_lon))
         # Format the output into a dictionary, and convert ctypes arrays into
         # native Python format.
+        posit = np.array(posit)
+        nposit = np.array(nposit)
+        for i,n in enumerate(nposit):
+            posit[i,n:,:] = np.nan
         self.drift_bounce_orbit_output = {'Lm':lm.value, 'blocal':np.array(blocal),
             'bmin':bmin.value, 'bmirr':bmirr.value, 'lstar':lstar.value, 'xj':xj.value,
-            'POSIT':np.array(posit), 'Nposit':np.array(nposit), 'hmin':hmin.value,
+            'POSIT':posit, 'Nposit':nposit, 'hmin':hmin.value,
             'hmin_lon': hmin_lon.value}
         return self.drift_bounce_orbit_output
     
