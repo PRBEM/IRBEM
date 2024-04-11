@@ -41,7 +41,7 @@
 !        whatf -> which kind of flux, 1=differential 2=E range 3=integral (long integer)
 !        Nene -> Number of energy channels to compute
 !        energy -> energy (MeV) at which fluxes must be computed (double array [2,25])
-!        iyear,idoy,UT -> times when flux are to be computed (not usefull if imput position is not in GSE, GSM, SM,GEI) (respectively long array(ntime), long array(ntime), double array(ntime))
+!        iyear,idoy,UT -> times when flux are to be computed (not useful if input position is not in GSE, GSM, SM,GEI) (respectively long array(ntime), long array(ntime), double array(ntime))
 !        xIN1 -> first coordinate in the chosen system (double array [ntime_max])
 !        xIN2 -> second coordinate in the chosen system (double array [ntime_max])
 !        xIN3 -> third coordinate in the chosen system (double array [ntime_max])
