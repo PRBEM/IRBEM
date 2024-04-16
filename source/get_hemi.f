@@ -94,7 +94,6 @@ c
 c     calls get_hemi1 multiple times (ntime, <= ntime)
       IMPLICIT NONE
       INCLUDE 'variables.inc'
-      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
 
 c     declare inputs
       INTEGER*4    ntime,kext,options(5)

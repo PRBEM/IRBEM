@@ -172,12 +172,12 @@ c declare inputs
         INTEGER*4    kext,k_ext,k_l,options(5),Nalp,Nipa
       PARAMETER (Nalp=25)
         INTEGER*4    ntime,sysaxes
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
-      real*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+      INTEGER*4    iyearsat(ntime)
+      integer*4    idoy(ntime)
+      real*8     UT(ntime)
+      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
       real*8     alpha(Nalp)
-      real*8     maginput(25,ntime_max)
+      real*8     maginput(25,ntime)
 c
 c
 c Declare internal variables
@@ -190,8 +190,8 @@ c Declare internal variables
 c
 c Declare output variables
         REAL*8     BLOCAL(ntime_max,Nalp),BMIN(ntime_max)
-      REAL*8     XJ(ntime_max,Nalp),MLT(ntime_max)
-        REAL*8     Lm(ntime_max,Nalp),Lstar(ntime_max,Nalp)
+      REAL*8     XJ(ntime_max,Nipa),MLT(ntime_max)
+        REAL*8     Lm(ntime_max,Nipa),Lstar(ntime_max,Nipa)
 C
       COMMON /magmod/k_ext,k_l,kint
         COMMON /flag_L/Ilflag
@@ -1561,11 +1561,11 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
+      INTEGER*4 ISW,ntime,whichAp,DOY(ntime),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
-      REAL*8 F107A(100000),F107(100000),AP(7,100000)
-      REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
+      REAL*8 UT(ntime),ALT(ntime),LAT(ntime),LONG(ntime)
+      REAL*8 F107A(ntime),F107(ntime),AP(7,ntime)
+      REAL*8 Dens(8,ntime),Temp(2,ntime),APin(7),D(8),T(2)
 c
       COMMON/CSWI/ISW
       DO I=1,25
@@ -1605,11 +1605,11 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
+      INTEGER*4 ISW,ntime,whichAp,DOY(ntime),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
-      REAL*8 F107A(100000),F107(100000),AP(7,100000)
-      REAL*8 Dens(8,100000),Temp(2,100000),APin(7),D(8),T(2)
+      REAL*8 UT(ntime),ALT(ntime),LAT(ntime),LONG(ntime)
+      REAL*8 F107A(ntime),F107(ntime),AP(7,ntime)
+      REAL*8 Dens(8,ntime),Temp(2,ntime),APin(7),D(8),T(2)
 c
       COMMON/CSWI/ISW
       DO I=1,25
@@ -1639,11 +1639,11 @@ c
      &F107,AP,Dens,Temp)
 c
       IMPLICIT NONE
-      INTEGER*4 ISW,ntime,whichAp,DOY(100000),I,J
+      INTEGER*4 ISW,ntime,whichAp,DOY(ntime),I,J
       REAL*8 SV(25),STL
-      REAL*8 UT(100000),ALT(100000),LAT(100000),LONG(100000)
-      REAL*8 F107A(100000),F107(100000),AP(7,100000)
-      REAL*8 Dens(9,100000),Temp(2,100000),APin(7),D(8),T(2)
+      REAL*8 UT(ntime),ALT(ntime),LAT(ntime),LONG(ntime)
+      REAL*8 F107A(ntime),F107(ntime),AP(7,ntime)
+      REAL*8 Dens(9,ntime),Temp(2,ntime),APin(7),D(8),T(2)
 c
       COMMON/CSWI/ISW
       DO I=1,25

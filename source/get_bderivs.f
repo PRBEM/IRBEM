@@ -30,7 +30,6 @@ C     real*8 diffB(3,3,ntime) - derivatives of Bgeo in GEO, nT/RE
 C        diffB(i,j,t) = dB_i/dx_j for point t (t=1 to ntime)
 
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
       INCLUDE 'variables.inc'
 C
       COMMON /magmod/k_ext,k_l,kint
@@ -133,7 +132,6 @@ c     compute derivatives
 C     computes gradient factors, curvature factors, and curl of B
 
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
       INCLUDE 'variables.inc'
 
 C     all coordinates are in GEO reference frame

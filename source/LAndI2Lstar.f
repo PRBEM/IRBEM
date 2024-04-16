@@ -20669,7 +20669,6 @@ c
 c
       IMPLICIT NONE
       INCLUDE 'variables.inc'
-      INCLUDE 'ntime_max.inc'
 c
 c declare inputs
       INTEGER*4    kext,options(5)
