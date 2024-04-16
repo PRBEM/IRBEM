@@ -23,14 +23,13 @@
 C     computes derivatives of B (vector and magnitude)
 C     inputs: ntime through maginput have the usual meaning, except dX
 C     REAL*8 dX is the step size, in RE for the numerical derivatives (recommend 1E-3?)
-C     real*8 Bgeo(3,ntime_max) - components of B in GEO, nT
-C     real*8 Bmag(ntime_max) - magnitude of B in nT
-C     real*8 gradBmag(3,ntime_max) - gradient of Bmag in GEO, nT/RE
-C     real*8 diffB(3,3,ntime_max) - derivatives of Bgeo in GEO, nT/RE
+C     real*8 Bgeo(3,ntime) - components of B in GEO, nT
+C     real*8 Bmag(ntime) - magnitude of B in nT
+C     real*8 gradBmag(3,ntime) - gradient of Bmag in GEO, nT/RE
+C     real*8 diffB(3,3,ntime) - derivatives of Bgeo in GEO, nT/RE
 C        diffB(i,j,t) = dB_i/dx_j for point t (t=1 to ntime)
 
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
       INCLUDE 'variables.inc'
 C
       COMMON /magmod/k_ext,k_l,kint
@@ -39,17 +38,17 @@ c     declare inputs
       INTEGER*4    ntime,kext,options(5)
       INTEGER*4    sysaxes
       REAL*8       dX
-      INTEGER*4    iyearsat(ntime_max)
-      integer*4    idoy(ntime_max)
-      real*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
-      real*8     maginput(25,ntime_max)
+      INTEGER*4    iyearsat(ntime)
+      integer*4    idoy(ntime)
+      real*8     UT(ntime)
+      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
+      real*8     maginput(25,ntime)
 
 c     declare outputs
-      real*8 Bgeo(3,ntime_max) ! components of B in GEO, nT
-      real*8 Bmag(ntime_max) ! magnitude of B in nT
-      real*8 gradBmag(3,ntime_max) ! gradient of Bmag in GEO, nT/RE
-      real*8 diffB(3,3,ntime_max) ! derivatives of Bgeo in GEO, nT/RE
+      real*8 Bgeo(3,ntime) ! components of B in GEO, nT
+      real*8 Bmag(ntime) ! magnitude of B in nT
+      real*8 gradBmag(3,ntime) ! gradient of Bmag in GEO, nT/RE
+      real*8 diffB(3,3,ntime) ! derivatives of Bgeo in GEO, nT/RE
 
 c     declare internal variables
       integer*4  isat
@@ -133,26 +132,25 @@ c     compute derivatives
 C     computes gradient factors, curvature factors, and curl of B
 
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'   ! include file created by make, defines ntime_max
       INCLUDE 'variables.inc'
 
 C     all coordinates are in GEO reference frame
 C     inputs: 
       integer*4 ntime           ! number of points
-      real*8 Bgeo(3,ntime_max)  ! components of B in GEO, nT
-      real*8 Bmag(ntime_max)    ! magnitude of B in nT
-      real*8 gradBmag(3,ntime_max) ! gradient of Bmag in GEO, nT/RE
-      real*8 diffB(3,3,ntime_max) ! derivatives of Bgeo in GEO, nT/RE
+      real*8 Bgeo(3,ntime)  ! components of B in GEO, nT
+      real*8 Bmag(ntime)    ! magnitude of B in nT
+      real*8 gradBmag(3,ntime) ! gradient of Bmag in GEO, nT/RE
+      real*8 diffB(3,3,ntime) ! derivatives of Bgeo in GEO, nT/RE
 c     diffB(i,j,t) = dB_i/dx_j for point t (t=1 to ntime)
 c     outputs:
-      real*8 grad_par(ntime_max) ! gradient of Bmag along B nT/RE
-      real*8 grad_perp(3,ntime_max) ! gradient of Bmag perpendicular to B nT/RE
-      real*8 grad_drift(3,ntime_max) ! (bhat x grad_perp)/B, 1/RE (part of gradient drift velocity)
-      real*8 curvature(3,ntime_max) ! (bhat dot grad)bhat, 1/RE (part of curvature force)
-      real*8 Rcurv(ntime_max) ! 1/|curvature| RE (radius of curvature)
-      real*8 curv_drift(3,ntime_max) ! (bhat x curvature), 1/RE (part of curvature drift)
-      real*8 curlB(3,ntime_max) ! curl of B (nT/RE) (part of electrostatic current term)
-      real*8 divB(ntime_max) ! divergence of B (nT/RE) (should be zero!)
+      real*8 grad_par(ntime) ! gradient of Bmag along B nT/RE
+      real*8 grad_perp(3,ntime) ! gradient of Bmag perpendicular to B nT/RE
+      real*8 grad_drift(3,ntime) ! (bhat x grad_perp)/B, 1/RE (part of gradient drift velocity)
+      real*8 curvature(3,ntime) ! (bhat dot grad)bhat, 1/RE (part of curvature force)
+      real*8 Rcurv(ntime) ! 1/|curvature| RE (radius of curvature)
+      real*8 curv_drift(3,ntime) ! (bhat x curvature), 1/RE (part of curvature drift)
+      real*8 curlB(3,ntime) ! curl of B (nT/RE) (part of electrostatic current term)
+      real*8 divB(ntime) ! divergence of B (nT/RE) (should be zero!)
 
 
 c     internal variables

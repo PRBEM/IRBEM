@@ -34,14 +34,12 @@
     format. This section provides the definitions for those
     arguments. The particular definitions given here are for the
     functions that perform a particular calculation for multiple
-    points (ntime, up to NTIME_MAX, defined in
-    IRBEM_GET_NTIME_MAX()). For a few functions, there is also a
+    points (ntime). For a few functions, there is also a
     pitch-angle dimension given by Nipa, which is up to NALPHA_MAX =
     25.  For functions that can compute for only a single point or
     angle the NTIME_MAX argument can be ignored.  </font><br />
       <p>
-    <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays
-    (max allowed is NTIME_MAX)</font> 
+    <font face="ARIAL, HELVETICA"><b>ntime:</b> long integer number of time in arrays</font> 
     <p>
       <p>
     <font face="ARIAL, HELVETICA"><b>nipa:</b> long integer number of pitch angles in arrays
@@ -237,27 +235,27 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>iyear</b>, <b>iyr</b> or <b>iyearsat</b>: array(NTIME_MAX) of long integer year when
+        <font face="ARIAL, HELVETICA"><b>iyear</b>, <b>iyr</b> or <b>iyearsat</b>: array(ntime) of long integer year when
         measurements are given. </font>
     <br>
-        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(NTIME_MAX) of long integer doy when
+        <font face="ARIAL, HELVETICA"><b>idoy:</b> array(ntime) of long integer doy when
         measurements are given</font> 
 	  <br>
-        <font face="ARIAL, HELVETICA"><b>UT</b> or <b>secs</b>: array(NTIME_MAX) of double, UT in seconds</font> 
+        <font face="ARIAL, HELVETICA"><b>UT</b> or <b>secs</b>: array(ntime) of double, UT in seconds</font> 
 <br>
 <i> Note: In matlab, year/doy/UT arguments are replaced by the single <b>matlabd</b> argument, which is a Matlab date numbers (a double precision day counter created with <b>datenum</b>). They can be generated, if needed, using the helper function [iyear,idoy,UT] = <b>onera_desp_lib_matlabd2yds</b>(matlabd).  </i>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x1:</b> array(NTIME_MAX) of double, first coordinate
+        <font face="ARIAL, HELVETICA"><b>x1:</b> array(ntime) of double, first coordinate
         according to sysaxes. If sysaxes is 0 then altitude has to be in km otherwise use
         dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x2:</b> array(NTIME_MAX) of double, second coordinate
+        <font face="ARIAL, HELVETICA"><b>x2:</b> array(ntime) of double, second coordinate
         according to sysaxes. If sysaxes is 0 then latitude has to be in degrees otherwise
         use dimensionless variables (in Re)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>x3:</b> array(NTIME_MAX) of double, third coordinate
+        <font face="ARIAL, HELVETICA"><b>x3:</b> array(ntime) of double, third coordinate
         according to sysaxes. If sysaxes is 0 then longitude has to be in degrees otherwise
         use dimensionless variables (in Re).</font> 
     </p>
@@ -270,7 +268,7 @@
 	  distance along the drift orbit (use R0 &lt; 1) for the drift loss cone.</font> 
 	</p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,NTIME_MAX) of double to specify
+        <font face="ARIAL, HELVETICA"><b>maginput: </b>array (25,ntime) of double to specify
         magnetic fields inputs such as:<b> 
         <br />
         </b></font>
@@ -368,7 +366,7 @@
         </li>
     </ol>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(NTIME_MAX,NALPHA_MAX) of double)</font> 
+        <font face="ARIAL, HELVETICA"><b>Lm:</b> L McIlwain (array(ntime) of double, unless specified)</font> 
         <br />
 
     <p>
@@ -379,21 +377,18 @@
     </p>
 
         <font face="ARIAL, HELVETICA"><b>Lstar or &#934; :</b> L Roederer&nbsp; or &#934;=2&#960;*Bo*/Lstar
-        [nT Re<sup>2</sup>] (array(NTIME_MAX,NALPHA_MAX) of double)</font> 
+        [nT Re<sup>2</sup>] (array(ntime) of double, unless specified)</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at point (array(NTIME_MAX,NALPHA_MAX)
-        of double) - [nT]</font> 
+        <font face="ARIAL, HELVETICA"><b>Blocal:</b> magnitude of magnetic field at point (array(ntime) of double, unless specified) - [nT]</font> 
         <br />
-        <font face="ARIAL, HELVETICA"><b>Bmir</b> or <b>Bmirror:</b> magnitude of magnetic field at mirror point (array(NTIME_MAX,NALPHA_MAX)
-        of double) - [nT]</font> 
+        <font face="ARIAL, HELVETICA"><b>Bmir</b> or <b>Bmirror:</b> magnitude of magnetic field at mirror point (array(ntime) of double, unless specified) - [nT]</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>Bmin:</b> magnitude of magnetic field at equator
-        (array(NTIME_MAX,NALPHA_MAX) of double) - [nT]</font> 
+        (array(ntime) of double, unless specified) - [nT]</font> 
         <br />
         <font face="ARIAL, HELVETICA"><b>XJ:</b> I, related to second adiabatic invariant
-        (array(NTIME_MAX,NALPHA_MAX) of double)</font> - [Re]<br />
-        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(NTIME_MAX,NALPHA_MAX)
-        of double) - [hour]</font> 
+        (array(ntime) of double, unless specified)</font> - [Re]<br />
+        <font face="ARIAL, HELVETICA"><b>MLT:</b> magnetic local time in hours, (array(ntime) of double, unless specified) - [hour]</font> 
 
       <p>
 
@@ -549,13 +544,6 @@
      This is set only for IGRF+Olson-Pfitzer quiet
      field model (kext can only be 5) so Lm and I provided as input must be computed with this field. The errors in L* values are less than 2%.</font><br />
 
-
-
-
-
-
-
-
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
 
@@ -605,11 +593,13 @@
     </h3>
     <font face="ARIAL, HELVETICA">This function allows one to compute the magnetic coordinates
     at any s/c position and pitch-angle, i.e. L, L*, Bmirror, Bequator.&nbsp;A set of internal/external
-    field&nbsp;can be selected</font><font face="ARIAL, HELVETICA">.</font> 
+    field&nbsp;can be selected</font><font face="ARIAL, HELVETICA">.
+    All the output arrays have shape (NTIME_MAX, Nipa).
+    </font> 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
 
-      <b>ntime, Nipa, kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, alpha, maginput</b> <p>
+      <b>ntime (up to NTIME_MAX), Nipa, kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, alpha, maginput</b> <p>
 
       see <a href=#COMMON_ARGUMENTS>Common Argument Definitions</a>
 
@@ -654,14 +644,16 @@
     field&nbsp;can be selected. 
     Right now this routine differs from MAKE_LSTAR_SHELL_SPLITTING because L* is deduced from Lm, I and day of year empirically. 
     This is set only for IGRF+Olson-Pfitzer quiet field model (kext can only be 5). 
-    The errors in L* values are less than 2%.</font> 
+    The errors in L* values are less than 2%. 
+    All the output arrays have shape (NTIME_MAX, Nipa).</font> 
+
 
 
 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
 
-      <b>ntime, Nipa, kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, alpha, maginput</b> <p>
+      <b>ntime (up to NTIME_MAX), Nipa, kext, options, sysaxes, iyear, idoy, UT, x1, x2, x3, alpha, maginput</b> <p>
 
       see <a href=#COMMON_ARGUMENTS>Common Argument Definitions</a>
 
@@ -1041,9 +1033,9 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>Bgeo:</b> BxGEO,ByGEO and BzGEO of the magnetic field
-    (nT), (array(3,NTIME_MAX) of double)</font> 
+    (nT), (array(3,ntime) of double)</font> 
     <br />
-    <font face="ARIAL, HELVETICA"><b>Bl:</b> magnitude of magnetic field (array(NTIME_MAX) of double) (nT)</font> 
+    <font face="ARIAL, HELVETICA"><b>Bl:</b> magnitude of magnetic field (array(ntime) of double) (nT)</font> 
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -1104,13 +1096,13 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>Bgeo:</b> BxGEO,ByGEO and BzGEO of the magnetic field
-    (nT), (array(3,NTIME_MAX) of double)</font> 
+    (nT), (array(3,ntime) of double)</font> 
     <br />
-    <font face="ARIAL, HELVETICA"><b>Bmag:</b> magnitude of magnetic field (array(NTIME_MAX) of double) (nT)</font> 
+    <font face="ARIAL, HELVETICA"><b>Bmag:</b> magnitude of magnetic field (array(ntime) of double) (nT)</font> 
     <br />
-    <font face="ARIAL, HELVETICA"><b>gradBmag:</b> gradient (GEO) of magnitude of magnetic field (array(3,NTIME_MAX) of double) (nT)</font> 
+    <font face="ARIAL, HELVETICA"><b>gradBmag:</b> gradient (GEO) of magnitude of magnetic field (array(3,ntime) of double) (nT)</font> 
     <br />
-    <font face="ARIAL, HELVETICA"><b>diffB:</b> derivatives of magnetic field vector (array(3,3,NTIME_MAX) of double) (nT)<br>
+    <font face="ARIAL, HELVETICA"><b>diffB:</b> derivatives of magnetic field vector (array(3,3,ntime) of double) (nT)<br>
         diffB(i,j,t) = dB_i/dx_j at t'th location. GEO coordinates. </font> 
     <br />
     &nbsp; 
@@ -1149,14 +1141,14 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
 
-      <font face="ARIAL, HELVETICA"><b>grad_par:</b> gradient of Bmag along B nT/RE, (array(NTIME_MAX) of double)</font> <br />
-      <font face="ARIAL, HELVETICA"><b>grad_perp:</b>  gradient of Bmag perpendicular to B nT/RE (array(3,NTIME_MAX) of double)</font> <br />
-      <font face="ARIAL, HELVETICA"><b>grad_drift:</b> (bhat x grad_perp)/B, 1/RE (part of gradient drift velocity) (array(3,NTIME_MAX) of double)</font> <br />
-      <font face="ARIAL, HELVETICA"><b>curvature:</b> (bhat dot grad)bhat, 1/RE (part of curvature force) (array(3,NTIME_MAX) of double)</font> <br />
-      <font face="ARIAL, HELVETICA"><b>Rcurv:</b> 1/|curvature| RE (radius of curvature) (array(3,NTIME_MAX) of double)</font> <br />
-      <font face="ARIAL, HELVETICA"><b>curv_drift:</b> (bhat x curvature), 1/RE (part of curvature drift) (array(NTIME_MAX) of double)</font> <br />
-      <font face="ARIAL, HELVETICA"><b>curlB:</b> curl of B (nT/RE) (part of electrostatic current term) (array(3,NTIME_MAX) of double)</font> <br />
-      <font face="ARIAL, HELVETICA"><b>divB:</b> divergence of B (nT/RE) (should be zero!) (array(NTIME_MAX) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>grad_par:</b> gradient of Bmag along B nT/RE, (array(ntime) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>grad_perp:</b>  gradient of Bmag perpendicular to B nT/RE (array(3,ntime) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>grad_drift:</b> (bhat x grad_perp)/B, 1/RE (part of gradient drift velocity) (array(3,ntime) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>curvature:</b> (bhat dot grad)bhat, 1/RE (part of curvature force) (array(3,ntime) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>Rcurv:</b> 1/|curvature| RE (radius of curvature) (array(3,ntime) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>curv_drift:</b> (bhat x curvature), 1/RE (part of curvature drift) (array(ntime) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>curlB:</b> curl of B (nT/RE) (part of electrostatic current term) (array(3,ntime) of double)</font> <br />
+      <font face="ARIAL, HELVETICA"><b>divB:</b> divergence of B (nT/RE) (should be zero!) (array(ntime) of double)</font> <br />
 
       <p>
 
@@ -1442,7 +1434,7 @@
 
     <p>
         <font face="ARIAL, HELVETICA"><b>Phi:</b> &#934;=2&#960;*Bo/Lstar [nT Re<sup>2</sup>]
-        (array(GET_IRBEM_NTIME_MAX()) of double)&nbsp;</font> 
+        (array(ntime) of double)&nbsp;</font> 
         <br />
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -1474,7 +1466,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">DESCRIPTION:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA">Generic coordinates transformation from one geophysical or
-    heliospheric coordinate system to another. Handles up to GET_IRBEM_NTIME_MAX() times at once.</font>
+    heliospheric coordinate system to another.</font>
     <br />
     &nbsp; 
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
@@ -1491,7 +1483,7 @@
     <font face="ARIAL, HELVETICA"><strong>sysaxesOUT :</strong> long integer indicating
     output coordinates system<font face="Times New Roman"> </font>
     <br />
-    <font face="ARIAL, HELVETICA"><b>xIN :</b> array (3,NTIME_MAX) of double&nbsp;with position
+    <font face="ARIAL, HELVETICA"><b>xIN :</b> array (3,ntime) of double&nbsp;with position
     in&nbsp;input coordinates system.
 
 
@@ -2149,7 +2141,7 @@
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
-    <font face="ARIAL, HELVETICA"><b>xOUT :</b> array (3,NTIME_MAX) of double&nbsp;with position
+    <font face="ARIAL, HELVETICA"><b>xOUT :</b> array (3,ntime) of double&nbsp;with position
     in&nbsp;output coordinates system. (systems defined by sysaxesOUT)</font>
     <br />
     &nbsp; 
@@ -3554,10 +3546,10 @@
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><strong>Nene:</strong> long integer number of&nbsp;energies
-        in array energy&nbsp;(max allowed is 25) </font>
+        in array energy</font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,25) of double. If whatf=1 or
+        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,Nene) of double. If whatf=1 or
         3 then energy(2,*) is not considered.<br />
         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <span style="FONT-STYLE: italic">Note: if energy is
         in MeV then differential flux will be per MeV.</span> 
@@ -3596,7 +3588,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-    all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
+    all times and energies (array(GET_IRBEM_NTIME_MAX(),Nene) of double)</font> 
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
     </h3>
@@ -3669,10 +3661,10 @@
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><strong>Nene:</strong> long integer number of&nbsp;energies
-        in array energy&nbsp;(max allowed is 25) </font>
+        in array energy</font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,25) of double. If whatf=1 or
+        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,Nene) of double. If whatf=1 or
         3 then energy(2,*) is not considered.<br />
         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <span style="FONT-STYLE: italic">Note: if energy is
         in MeV then differential flux will be per MeV.</span> 
@@ -3699,7 +3691,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-        all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
+        all times and energies (array(GET_IRBEM_NTIME_MAX(),Nene) of double)</font> 
         <br />
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -3801,11 +3793,11 @@
     <p>
     </p>
     <font face="ARIAL, HELVETICA"><b>Nene:</b> long integer number of&nbsp;energies in
-    array energy&nbsp;(max allowed is 25) </font> 
+    array energy</font> 
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,25) of double (MeV). If whatf=1
+        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,Nene) of double (MeV). If whatf=1
         or 3 then energy(2,*) is not considered.<br />
         </font>
     </p>
@@ -3858,7 +3850,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-    all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
+    all times and energies (array(GET_IRBEM_NTIME_MAX(),Nene) of double)</font> 
     <br />
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
     </h3>
@@ -3934,12 +3926,12 @@
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>Nene:</b> long integer number of&nbsp;energies in
-        array energy&nbsp;(max allowed is 25) </font>
+        array energy&nbsp;(max allowed is Nene) </font>
     </p>
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,25) of double (MeV). If whatf=1
+        <font face="ARIAL, HELVETICA"><b>energy:</b> array(2,Nene) of double (MeV). If whatf=1
         or 3 then energy(2,*) is not considered.<br />
         </font>
     </p>
@@ -3978,7 +3970,7 @@
     </h3>
     <p>
         <font face="ARIAL, HELVETICA"><b>flux:</b> flux according to selection of whatf for
-        all times and energies (array(GET_IRBEM_NTIME_MAX(),25) of double)</font> 
+        all times and energies (array(GET_IRBEM_NTIME_MAX(),Nene) of double)</font> 
         <br />
     </p>
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">CALLING SEQUENCE FROM MATLAB:</font></font> 
@@ -4320,8 +4312,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays
-        (max allowed is GET_IRBEM_NTIME_MAX())</font> 
+        <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>WhichAp:</b> long integer</font> to select the&nbsp;kind
@@ -4346,35 +4337,35 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(GET_IRBEM_NTIME_MAX()) of long integer, Number of
+        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(ntime) of long integer, Number of
         day of year (DOY=1 is for January 1st) </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(GET_IRBEM_NTIME_MAX()) of double, UT in
+        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(ntime) of double, UT in
         seconds when positions are given..</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Altitude
+        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(ntime) of double, Altitude
         in km (greater than 85 km).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(ntime) of double, Geodetic
         latitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(ntime) of double, Geodetic
         longitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(GET_IRBEM_NTIME_MAX()) of double, 3 month
+        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(ntime) of double, 3 month
         average of F10.7 flux.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(GET_IRBEM_NTIME_MAX()) of double, daily
+        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(ntime) of double, daily
         F10.7 flux for previous day.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">1st element=Daily Ap<br />
@@ -4393,7 +4384,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px"><font face="ARIAL, HELVETICA">Dens(1st element,*)=He number density (cm<sup>-3</sup>) 
@@ -4407,7 +4398,7 @@
         Dens(8th element,*)=N number density (cm<sup>-3</sup>) </font>
     </div>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Temp(1st element,*)=Exospheric temperature (K) 
@@ -4463,8 +4454,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays
-        (max allowed is GET_IRBEM_NTIME_MAX())</font> 
+        <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>WhichAp:</b> long integer</font> to select the&nbsp;kind
@@ -4485,35 +4475,35 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(GET_IRBEM_NTIME_MAX()) of long integer, Number of
+        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(ntime) of long integer, Number of
         day of year (DOY=1 is for January 1st) </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(GET_IRBEM_NTIME_MAX()) of double, UT in
+        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(ntime) of double, UT in
         seconds when positions are given..</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Altitude
+        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(ntime) of double, Altitude
         (km).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(ntime) of double, Geodetic
         latitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(ntime) of double, Geodetic
         longitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(GET_IRBEM_NTIME_MAX()) of double, 3 month
+        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(ntime) of double, 3 month
         average of F10.7 flux.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(GET_IRBEM_NTIME_MAX()) of double, daily
+        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(ntime) of double, daily
         F10.7 flux for previous day.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">1st element=Daily Ap<br />
@@ -4538,7 +4528,7 @@
     </p>
     <font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     <p>
-        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(8,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Dens(1st element,*)=He number density (cm<sup>-3</sup>) 
@@ -4552,7 +4542,7 @@
         Dens(8th element,*)=N number density (cm<sup>-3</sup>) 
     </div>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Temp(1st element,*)=Exospheric temperature (K) 
@@ -4612,8 +4602,7 @@
     <h3><font face="ARIAL, HELVETICA"><font color="#ff0000">INPUTS:</font></font> 
     </h3>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays
-        (max allowed is GET_IRBEM_NTIME_MAX())</font> 
+        <font face="ARIAL, HELVETICA"><b>Ntime:</b> long integer number of time in arrays</font> 
     </p>
     <p>
         <font face="ARIAL, HELVETICA"><b>WhichAp:</b> long integer to select the&nbsp;kind
@@ -4640,35 +4629,35 @@
     <p>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(GET_IRBEM_NTIME_MAX()) of long integer, Number of
+        <font face="ARIAL, HELVETICA"><b>DOY:</b> array(ntime) of long integer, Number of
         day of year (DOY=1 is for January 1st) </font>
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(GET_IRBEM_NTIME_MAX()) of double, UT in
+        <font face="ARIAL, HELVETICA"><strong>UT:</strong> array(ntime) of double, UT in
         seconds when positions are given..</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Altitude
+        <font face="ARIAL, HELVETICA"><strong>Alt:</strong> array(ntime) of double, Altitude
         in km (greater than 85 km).</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Lat:</strong> array(ntime) of double, Geodetic
         latitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(GET_IRBEM_NTIME_MAX()) of double, Geodetic
+        <font face="ARIAL, HELVETICA"><strong>Long:</strong> array(ntime) of double, Geodetic
         longitude (Deg.)</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(GET_IRBEM_NTIME_MAX()) of double, 3 month
+        <font face="ARIAL, HELVETICA"><strong>F107A:</strong> array(ntime) of double, 3 month
         average of F10.7 flux.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(GET_IRBEM_NTIME_MAX()) of double, daily
+        <font face="ARIAL, HELVETICA"><strong>F107:</strong> array(ntime) of double, daily
         F10.7 flux for previous day.</font> 
     </p>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Ap:</b> array(7,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">1st element=Daily Ap<br />
@@ -4692,7 +4681,7 @@
     </p>
     <font face="ARIAL, HELVETICA"><font color="#ff0000">OUTPUTS:</font></font> 
     <p>
-        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(9,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Dens:</b> array(9,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px"><font face="ARIAL, HELVETICA">Dens(1st element,*)=He number density (cm<sup>-3</sup>) 
@@ -4708,7 +4697,7 @@
         Dens(9th element,*)=Anomalous oxygen&nbsp;number density (cm<sup>-3</sup>) 
     </font></div>
     <p>
-        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,GET_IRBEM_NTIME_MAX()) of double where:<br />
+        <font face="ARIAL, HELVETICA"><b>Temp:</b> array(2,ntime) of double where:<br />
         </font>
     </p>
     <div style="MARGIN-LEFT: 40px">Temp(1st element,*)=Exospheric temperature (K) 

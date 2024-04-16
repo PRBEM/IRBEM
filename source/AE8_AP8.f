@@ -51,13 +51,13 @@
 !	whatf -> which kind of flux, 1=differential 2=E range 3=integral (long integer)
 !	Nene -> Number of energy channels to compute
 !	energy -> energy (MeV) at which fluxes must be computed (double array [2,25])
-!	iyear,idoy,UT -> times when flux are to be computed (not usefull if imput position is not in GSE, GSM, SM,GEI) (respectively long array(ntime_max), long array(ntime_max), double array(ntime_max))
+!	iyear,idoy,UT -> times when flux are to be computed (not useful if input position is not in GSE, GSM, SM,GEI) (respectively long array(ntime), long array(ntime), double array(ntime))
 !	xIN1 -> first coordinate in the chosen system (double array [ntime_max])
 !	xIN2 -> second coordinate in the chosen system (double array [ntime_max])
 !	xIN3 -> third coordinate in the chosen system (double array [ntime_max])
 !
 ! OUTPUTS:
-!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,25])
+!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,Nene])
 !
 ! COMMON BLOCKS:
 !	COMMON/GENER/ERA,AQUAD,BQUAD
@@ -79,13 +79,11 @@ c
       INCLUDE 'ntime_max.inc'
 C
 c declare inputs
-      INTEGER*4 nene_max
-      PARAMETER (nene_max=25)
       INTEGER*4  ntime,sysaxes,whichm,whatf,Nene
-      INTEGER*4  iyear(ntime_max),idoy(ntime_max)
-      REAL*8     energy(2,nene_max)
-      REAL*8     UT(ntime_max)
-      real*8     xIN1(ntime_max),xIN2(ntime_max),xIN3(ntime_max)
+      INTEGER*4  iyear(ntime),idoy(ntime)
+      REAL*8     energy(2,nene)
+      REAL*8     UT(ntime)
+      real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
 c Declare internal variables
       INTEGER*4  k_ext,k_l,isat,kint
       INTEGER*4  t_resol,r_resol,Ilflag
@@ -94,11 +92,11 @@ c Declare internal variables
       REAL*8     xGSM(3),xSM(3),xGEI(3),xGSE(3)
       real*8     alti,lati,longi,UT_dip,psi,tilt
       REAL*8     ERA,AQUAD,BQUAD
-      REAL*8     BLOCAL(ntime_max),BMIN(ntime_max),XJ(ntime_max)
-      REAL*8     Lm(ntime_max),Lstar(ntime_max),BBo(ntime_max)
+      REAL*8     BLOCAL(ntime),BMIN(ntime),XJ(ntime)
+      REAL*8     Lm(ntime),Lstar(ntime),BBo(ntime)
 c
 c Declare output variables
-      REAL*8     flux(ntime_max,nene_max)
+      REAL*8     flux(ntime_max,Nene)
 C
       COMMON/GENER/ERA,AQUAD,BQUAD
       COMMON /magmod/k_ext,k_l,kint
@@ -193,12 +191,12 @@ C           BBo(isat)=BLOCAL(isat)/BMIN(isat)  ! removed to use McIlwain Gmagmo 
 !	whichm -> which model to use, 1=AE8min 2=AE8max 3=AP8min 4=AP8max (long integer)
 !	whatf -> which kind of flux, 1=differential 2=E range 3=integral (long integer)
 !	Nene -> Number of energy channels to compute
-!	energy -> energy (MeV) at which fluxes must be computed (double array [2,25])
+!	energy -> energy (MeV) at which fluxes must be computed (double array [2,Nene])
 !	BBo -> Blocal/Bequator (double array [ntime_max])
 !	L -> McIlwain L (double array [ntime_max])
 !
 ! OUTPUTS:
-!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,25])
+!	flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,Nene])
 !
 ! COMMON BLOCKS:
 !	COMMON /PROMIN/ IHEADPMIN, MAPPMIN
@@ -233,8 +231,8 @@ c  minimum and maximum Lshell to calculate electron fluxes
       INTEGER*4   whatf
       INTEGER*4 MAPPMIN(16582), MAPPMAX(16291),
      &           MAPEMIN(13168), MAPEMAX(13548)
-      REAL*8      energy(2,25)
-      REAL*8      flux(ntime_max,25),BBo(ntime_max),L(ntime_max)
+      REAL*8      energy(2,nene)
+      REAL*8      flux(ntime_max,nene),BBo(ntime_max),L(ntime_max)
       REAL*8    FL,FL1
       INTEGER*4 IHEADPMIN(8),IHEADPMAX(8),IHEADEMIN(8),IHEADEMAX(8)
 c
@@ -245,7 +243,7 @@ c
 c
 c  init
       DO i=1,ntmax
-         do ieny=1,25
+         do ieny=1,Nene
             Flux(i,ieny) = baddata
          enddo
       enddo

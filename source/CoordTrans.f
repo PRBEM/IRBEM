@@ -23,8 +23,7 @@
 !               SUBROUTINE coord_trans1: Generic coordinate transformation from one Earth or Heliospheric coordinate
 !                                        system to another one
 !               SUBROUTINE coord_trans_vec1: Generic coordinate transformation from one Earth or Heliospheric coordinate
-!                                        system to another one (handle up to
-!                                        ntime_max positions)
+!                                        system to another one 
 !
 !***************************************************************************************************
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2706,8 +2705,6 @@ C      REAL*8 secs(nmax)
 C      REAL*8 xINV(3,nmax), xOUTV(3,nmax)
 C      INTEGER*4 numpoints
 C
-C     As with all (most?) onera library calls, the maximum array size
-C     is limited to ntime_max elements
 C                              Contributed by Timothy Guild, 2.2.07
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
@@ -2716,12 +2713,11 @@ C
      &   iyear,idoy,secs,xINV,xOUTV)
 
       IMPLICIT NONE
-      INCLUDE 'ntime_max.inc'
       INCLUDE 'variables.inc'
 
       INTEGER*4 nmax,i,ntime, sysaxesIN, sysaxesOUT
-      INTEGER*4 iyear(ntime_max),idoy(ntime_max),y,d
-      REAL*8 secs(ntime_max),xINV(3,ntime_max),xOUTV(3,ntime_max)
+      INTEGER*4 iyear(ntime),idoy(ntime),y,d
+      REAL*8 secs(ntime),xINV(3,ntime),xOUTV(3,ntime)
       ! local vars
       REAL*8 xIN(3),xOUT(3),s
 
