@@ -40,14 +40,14 @@
 !        whichm -> which model to use, 1=pro quiet 2=pro active 3=ele ave  4=ele worst case  5=ele Ap15 (long integer)
 !        whatf -> which kind of flux, 1=differential 2=E range 3=integral (long integer)
 !        Nene -> Number of energy channels to compute
-!        energy -> energy (MeV) at which fluxes must be computed (double array [2,25])
+!        energy -> energy (MeV) at which fluxes must be computed (double array [2,Nene])
 !        iyear,idoy,UT -> times when flux are to be computed (not useful if input position is not in GSE, GSM, SM,GEI) (respectively long array(ntime), long array(ntime), double array(ntime))
 !        xIN1 -> first coordinate in the chosen system (double array [ntime_max])
 !        xIN2 -> second coordinate in the chosen system (double array [ntime_max])
 !        xIN3 -> third coordinate in the chosen system (double array [ntime_max])
 !        Ap15 -> 15 previous days average of Ap index assuming a one day delay (double array [ntime_max])
 !
-! OUTPUT: flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,25])
+! OUTPUT: flux -> Computed fluxes (MeV-1 cm-2 s-1 or cm-2 s-1) (double array [ntime_max,Nene])
 !
 ! CALLING SEQUENCE: CALL fly_in_afrl_crres1(ntime,sysaxes,whichm,whatf,energy,xIN1,xIN2,xIN3,flux)
 !---------------------------------------------------------------------------------------------------
@@ -62,11 +62,9 @@ c declare inputs
         INTEGER*4  STRLEN
         BYTE       ascii_path(strlen)
 c
-        INTEGER*4  nene_max
-	PARAMETER (nene_max=25)
         INTEGER*4  ntime,sysaxes,whichm,whatf,nene
 	INTEGER*4  iyear(ntime),idoy(ntime)
-	REAL*8     energy(2,nene_max)
+	REAL*8     energy(2,nene)
 	REAL*8     UT(ntime)
 	real*8     xIN1(ntime),xIN2(ntime),xIN3(ntime)
 c Declare internal variables
@@ -83,7 +81,7 @@ c Declare internal variables
 	REAL*8     Ap15(ntime)
 c
 c Declare output variables	
-	REAL*8     flux(ntime_max,nene_max)
+	REAL*8     flux(ntime_max,nene)
 c
 	CHARACTER*(500) afrl_crres_path
 C
