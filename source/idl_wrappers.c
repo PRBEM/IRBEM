@@ -72,6 +72,8 @@ IDL_SIMPLE(irbem_fortran_version,1)
 IDL_SIMPLE(irbem_fortran_release,1)
 IDL_SIMPLE(get_irbem_ntime_max,1)
 
+IDL_WRAPPER(igrf_version_idl,get_igrf_version,1)
+
 IDL_SIMPLE(make_lstar_shell_splitting,19)
 IDL_SIMPLE(lstar_phi,7)
 IDL_SIMPLE(drift_shell,17)
@@ -141,4 +143,4 @@ IDL_SIMPLE(landi2lstar,17)
 IDL_SIMPLE(landi2lstar_shell_splitting,19)
 IDL_SIMPLE(empiricallstar,9)
 
-IDL_WRAPPER(shieldose2idl,shieldose2,28)
+IDL_WRAPPER(shieldose2idl,shieldose2,29)

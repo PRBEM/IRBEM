@@ -213,7 +213,7 @@ class MagFields:
         # DEFINE OUTPUTS HERE        
         positType = (((ctypes.c_double * 3) * 1000) * 48)
         posit = positType()
-        npositType = (48 * ctypes.c_long)
+        npositType = (48 * ctypes.c_int)
         nposit = npositType()
         lm, lstar, bmin, xj = [ctypes.c_double() for i in range(4)]
         blocalType = ((ctypes.c_double * 1000) * 48)
@@ -230,14 +230,84 @@ class MagFields:
                 ctypes.byref(nposit))
         # Format the output into a dictionary, and convert ctypes arrays into
         # native Python format.
+        posit = np.array(posit)
+        nposit = np.array(nposit)
+        for i,n in enumerate(nposit):
+            posit[i,n:,:] = np.nan
         self.drift_shell_output = {'Lm':lm.value, 'blocal':np.array(blocal),
             'bmin':bmin.value, 'lstar':lstar.value, 'xj':xj.value, 
-            'POSIT':np.array(posit), 'Nposit':np.array(nposit)} 
+            'POSIT':posit, 'Nposit':nposit} 
         return self.drift_shell_output
                    
-    def drift_bounce_orbit(self):
-        raise NotImplementedError()
-        return
+    def drift_bounce_orbit(self, X, maginput, alpha=90, R0=1):
+        """
+        This function traces a full drift-bounce orbit for particles with a specified pitch
+        angle at the input location.  The output is a full array of positions of the
+        drift-bounce orbit, usefull for computing drift-bounce averages.
+        Key differences from `drif_shell`:
+         (1) only positions between mirror points are returned,
+         (2) 25 rather than 48 azimuths are returned,
+         (3) Lstar accuracy respects options(3) and options(4),
+         (4) a new parameter R0 is required which specifies the minimum radial distance allowed
+             along the drift path (usually R0=1, but use R0<1 in the drift loss cone),
+         (5) hmin and hmin_lon outputs provide the altitude and longitude (GDZ) of the minimum
+             altitude point along the orbit (among those traced, not just those returned). A set
+             of internal/external field can be selected.
+
+        Parameters
+        ----------
+        X: dict
+            A dictionary that specifies the input time and location. The `time` key can be a
+            ISO-formatted time string, or a `datetime.datetime` or `pd.TimeStamp` objects.
+            The three location keys: `x1`, `x2`, and `x3` specify the location in the `sysaxes`.
+        maginput: dict
+            The magnetic field input dictionary. See the online documentation for the valid
+            keys and the corresponding models.
+        alpha: float
+            The local pitch angle.
+        R0: float
+            The radius, in units of RE, of the reference surface (i.e. altitude) between which
+            the line is traced.
+
+        Returns
+        -------
+        dict
+            Contains keys Lm, lstar or Φ, blocal, bmin, bmirr, XJ, POSIT, Nposit, hmin, hmin_lon
+        """
+        # Prep the magnetic field model inputs and samping spacetime location.
+        self._prepMagInput(maginput)
+        iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
+        alpha = ctypes.c_double(alpha)
+        R0 = ctypes.c_double(R0)
+
+        # DEFINE OUTPUTS HERE
+        positType = (((ctypes.c_double * 3) * 1000) * 25)
+        posit = positType()
+        npositType = (25 * ctypes.c_int)
+        nposit = npositType()
+        lm, lstar, bmin, bmirr, xj, hmin, hmin_lon = [ctypes.c_double() for i in range(7)]
+        blocalType = ((ctypes.c_double * 1000) * 25)
+        blocal = blocalType()
+
+        if self.TMI: print("Running IRBEM-LIB drift_bounce_orbit")
+        self._irbem_obj.drift_bounce_orbit2_1_(ctypes.byref(self.kext), ctypes.byref(self.options),\
+                ctypes.byref(self.sysaxes), ctypes.byref(iyear),\
+                ctypes.byref(idoy), ctypes.byref(ut), ctypes.byref(x1), \
+                ctypes.byref(x2), ctypes.byref(x3), ctypes.byref(alpha), ctypes.byref(self.maginput), \
+                ctypes.byref(R0), ctypes.byref(lm), ctypes.byref(lstar), ctypes.byref(blocal), \
+                ctypes.byref(bmin), ctypes.byref(bmirr), ctypes.byref(xj), ctypes.byref(posit), \
+                ctypes.byref(nposit), ctypes.byref(hmin), ctypes.byref(hmin_lon))
+        # Format the output into a dictionary, and convert ctypes arrays into
+        # native Python format.
+        posit = np.array(posit)
+        nposit = np.array(nposit)
+        for i,n in enumerate(nposit):
+            posit[i,n:,:] = np.nan
+        self.drift_bounce_orbit_output = {'Lm':lm.value, 'blocal':np.array(blocal),
+            'bmin':bmin.value, 'bmirr':bmirr.value, 'lstar':lstar.value, 'xj':xj.value,
+            'POSIT':posit, 'Nposit':nposit, 'hmin':hmin.value,
+            'hmin_lon': hmin_lon.value}
+        return self.drift_bounce_orbit_output
     
     def find_mirror_point(self, X, maginput, alpha):
         """
