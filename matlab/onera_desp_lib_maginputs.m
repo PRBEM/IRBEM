@@ -50,7 +50,7 @@ function maginputs = onera_desp_lib_maginputs(varargin)
 % NaN's are replaced with the library bad data value, -1e31
 baddata=-1.0E31;
 
-if (length(varargin)==1) && (size(varargin{1},2)==25) % first/only arg is maginputs
+if (isscalar(varargin)) && (size(varargin{1},2)==25) % first/only arg is maginputs
     maginputs = varargin{1};
 else % multiple args
     n = max(arrayfun(@(x)length(x{1}),varargin)); % get length of longest list

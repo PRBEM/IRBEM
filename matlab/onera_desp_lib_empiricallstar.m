@@ -43,7 +43,7 @@ end
 if size(maginput,1) ~= ntime
     maginput = repmat(maginput,ntime,1);
 end
-if length(matlabd)==1
+if isscalar(matlabd)
     matlabd = repmat(matlabd,ntime,1);
 end
 
@@ -62,7 +62,7 @@ if ntime>Nmax
             onera_desp_lib_empiricallstar(kext,options,matlabd(ii),maginput(ii,:),Lm(ii),J(ii));
     end
 else
-    [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(matlabd);
+    [iyear,idoy,~] = onera_desp_lib_matlabd2yds(matlabd);
     LstarPtr = libpointer('doublePtr',Lstar);
     maginput = maginput';
     % expand arrays
