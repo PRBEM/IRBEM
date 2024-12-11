@@ -41,7 +41,7 @@ end
 
 ntimes = numel(dates);
 
-if numel(alpha)==1
+if isscalar(alpha)
     alpha = repmat(alpha,ntimes,1);
 end
 
