@@ -329,7 +329,7 @@ class MagFields:
         Returns
         -------
         dict
-            A dictionary with "blocal" and "bmin" scalars, and "POSIT" that contains the 
+            A dictionary with "blocal" and "bmirr" scalars, as well as "POSIT" that contains the 
             GEO coordinates of the mirror point.
         """
         a = ctypes.c_double(alpha)
@@ -338,7 +338,7 @@ class MagFields:
         self._prepMagInput(maginput)
         iyear, idoy, ut, x1, x2, x3 = self._prepTimeLoc(X)
         
-        blocal, bmin = [ctypes.c_double(-9999) for i in range(2)]
+        blocal, bmirr = [ctypes.c_double(-9999) for i in range(2)]
         positType = (3 * ctypes.c_double)
         posit = positType()
 
@@ -349,9 +349,9 @@ class MagFields:
                 ctypes.byref(iyear), ctypes.byref(idoy), ctypes.byref(ut), \
                 ctypes.byref(x1), ctypes.byref(x2), ctypes.byref(x3), \
                 ctypes.byref(a), ctypes.byref(self.maginput), \
-                ctypes.byref(blocal), ctypes.byref(bmin), ctypes.byref(posit))     
+                ctypes.byref(blocal), ctypes.byref(bmirr), ctypes.byref(posit))     
                 
-        self.find_mirror_point_output = {'blocal':blocal.value, 'bmin':bmin.value, \
+        self.find_mirror_point_output = {'blocal':blocal.value, 'bmirr':bmirr.value, \
                 'POSIT':posit[:]}
         return self.find_mirror_point_output
     

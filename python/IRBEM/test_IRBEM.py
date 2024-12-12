@@ -141,7 +141,7 @@ class TestIRBEM(unittest.TestCase):
         """
         Test find_mirror_point for locally-mirroring electrons.
         """
-        find_mirror_point_true_dict = {'blocal': 42271.69731031445, 'bmin': 42271.69731031445, 
+        find_mirror_point_true_dict = {'blocal': 42271.69731031445, 'bmirr': 42271.69731031445, 
                                         'POSIT': [0.35282136776620165, 0.4204761325793738, 0.9448914452448274]}
         self.model.find_mirror_point(self.X, self.maginput, 90)
         self.assertAlmostEqualDict(self.model.find_mirror_point_output, 
