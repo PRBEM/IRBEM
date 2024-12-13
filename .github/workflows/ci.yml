@@ -58,7 +58,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Show gfortran version
-      run: gfortran-11 --version
+      run: gfortran-12 --version
 
     - name: Build
       shell: bash
