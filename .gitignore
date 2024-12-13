@@ -10,3 +10,4 @@ __pycache__
 settings.json
 *.egg-info
 env/
+.venv/

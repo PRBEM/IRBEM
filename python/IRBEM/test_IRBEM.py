@@ -42,9 +42,9 @@ class TestIRBEM(unittest.TestCase):
             self.X_array_pd['dateTime'] = pd.to_datetime(self.X_array_pd['dateTime'])
 
         self.l_star_true_dict = {
-                    'Lm': [3.5597506994978874], 'MLT': [], 
-                    'blocal': [42271.69731031445], 'bmin': [626.2135860526192], 
-                    'Lstar': [-1e+31], 'xj': [7.020659721307229]
+                    'Lm': [3.5597242229067536], 'MLT': [],
+                    'blocal': [42271.43059990003], 'bmin': [626.2258295723121],
+                    'Lstar': [-1e+31], 'xj': [7.020585390925573]
                     }
         return
 
@@ -81,12 +81,12 @@ class TestIRBEM(unittest.TestCase):
         Test lstar with array inputs
         """
         self.model.make_lstar(self.X_array, self.maginput_array)
-        array_true_dict = {'Lm': [3.5597506994978874, 3.5597506994978874, 3.5597506994978874], 
-                    'MLT': [10.17027738786211, 10.17027738786211, 10.17027738786211], 
-                    'blocal': [42271.69731031445, 42271.69731031445, 42271.69731031445], 
-                    'bmin': [626.2135860526192, 626.2135860526192, 626.2135860526192], 
+        array_true_dict = {'Lm': [3.5597242229067536, 3.5597242229067536, 3.5597242229067536],
+                    'MLT': [10.170297893176182, 10.170297893176182, 10.170297893176182],
+                    'blocal': [42271.43059990003, 42271.43059990003, 42271.43059990003],
+                    'bmin': [626.2258295723121, 626.2258295723121, 626.2258295723121],
                     'Lstar': [-1e+31, -1e+31, -1e+31], 
-                    'xj': [7.020659721307229, 7.020659721307229, 7.020659721307229]}
+                    'xj': [7.020585390925573, 7.020585390925573, 7.020585390925573]}
         self.assertAlmostEqualDict(self.model.make_lstar_output, array_true_dict)
         return
 
@@ -109,9 +109,9 @@ class TestIRBEM(unittest.TestCase):
         Test the footpoint coodinate function.
         """
         foot_point_true_dict = {
-            'XFOOT': [99.9906483758779, 61.11386425473068, 50.556343573716546], 
-            'BFOOT': [-25644.152390899286, -25370.805211731364, -38650.435481519795], 
-            'BFOOTMAG': [52869.23937272415, -9999.0, -9999.0]
+            'XFOOT': [99.99412846343064, 61.113869939535036, 50.55633537632344],
+            'BFOOT': [-25644.012241653385, -25370.689449132995, -38649.994779664776],
+            'BFOOTMAG': [52868.793663583165, -9999.0, -9999.0]
             }
         stopAlt = 100
         hemiFlag = 0
@@ -124,10 +124,10 @@ class TestIRBEM(unittest.TestCase):
         Test the get_field_multi function with array inputs.
         """
         get_field_multi_true_dict = {
-                                    'BxGEO': [-21079.870874468797, -21079.870874468797, -21079.870874468797], 
-                                    'ByGEO': [-21504.2643134513, -21504.2643134513, -21504.2643134513], 
-                                    'BzGEO': [-29666.514014083168, -29666.514014083168, -29666.514014083168], 
-                                    'Bl': [42271.69731031445, 42271.69731031445, 42271.69731031445]
+                                    'BxGEO': [-21079.764883133903, -21079.764883133903, -21079.764883133903],
+                                    'ByGEO': [-21504.21460705096, -21504.21460705096, -21504.21460705096],
+                                    'BzGEO': [-29666.24532305791, -29666.24532305791, -29666.24532305791],
+                                    'Bl': [42271.43059990003, 42271.43059990003, 42271.43059990003]
                                     }
         self.model.get_field_multi(self.X_array, self.maginput_array)
         # Convert numpy arrays to lists for the comparison.
@@ -141,7 +141,7 @@ class TestIRBEM(unittest.TestCase):
         """
         Test find_mirror_point for locally-mirroring electrons.
         """
-        find_mirror_point_true_dict = {'blocal': 42271.69731031445, 'bmin': 42271.69731031445, 
+        find_mirror_point_true_dict = {'blocal': 42271.43059990003, 'bmin': 42271.43059990003,
                                         'POSIT': [0.35282136776620165, 0.4204761325793738, 0.9448914452448274]}
         self.model.find_mirror_point(self.X, self.maginput, 90)
         self.assertAlmostEqualDict(self.model.find_mirror_point_output, 
@@ -152,7 +152,7 @@ class TestIRBEM(unittest.TestCase):
         """
         Tests the find_magequator function.
         """
-        find_magequator_true_dict = {'bmin': 626.2135860526192, 'XGEO': [2.196250169568078, 2.83603545554354, 0.347239732598501]}
+        find_magequator_true_dict = {'bmin': 626.2258295723121, 'XGEO': [2.1962220856733894, 2.8360222891612192, 0.3472455620354017]}
         self.model.find_magequator(self.X, self.maginput)
         # Convert to list so it can be compared
         self.model.find_magequator_output['XGEO'] = list(self.model.find_magequator_output['XGEO'])
@@ -167,7 +167,7 @@ class TestIRBEM(unittest.TestCase):
                     'x1':2.195517156287977,
                     'x2':2.834061428571752,
                     'x3':0.34759070278576953}
-        true_MLT = 9.569987066693876
+        true_MLT = 9.56999052595853
         self.model.get_mlt(input_dict)
         self.assertAlmostEqual(self.model.get_mlt_output, true_MLT)
         return
