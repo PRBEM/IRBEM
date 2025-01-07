@@ -47,7 +47,7 @@ if c ~=3
     error('Argument X must be size n x 3 in %s',mfilename);
 end
 ntime = r;
-if length(matlabd)==1
+if isscalar(matlabd)
     matlabd = repmat(matlabd,ntime,1);
 end
 

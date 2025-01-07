@@ -1,4 +1,4 @@
-function info = onera_desp_lib_load(libfile,headerfile)
+function onera_desp_lib_load(libfile,headerfile)
 %***************************************************************************************************
 % Copyright 2009, T.P. O'Brien
 %

@@ -34,7 +34,7 @@ end
 
 ntime = size(xGEO,1);
 
-if length(matlabd)==1
+if isscalar(matlabd)
     matlabd = repmat(matlabd,ntime,1);
 end
 
