@@ -899,6 +899,9 @@ C
         REAL*8     pi,rad
         common /rconst/rad,pi
 C
+
+       CALL INITIZE
+
       IF (iyr.LT.1901 .OR. iyr.GT.2099) RETURN
 C
       fday = secs/86400.D0
