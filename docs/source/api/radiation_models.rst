@@ -346,7 +346,8 @@ Effect models
    * at the transmission surface of a plane slab, as a function of slab
      thickness; irradiation is from one side only.
    * at the centre of a solid sphere, as a function of sphere radius;
-     irradiation is from all directions.
+     irradiation is from one hemisphere only (i.e., half the dose at the 
+     center of the solid sphere)
 
    .. note::
       
