@@ -101,7 +101,7 @@ else
 
     nanpad = nan(Nmax-N,1);
     date = [date(:);nanpad];
-    [iyear,idoy,UT] = onera_desp_lib_matlabd2yds(date);
+    [~,idoy,UT] = onera_desp_lib_matlabd2yds(date);
     Ap = [Ap;repmat(nanpad,1,size(Ap,2))];
     if WhichAp==1
         Ap = [Ap,nan(Nmax,6)]; % add extra columns

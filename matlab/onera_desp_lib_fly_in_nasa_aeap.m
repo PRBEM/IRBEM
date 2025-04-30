@@ -55,7 +55,7 @@ else
     end
 end
 
-if length(matlabd)==1
+if isscalar(matlabd)
     matlabd = repmat(matlabd,length(x1));
 end
 
