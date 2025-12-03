@@ -80,6 +80,7 @@ C
        common /rconst/rad,pi
 C
 C
+        Ilflag = 0
        Nder=Nder_def*r_resol
        Nreb=Nreb_def
        Ntet=Ntet_def*t_resol
@@ -286,14 +287,10 @@ C
         phi(I) = phi(I-1)+2.D0*pi/Nder
         Iflag_I = 0
 c	write(6,*)tet(I)
-	IF (Ilflag.EQ.0) THEN
          tetl = tet(I-1)
 	 IF (I.GT.2) tetl = 2.D0*tet(I-1)-tet(I-2)
          tet1 = tetl
-	ELSE
-	 tetl = tet(I)
-	 tet1 = tetl
-	ENDIF
+
 c	write(6,*)tetl
 c	read(5,*)
 	leI1 = baddata
