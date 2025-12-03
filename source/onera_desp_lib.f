@@ -130,13 +130,14 @@ c        if (alti .le. 50.) ifail=-10 ! removed by TPO, 5/31/2011 - why would we
               GOTO 99
              endif
 c
+            Ilflag=0
            CALL calcul_Lstar_opt(t_resol,r_resol,XGeo
      &     ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
-           if (Ilflag_old .eq.1 .and. Lstar(isat).eq. Baddata) then
-            Ilflag=0
-              CALL calcul_Lstar_opt(t_resol,r_resol,xGeo
-     &        ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
-         endif
+c        if (Ilflag_old .eq.1 .and. Lstar(isat).eq. Baddata) then
+c         Ilflag=0
+c           CALL calcul_Lstar_opt(t_resol,r_resol,xGeo
+c  &        ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
+c      endif
          Ilflag_old=Ilflag
 
 99         continue
