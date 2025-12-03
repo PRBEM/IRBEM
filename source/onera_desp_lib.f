@@ -64,7 +64,7 @@ c declare inputs
 c
 c Declare internal variables
       INTEGER*4    isat,iyear,kint,ifail
-        INTEGER*4    t_resol,r_resol,Ilflag,Ilflag_old
+        INTEGER*4    t_resol,r_resol
       REAL*8     mlon,mlon1
       REAL*8     xGEO(3),xMAG(3),xSUN(3),rM,MLAT
       real*8     alti,lati,longi
@@ -75,12 +75,9 @@ c Declare output variables
         REAL*8     Lm(ntime_max),Lstar(ntime_max)
 C
       COMMON /magmod/k_ext,k_l,kint
-        COMMON /flag_L/Ilflag
         DATA  xSUN /1.d0,0.d0,0.d0/
       integer*4 int_field_select, ext_field_select
 C
-      Ilflag=0
-      Ilflag_old=Ilflag
       if (options(3).lt.0 .or. options(3).gt.9) options(3)=0
       t_resol=options(3)+1
       r_resol=options(4)+1
@@ -130,15 +127,8 @@ c        if (alti .le. 50.) ifail=-10 ! removed by TPO, 5/31/2011 - why would we
               GOTO 99
              endif
 c
-            Ilflag=0
            CALL calcul_Lstar_opt(t_resol,r_resol,XGeo
      &     ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
-c        if (Ilflag_old .eq.1 .and. Lstar(isat).eq. Baddata) then
-c         Ilflag=0
-c           CALL calcul_Lstar_opt(t_resol,r_resol,xGeo
-c  &        ,Lm(isat),Lstar(isat),XJ(isat),BLOCAL(isat),BMIN(isat))
-c      endif
-         Ilflag_old=Ilflag
 
 99         continue
 
