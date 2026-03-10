@@ -210,7 +210,7 @@ c
        endif
 c
 c Case for Tsyganenko dynamic mag model 01 storm (use of GSM coordinates)
-c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT), G1,G2
+c inputs is SW pressure, (nPa), DST (nT), ByIMF and BzIMF (nT), G2,G3
 c
        if (k_ext .eq. 10) then
           PARMOD(1)=Pdyn_nPa
@@ -224,7 +224,7 @@ c
            Ifail=-1
            RETURN
         ENDIF
-          CALL T01_01(PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
+          CALL T01_S(PARMOD,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),
      &      BxSM(3))
           CALL GSM_GEO(BxSM,Bxext)
        endif
