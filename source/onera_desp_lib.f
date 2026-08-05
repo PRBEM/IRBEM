@@ -866,7 +866,7 @@ c
          WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
          WRITE(6,*)
       ENDIF
-      if (kext .gt. 14) THEN
+      if (kext .gt. 15) THEN
          k_ext=5
          WRITE(6,*)
          WRITE(6,*)'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
@@ -1288,10 +1288,38 @@ c     &         maginput(1).gt.90.d0) return
 c           ifail = 0
 c           return
 c        endif
-       print *, ' invalid kext'
 
-       return
-       end
+c
+c
+        if (kext .eq. 15) then
+c
+c            write(6,*) "Kp", maginput(1)
+            if (maginput(1).eq.baddata) return
+            if (maginput(1).lt.0.d0 .or. maginput(1).gt.90.d0) return
+c
+            if (maginput(1).lt.7.d0) Activ=1
+            if (maginput(1).ge.7.d0 .and. maginput(1).lt.17.d0) Activ=2
+            if (maginput(1).ge.17.d0 .and. maginput(1).lt.27.d0) Activ=3
+            if (maginput(1).ge.27.d0 .and. maginput(1).lt.37.d0) Activ=4
+            if (maginput(1).ge.37.d0 .and. maginput(1).lt.47.d0) Activ=5
+            if (maginput(1).ge.47.d0 .and. maginput(1).lt.57.d0) Activ=6
+            if (maginput(1).ge.57.d0) Activ=7
+c
+            if (maginput(2).eq.baddata .or. maginput(2).eq.99999) then
+                fkp=maginput(1)*1.d0/10.d0
+C               fit average Dst per Kp classes from OMNI dataset 1963 - 2026                
+                dst_nt = -1.d0 * exp(1.7 + fkp / 2.5)
+            else
+                dst_nt = maginput(2)
+            endif
+            ifail=0
+            return
+        endif
+
+        print *, ' invalid kext'
+
+        return
+        end
 
 c Wrapper and procedure to access many coordinate transformation form the
 c ONERA library

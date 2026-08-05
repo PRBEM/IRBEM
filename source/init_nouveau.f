@@ -313,6 +313,22 @@ c less based on the current (at the time) expansion:
                     ! included through the TS07D common block
           CALL GSM_GEO(BxSM,Bxext)
        endif
+c
+c Case for Tsyganenko 89c with Boberg extension reffited for T89c
+c GSM coordinates
+c Inputs can be Kp or (Kp, Dst)
+c This field model is only valid for rGEO<70 Re
+        if (k_ext .eq. 15) then
+            IF (xGEO(1)*xGEO(1)+xGEO(2)*xGEO(2)+xGEO(3)*xGEO(3).GT.4900.D0) THEN
+                Ifail=-1
+                RETURN
+            ENDIF
+        CALL GEO_GSM(xGEO,xSM)
+        IOPT=Activ
+c        WRITE(6,*) "T89BOB CALLED WITH IOPT", IOPT, "DST", dst_nt
+        CALL T89CBOBERG(IOPT,dst_nt,xSM(1),xSM(2),xSM(3),BxSM(1),BxSM(2),BxSM(3))
+        CALL GSM_GEO(BxSM,Bxext)
+       endif
 
        Bl = 0.D0
        DO I = 1,3
