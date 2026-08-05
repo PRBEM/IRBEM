@@ -65,7 +65,15 @@ Key    Magnetic field name                               Comments
 12     Alexeev [2000], also known as Paraboloid model    - uses Dsw_, Vsw_, Dst_, Bz_, AL_
 13     Tsyganenko [2007]
 14     Mead-Tsyganenko                                   - uses Kp_
-                                                         - onera model where the Tsyganenko 89 model is best fitted by a Mead model     
+                                                         - onera model where the Tsyganenko 89 model is best fitted by a Mead model
+15     Tsyganenko [1989c] + P. Boberg extension          - uses Kp_, Dst_
+                                                         - Based on T89a P. Boberg extension (https://doi.org/10.1029/95GL00948)
+                                                         - Refitted on T89c by N. Larsen
+                                                         - Behavior :
+                                                            - if Kp_ < 57, same as model 4 (T89c)
+                                                            - if Kp_ >= 57
+                                                                - if Dst_ is IRBEM BADDATA (-1e31) or OMNI BADDATA (99999) -> uses Dst=f(Kp) fit (based on average Dst as a function of Kp class)
+                                                                - else -> uses provided Dst_ 
 =====  ================================================  ==========
 
 .. note::
