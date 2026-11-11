@@ -1,5 +1,5 @@
-<!-- %***************************************************************************************************
-% Copyright 2004,2006, S. Bourdarie
+function igrf_version = onera_desp_lib_igrf_version()
+%***************************************************************************************************
 %
 % This file is part of IRBEM-LIB.
 %
@@ -15,18 +15,14 @@
 %
 %    You should have received a copy of the GNU Lesser General Public License
 %    along with IRBEM-LIB.  If not, see <http://www.gnu.org/licenses/>.
-% -->
-<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
-<html>
-<head>
-<title> IRBEM library user's guide</title>
-<LINK REL="SHORTCUT ICON" HREF="frames/favicon.ico">
-</head>
-<frameset rows="15%,*">
-  <frame src="frames/header.html" name="header">
- <frameset cols="25%,75%">
-  <frame src="frames/category-menus.html" name="left">
-  <frame src="frames/introduction.html" name="right">
- </frameset>
-</frameset>
-</html>
+%***************************************************************************************************
+%
+% igrf_version = onera_desp_lib_igrf_version()
+% size of ntime dimension in fortran arrays
+
+onera_desp_lib_load;
+
+nPtr = libpointer('int32Ptr',-1);
+calllib('onera_desp_lib','get_igrf_version_',nPtr);
+igrf_version = double(nPtr.value);
+

@@ -8,12 +8,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ['3.8', '3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
@@ -31,6 +31,82 @@ jobs:
       run: |
         make OS=linux64 ENV=gfortran64 all
         make OS=linux64 ENV=gfortran64 install
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Python wrapper
+      run: |
+        cd python
+        python3 -m pip install -r requirements.txt
+        python3 -m pip install pytest
+
+    - name: Run Python tests
+      run: |
+        pytest
+
+  build-osx:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Show gfortran version
+      run: gfortran-12 --version
+
+    - name: Build
+      shell: bash
+      run: |
+        make OS=osx64 ENV=github all
+        make OS=osx64 ENV=github install
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Python wrapper
+      run: |
+        cd python
+        python3 -m pip install -r requirements.txt
+        python3 -m pip install pytest
+
+    - name: Run Python tests
+      run: |
+        pytest
+
+  build-win:
+    runs-on: windows-2019
+
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # - uses: msys2/setup-msys2@v2
+
+    - name: Add gfortran to PATH
+      shell: bash
+      run: |
+        # $env:PATH = "C:\msys64\mingw64\bin;C:\msys64\usr\bin;$env:PATH"
+        # gfortran --version
+        echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
+        echo "C:\msys64\usr\bin" >> $GITHUB_PATH
+        echo $(gfortran --version)
+
+    - name: Build
+      shell: bash
+      run: |
+        make OS=win64 ENV=gfortran64 all
+        make OS=win64 ENV=gfortran64 install
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2

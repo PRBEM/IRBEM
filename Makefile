@@ -37,6 +37,28 @@ $(SRC_DIR)/fortran_release.inc :
 
 .PHONY : $(SRC_DIR)/fortran_version.inc $(SRC_DIR)/fortran_release.inc
 
+# Help text (as per README.install)
+all.help:
+	@if `type -p more > /dev/null 2>&1` ; then \
+	   more compile/Help.all ; \
+	 else \
+	   less compile/Help.all ; \
+	 fi
+
+install.help:
+	@if `type -p more > /dev/null 2>&1` ; then \
+	   more compile/Help.install ; \
+	 else \
+	   less compile/Help.install ; \
+	 fi
+
+test.help:
+	@if `type -p more > /dev/null 2>&1` ; then \
+	   more compile/Help.test ; \
+	 else \
+	   less compile/Help.test ; \
+	 fi
+
 #------------------------------------------------------------------------------
 #     myOwnMagField
 #     Set the MYOWNMAGFIELD_DIR parameter to directory containing the fields
