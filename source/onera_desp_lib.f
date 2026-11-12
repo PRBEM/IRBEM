@@ -1290,7 +1290,7 @@ c           return
 c        endif
 
 c
-c
+c       Tsyganenko89 + Boberg extension
         if (kext .eq. 15) then
 c
 c            write(6,*) "Kp", maginput(1)
