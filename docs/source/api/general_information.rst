@@ -70,8 +70,8 @@ Key    Magnetic field name                               Comments
                                                          - Based on T89a P. Boberg extension (https://doi.org/10.1029/95GL00948)
                                                          - Refitted on T89c by N. Larsen
                                                          - Behavior :
-                                                            - if Kp_ < 57, same as model 4 (T89c)
-                                                            - if Kp_ >= 57
+                                                            - if Kp_ <= 5+, same as model 4 (T89c)
+                                                            - if Kp_ >= 6-
                                                                 - if Dst_ is IRBEM BADDATA (-1e31) or OMNI BADDATA (99999) -> uses Dst=f(Kp) fit (based on average Dst as a function of Kp class)
                                                                 - else -> uses provided Dst_ 
 =====  ================================================  ==========
