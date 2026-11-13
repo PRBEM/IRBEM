@@ -1307,8 +1307,10 @@ c
 c
             if (maginput(2).eq.baddata .or. maginput(2).eq.99999) then
                 fkp=maginput(1)*1.d0/10.d0
-C               fit average Dst per Kp classes from OMNI dataset 1963 - 2026                
-                dst_nt = -1.d0 * exp(1.7 + fkp / 2.5)
+c               Estimate Dst from Kp using the empirical average relationship
+c               shown in Fig 10. of: https://doi.org/10.1016/j.asr.2023.03.012
+c               Smart, Shea et al. (2023), Advances in Space Research
+                dst_nt = -1.d0*10.0**(0.15d0*fkp + 0.92d0)
             else
                 dst_nt = maginput(2)
             endif
