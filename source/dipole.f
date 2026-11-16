@@ -18,7 +18,7 @@
 !
 C
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-C dipole tilte decentre
+C Eccentric Tilted Dipole
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
        SUBROUTINE DTD(xGEO,yGEO,zGEO,BxGEO,ByGEO,BzGEO)
@@ -105,31 +105,3 @@ C
        RETURN
        END
 C
-C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-C   Init centered dipole !!! BE CAREFUL : need to be called after
-C                            INIT_DTD
-C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-C
-       SUBROUTINE INIT_CD
-C
-       IMPLICIT NONE
-C
-       REAL*8    xc,yc,zc                  !Re
-       REAL*8    ct,st,cp,sp
-       REAL*8    Bo
-C
-       COMMON /dipigrf/Bo,xc,yc,zc,ct,st,cp,sp
-C
-C  Centered dipole !
-       xc = 0.d0
-       yc = 0.d0
-       zc = 0.d0
-       ct = 1.d0
-       st = 0.d0
-       cp = 1.d0
-       sp = 0.d0
-C
-       RETURN
-       END
-C
-C++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
