@@ -224,6 +224,10 @@ Key    Name       Description
 =====  =========  ========================
 
 .. note::
+
+   Whenever a coordinate system refers to the *dipole axis*, it refers to the axis whose orientation is determined by the IGRF model, regardless of the internal magnetic field model selected.
+
+.. note::
    
    Four geocentric equatorial inertial systems are in widespread use. These
    are J2000, MOD (Mean of Date), TOD, and TEME. J2000 defines the axes
