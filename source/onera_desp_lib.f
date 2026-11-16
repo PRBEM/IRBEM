@@ -912,7 +912,6 @@ c
             else
               CALL INIT_DTD(dec_year)
             endif
-            if (kint .eq. 5) CALL INIT_CD
           endif
         else
           if (iyearsat .ne. iyear .or.
