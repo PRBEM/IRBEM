@@ -30,6 +30,8 @@ jobs:
 
     - name: Set up Python
       uses: actions/setup-python@v7
+      with:
+        python_version: "3.15"
 
     - name: Install Python wrapper
       run: |
@@ -58,6 +60,8 @@ jobs:
 
     - name: Set up Python
       uses: actions/setup-python@v7
+      with:
+        python_version: "3.15"
 
     - name: Install Python wrapper
       run: |
@@ -94,6 +98,8 @@ jobs:
 
     - name: Set up Python
       uses: actions/setup-python@v7
+      with:
+        python_version: "3.15"
 
     - name: Install Python wrapper
       run: |
