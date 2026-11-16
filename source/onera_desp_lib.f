@@ -907,10 +907,10 @@ c
           if (iyearsat .ne. iyear) then
             iyear=iyearsat
             dec_year=iyear+0.5d0
+            CALL INIT_DTD(dec_year)
             if (Kint .eq. 4) then
               call myOwnMagField_init(dec_year)
             endif
-            CALL INIT_DTD(dec_year)
           endif
         else
           if (iyearsat .ne. iyear .or.
@@ -922,10 +922,10 @@ c
             if (currentdoy .eq. 0) currentdoy=1
             dec_year=iyear+currentdoy*1.d0/
      &             ((lastDecember-firstJanuary+1)*1.d0)
+            CALL INIT_DTD(dec_year)
             if (Kint .eq. 4) then
               call myOwnMagField_init(dec_year)
             endif
-            CALL INIT_DTD(dec_year)
           endif
         endif
       endif
