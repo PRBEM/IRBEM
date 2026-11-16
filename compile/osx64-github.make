@@ -11,9 +11,9 @@
 #     INSTALL_LIB_NAME : Name of the installed library file
 #------------------------------------------------------------------------------
 
-FC = gfortran-12
+FC = gfortran-15
 CC = gcc
-LD = gfortran-12
+LD = gfortran-15
 
 FFLAGS=-fpic -fno-second-underscore -std=legacy -ffixed-line-length-none
 CFLAGS=-fpic

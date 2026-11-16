@@ -1,13 +1,15 @@
 name: documentation
 
-on: [push, pull_request, workflow_dispatch]
-
+on:
+  push:
+    branches: [ main ]
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
       - name: Install dependencies
         run: |
           pip install sphinx pydata-sphinx-theme

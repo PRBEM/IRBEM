@@ -11,12 +11,8 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10']
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
 
     - name: Install gfortran
       run: |
@@ -32,10 +28,8 @@ jobs:
         make OS=linux64 ENV=gfortran64 all
         make OS=linux64 ENV=gfortran64 install
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Set up Python
+      uses: actions/setup-python@v7
 
     - name: Install Python wrapper
       run: |
@@ -50,15 +44,11 @@ jobs:
   build-osx:
     runs-on: macos-latest
 
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10']
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
 
     - name: Show gfortran version
-      run: gfortran-12 --version
+      run: gfortran-15 --version
 
     - name: Build
       shell: bash
@@ -66,10 +56,8 @@ jobs:
         make OS=osx64 ENV=github all
         make OS=osx64 ENV=github install
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Set up Python
+      uses: actions/setup-python@v7
 
     - name: Install Python wrapper
       run: |
@@ -84,12 +72,8 @@ jobs:
   build-win:
     runs-on: windows-2019
 
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10']
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
 
     # - uses: msys2/setup-msys2@v2
 
@@ -108,10 +92,8 @@ jobs:
         make OS=win64 ENV=gfortran64 all
         make OS=win64 ENV=gfortran64 install
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+    - name: Set up Python
+      uses: actions/setup-python@v7
 
     - name: Install Python wrapper
       run: |
