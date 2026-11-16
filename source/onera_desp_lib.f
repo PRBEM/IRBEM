@@ -909,9 +909,8 @@ c
             dec_year=iyear+0.5d0
             if (Kint .eq. 4) then
               call myOwnMagField_init(dec_year)
-            else
-              CALL INIT_DTD(dec_year)
             endif
+            CALL INIT_DTD(dec_year)
           endif
         else
           if (iyearsat .ne. iyear .or.
@@ -925,9 +924,8 @@ c
      &             ((lastDecember-firstJanuary+1)*1.d0)
             if (Kint .eq. 4) then
               call myOwnMagField_init(dec_year)
-            else
-              CALL INIT_DTD(dec_year)
             endif
+            CALL INIT_DTD(dec_year)
           endif
         endif
       endif
