@@ -92,7 +92,7 @@ if delOutFile
     % 6: longitude (deg)
     % 26/01/2007   0: 4:59.999982 2007.06850263      20096.506220        -0.002629      -124.124210
     % 26/01/2007   0:10: 0.000004 2007.06851218      20096.506204        -0.002508      -122.858292
-    [dd,mm,yyyy,hh,minute,ss,decyear,alt,lat,lon] = textread(OutFile,'%d/%d/%d %d:%d:%f %f %f %f %f');
+    [dd,mm,yyyy,hh,minute,ss,~,alt,lat,lon] = textread(OutFile,'%d/%d/%d %d:%d:%f %f %f %f %f');
 
     pos.date = datenum(yyyy,mm,dd,hh,minute,ss);
     pos.alt = alt;

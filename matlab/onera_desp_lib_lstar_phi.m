@@ -44,11 +44,11 @@ matlabd = datenum(matlabd);
 
 onera_desp_lib_load;
 
-if (numel(matlabd)==1) && (numel(in)>1)
+if (isscalar(matlabd)) && (numel(in)>1)
     matlabd = repmat(matlabd,size(in));
 end
 
-if (numel(in)==1) && (numel(matlabd)>1)
+if (isscalar(in)) && (numel(matlabd)>1)
     in = repmat(in,size(matlabd));
 end
 

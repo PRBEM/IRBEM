@@ -84,7 +84,7 @@ else
     end
 end
 
-if length(matlabd)==1
+if isscalar(matlabd)
     matlabd = repmat(matlabd,length(x1));
 end
 
@@ -115,7 +115,7 @@ Nmax = onera_desp_lib_ntime_max; % maximum array size in fortran library
 Flux = nan(Nmax,1);
 if isempty(Ap15)
     Ap15 = nan(1,Nmax);
-elseif length(Ap15)==1
+elseif isscalar(Ap15)
     Ap15 = repmat(Ap15,1,Nmax);
 else
     Ap15 = [Ap15(:)', nan(1,Nmax-ntime)];
